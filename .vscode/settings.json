@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "memlayout.h": "c",
+        "random": "c",
+        "fat32.h": "c",
+        "file.h": "c",
+        "spinlock.h": "c",
+        "types.h": "c",
+        "loongarch.h": "c"
+    }
+}

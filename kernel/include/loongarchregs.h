@@ -1,5 +1,3 @@
-
-
 #ifndef _LOONGARCHREGS_H
 #define _LOONGARCHREGS_H
 

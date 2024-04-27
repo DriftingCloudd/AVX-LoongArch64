@@ -1,5 +1,3 @@
-#include <larchintrin.h>
-
 #define  CSR_CRMD_IE_SHIFT		    2
 #define  CSR_CRMD_IE			        ( 0x1 << CSR_CRMD_IE_SHIFT )
 

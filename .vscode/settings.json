@@ -11,6 +11,7 @@
         "elf.h": "c",
         "thread.h": "c",
         "context.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "ring_buffer.h": "c"
     }
 }

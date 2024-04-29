@@ -2,6 +2,7 @@
 #include "include/proc.h"
 #include "include/string.h"
 
+//设置缓冲区自旋`
 struct spinlock ring_buffer_lock;
 
 /* wait until ring buffer is not empty or timeout */
@@ -40,7 +41,10 @@ void init_ring_buffer(struct ring_buffer *rbuf) {
 }
 
 int ring_buffer_used(struct ring_buffer *rbuf) {
+  // 首尾相同时表示缓冲区没有占用
+  // 反之， 用于表示占用
   return (rbuf->tail - rbuf->head + rbuf->size) % (rbuf->size);
+  
 }
 
 int ring_buffer_free(struct ring_buffer *rbuf) {

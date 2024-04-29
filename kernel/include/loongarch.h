@@ -313,3 +313,15 @@ intr_off()
 
 typedef uint64 pte_t;//typde of pte
 typedef uint64 *pagetable_t;
+
+// 补充函数
+// 
+static inline uint64
+r_time()
+{
+  uint64 x;
+  // asm volatile("csrr %0, time" : "=r" (x) );
+  // this instruction will trap in SBI
+  asm volatile("rdtime.d %0" : "=r" (x) );
+  return x;
+}

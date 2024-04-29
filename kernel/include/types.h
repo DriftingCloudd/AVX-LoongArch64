@@ -29,10 +29,11 @@ typedef uint64 pde_t;
 // for socket use
 typedef uint size_t;
 typedef int ssize_t;
-// typedef int in_addr_t;
-// typedef uint16 in_port_t;
-// typedef uint32 socklen_t;
-// typedef uint16 sa_family_t;
+typedef int in_addr_t;
+typedef uint16 in_port_t;
+typedef uint32 socklen_t;
+typedef uint16 sa_family_t;
+// 时间刻类型，获取方式在time.h中
 typedef int64 time_t;
 typedef int64 suseconds_t;
 #endif

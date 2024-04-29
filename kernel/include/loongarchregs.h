@@ -1,3 +1,4 @@
+// This file defines the register names and values for the LoongArch architecture.
 #ifndef _LOONGARCHREGS_H
 #define _LOONGARCHREGS_H
 

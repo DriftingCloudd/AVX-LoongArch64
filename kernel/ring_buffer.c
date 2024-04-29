@@ -9,7 +9,8 @@ struct spinlock ring_buffer_lock;
 /* wait success return 0, timeout return 1, error return -1 */
 int wait_ring_buffer_read(struct ring_buffer *rbuf, time_t final_ticks) {
   while (ring_buffer_empty(rbuf)) {
-    time_t now_ticks = r_time();
+    //r_time为获取时间戳定义，在头文件更新
+    time_t now_ticks = r_time(); 
     if (final_ticks < now_ticks)
       return 1;
     yield(); // give up CPU

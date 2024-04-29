@@ -44,6 +44,8 @@
 struct cpu {
   struct proc *proc;          // The process running on this cpu, or null.
   struct context context;     // swtch() here to enter scheduler().
+  // 中断保存，禁用中断
+  // noff存放push_off() 深度：push_off() 被intr_off()替代
   int noff;                   // Depth of push_off() nesting.
   int intena;                 // Were interrupts enabled before push_off()?
 };

@@ -3,7 +3,7 @@
 
 // #include <larchintrin.h>
 #include "types.h"
-
+#define  NULL                     0
 #define  CSR_CRMD_IE_SHIFT		    2
 #define  CSR_CRMD_IE			        ( 0x1 << CSR_CRMD_IE_SHIFT )
 

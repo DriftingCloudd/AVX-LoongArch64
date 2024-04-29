@@ -10,7 +10,7 @@
 // are initially off, then push_off, pop_off leaves them off.
 
 void push_off(void) {
-  int old = intr_get();
+  int old = intr_get(); 
 
   intr_off();
   // printf("\e[32mpush_off()\e[0m: cpuid(): %d\n", cpuid());

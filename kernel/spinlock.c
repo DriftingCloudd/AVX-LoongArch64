@@ -19,6 +19,7 @@ void initlock(struct spinlock *lk, char *name) {
 // Loops (spins) until the lock is acquired.
 void acquire(struct spinlock *lk) {
   push_off(); // disable interrupts to avoid deadlock.
+  // 以下是原本注释，我认为很有意义
   // if(!(lk->name[0] == 'k' && lk->name[1] == 'm' && lk->name[2] == 'e' &&
   // lk->name[3] == 'm')
   // && !(lk->name[0] == 'p' && lk->name[1] == 'r' && lk->name[2] == 'o' &&
@@ -38,8 +39,7 @@ void acquire(struct spinlock *lk) {
   //   a5 = 1
   //   s1 = &lk->locked
   //   amoswap.w.aq a5, a5, (s1)
-  while (__sync_lock_test_and_set(&lk->locked, 1) != 0)
-    ;
+  while (__sync_lock_test_and_set(&lk->locked, 1) != 0);
 
   // Tell the C compiler and the processor to not move loads or stores
   // past this point, to ensure that the critical section's memory
@@ -63,7 +63,8 @@ void release(struct spinlock *lk) {
   // section are visible to other CPUs before the lock is released,
   // and that loads in the critical section occur strictly before
   // the lock is released.
-  // On RISC-V, this emits a fence instruction.
+  
+  // 顺序化
   __sync_synchronize();
 
   // Release the lock, equivalent to lk->locked = 0.
@@ -94,6 +95,6 @@ void release(struct spinlock *lk) {
 // Interrupts must be off.
 int holding(struct spinlock *lk) {
   int r;
-  r = (lk->locked && lk->cpu == mycpu());
+  r = (lk->locked && lk->cpu == mycpu()); //判断是否被当前cpu占用
   return r;
 }

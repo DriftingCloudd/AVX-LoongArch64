@@ -124,6 +124,7 @@ int cpuid() {
 // Return this CPU's cpu struct.
 // Interrupts must be disabled.
 struct cpu *mycpu(void) {
+  // 通过进程id判断是我cpu占用
   int id = cpuid();
   struct cpu *c = &cpus[id];
 

@@ -78,6 +78,7 @@ size_t read_ring_buffer(struct ring_buffer *rbuf, char *buf, size_t size) {
     if (rbuf->head + len > rbuf->size) {
       int right = rbuf->size - rbuf->head, left = len - right;
       // memcpy(buf, rbuf->buf + rbuf->head, right);
+      // 复制
       copyout(myproc()->pagetable, (uint64)buf, rbuf->buf + rbuf->head, right);
       // memcpy(buf + right, rbuf->buf, left);
       copyout(myproc()->pagetable, (uint64)buf + right, rbuf->buf, left);

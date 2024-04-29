@@ -52,6 +52,7 @@ extern struct cpu cpus[NCPU];
 
 enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+// 标准的riscv 进程结构体，未经修改可以使用
 // Per-process state
 struct proc {
   struct spinlock lock;

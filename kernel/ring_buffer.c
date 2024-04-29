@@ -2,6 +2,11 @@
 #include "include/proc.h"
 #include "include/string.h"
 
+#ifndef min
+#define min(x, y) ((x) < (y) ? (x) : (y))
+#endif
+
+
 //设置缓冲区自旋`
 struct spinlock ring_buffer_lock;
 
@@ -31,16 +36,18 @@ int wait_ring_buffer_write(struct ring_buffer *rbuf, time_t final_ticks) {
 }
 
 void init_ring_buffer(struct ring_buffer *rbuf) {
+  // 环形缓冲区的末尾不应该被访问，读写
   // there is always one byte which should not be read or written
   // memset(rbuf, 0, sizeof(struct ring_buffer)); /* head = tail = 0 */
   memset(rbuf, 0, RING_BUFFER_SIZE); /* head = tail = 0 */
   rbuf->size = RING_BUFFER_SIZE;
   // WH ADD
   // rbuf->buf = kmalloc(PAGE_SIZE);
+  // 初始化缓冲区 spinlock
   initlock(&ring_buffer_lock, "ring_buffer_lock");
   return;
 }
-
+// 缓冲区空判断
 int ring_buffer_used(struct ring_buffer *rbuf) {
   // 首尾相同时表示缓冲区没有占用
   // 反之， 用于表示占用
@@ -54,19 +61,17 @@ int ring_buffer_free(struct ring_buffer *rbuf) {
 }
 
 int ring_buffer_empty(struct ring_buffer *rbuf) {
-  return ring_buffer_used(rbuf) == 0;
+  return ring_buffer_used(rbuf) == 0; 
 }
 
 int ring_buffer_full(struct ring_buffer *rbuf) {
   return ring_buffer_free(rbuf) == 0;
 }
 
-#ifndef min
-#define min(x, y) ((x) < (y) ? (x) : (y))
-#endif
 
 // buf是用户空间地址
 size_t read_ring_buffer(struct ring_buffer *rbuf, char *buf, size_t size) {
+  // 获得spinlock
   acquire(&ring_buffer_lock);
   int len = min(ring_buffer_used(rbuf), size);
   if (len > 0) {

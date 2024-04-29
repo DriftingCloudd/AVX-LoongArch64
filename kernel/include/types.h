@@ -34,6 +34,7 @@ typedef uint16 in_port_t;
 typedef uint32 socklen_t;
 typedef uint16 sa_family_t;
 // 时间刻类型，获取方式在time.h中
-typedef int64 time_t;
+// 时间戳类型
+typedef int64 time_t; 
 typedef int64 suseconds_t;
 #endif

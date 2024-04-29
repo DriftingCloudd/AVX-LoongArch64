@@ -268,6 +268,7 @@ static inline void iocsr_writeq(uint64 val, uint32 reg)
 static inline int
 intr_get()
 {
+  // 读crmd寄存器
   uint32 x = r_csr_crmd();
   return (x & CSR_CRMD_IE) != 0;
 }

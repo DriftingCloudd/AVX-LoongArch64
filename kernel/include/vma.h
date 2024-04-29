@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "proc.h"
+//vma :proc相关的 vm处理
 
 #define INIT_STACK_SIZE 100 * PGSIZE
 #define INCREASE_STACK_SIZE_PER_FAULT 100 * PGSIZE

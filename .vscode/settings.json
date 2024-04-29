@@ -6,6 +6,10 @@
         "file.h": "c",
         "spinlock.h": "c",
         "types.h": "c",
-        "loongarch.h": "c"
+        "loongarch.h": "c",
+        "proc.h": "c",
+        "elf.h": "c",
+        "thread.h": "c",
+        "context.h": "c"
     }
 }

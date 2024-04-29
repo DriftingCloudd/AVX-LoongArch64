@@ -5,7 +5,7 @@
 #include "include/param.h"
 #include "include/printf.h"
 #include "include/proc.h"
-#include "include/riscv.h"
+#include "include/loongarch.h"
 #include "include/string.h"
 #include "include/types.h"
 #include "include/uart8250.h"

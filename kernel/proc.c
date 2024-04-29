@@ -7,7 +7,6 @@
 #include "include/memlayout.h"
 #include "include/param.h"
 #include "include/printf.h"
-#include "include/riscv.h"
 #include "include/loongarch.h"
 #include "include/spinlock.h"
 #include "include/string.h"
@@ -38,23 +37,23 @@ extern thread threads[];
 extern char trampoline[];       // trampoline.S
 extern char signalTrampoline[]; // signalTrampoline.S
 
-void reg_info(void) {
-  printf("register info: {\n");
-  printf("sstatus: %p\n", r_sstatus());
-  printf("sip: %p\n", r_sip());
-  printf("sie: %p\n", r_sie());
-  printf("sepc: %p\n", r_sepc());
-  printf("stvec: %p\n", r_stvec());
-  printf("satp: %p\n", r_satp());
-  printf("scause: %p\n", r_scause());
-  printf("stval: %p\n", r_stval());
-  printf("sp: %p\n", r_sp());
-  printf("tp: %p\n", r_tp());
-  printf("ra: %p\n", r_ra());
-  printf("}\n");
-}
+// void reg_info(void) {
+//   printf("register info: {\n");
+//   printf("sstatus: %p\n", r_sstatus());
+//   printf("sip: %p\n", r_sip());
+//   printf("sie: %p\n", r_sie());
+//   printf("sepc: %p\n", r_sepc());
+//   printf("stvec: %p\n", r_stvec());
+//   printf("satp: %p\n", r_satp());
+//   printf("scause: %p\n", r_scause());
+//   printf("stval: %p\n", r_stval());
+//   printf("sp: %p\n", r_sp());
+//   printf("tp: %p\n", r_tp());
+//   printf("ra: %p\n", r_ra());
+//   printf("}\n");
+// }
 
-void cpuinit(void) {
+void cpuinit(void) { //smp
   struct cpu *it;
   for (it = cpus; it < &cpus[NCPU]; it++) {
     it->proc = 0;

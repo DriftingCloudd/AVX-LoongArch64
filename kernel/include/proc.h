@@ -89,6 +89,7 @@ struct proc {
   int thread_num;
   int char_count;   // not used
   uint64 clear_child_tid;
+  
   //signal
   sigaction sigaction[SIGRTMAX + 1]; // signal action
   __sigset_t sig_set; // signal mask

@@ -1,3 +1,6 @@
+#include "types.h"
+#include "loongarch.h"
+
 struct buf;
 struct context;
 struct file;

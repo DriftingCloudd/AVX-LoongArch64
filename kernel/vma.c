@@ -5,7 +5,7 @@
 #include "include/param.h"
 #include "include/printf.h"
 #include "include/proc.h"
-#include "include/riscv.h"
+#include "include/loongarch.h"
 #include "include/string.h"
 #include "include/types.h"
 #include "include/vm.h"
@@ -27,7 +27,7 @@ struct vma *vma_init(struct proc *p) {
   vma->type = NONE;
   vma->prev = vma->next = vma;
   p->vma = vma;
-
+// 进程状态
   if (NULL == alloc_mmap_vma(p, 0, USER_MMAP_START, 0, 0, 0, 0)) {
     // free_vma_list(p);
     kfree(vma);

@@ -5,23 +5,23 @@
 _entry:
         # entry只对每个CPU设定自己的栈空间，然后跳转到main函数
 
-        # li.d        $t0, 0x8000000000000000   
-        # csrwr       $t0, LOONGARCH_CSR_DMWIN0   # 设置设备操作空间
-        # li.d        $t0, 0x9000000000000000   
-        # csrwr       $t0, LOONGARCH_CSR_DMWIN1   # 设置指令数据访问空间
-        # li.d        $t0, 0x0000000000000000
-        # csrwr       $t0, LOONGARCH_CSR_DMWIN2
-        # csrwr       $t0, LOONGARCH_CSR_DMWIN3
-        # csrwr       $t0, LOONGARCH_CSR_TLBRENTRY   # 关闭TLB，其他两个窗口不用管
+        li.d        $t0, 0x8000000000000000   
+        csrwr       $t0, LOONGARCH_CSR_DMWIN0   # 设置设备操作空间
+        li.d        $t0, 0x9000000000000000   
+        csrwr       $t0, LOONGARCH_CSR_DMWIN1   # 设置指令数据访问空间
+        li.d        $t0, 0x0000000000000000
+        csrwr       $t0, LOONGARCH_CSR_DMWIN2
+        csrwr       $t0, LOONGARCH_CSR_DMWIN3
+        csrwr       $t0, LOONGARCH_CSR_TLBRENTRY   # 关闭TLB，其他两个窗口不用管
 
-        # li.w	    $t0, 0xb0		      # PLV=0, IE=0, PG=1
-	# csrwr	    $t0, LOONGARCH_CSR_CRMD
-        # li.w        $t0, 0x00                 # PPLV=0, PIE=0, PWE=0
-        # csrwr       $t0, LOONGARCH_CSR_PRMD
-        # li.w        $t0, 0x00                 # FPE=0, SXE=0, ASXE=0, BTE=0
-        # csrwr       $t0, LOONGARCH_CSR_EUEN
+        li.w	    $t0, 0xb0		      # PLV=0, IE=0, PG=1
+	csrwr	    $t0, LOONGARCH_CSR_CRMD
+        li.w        $t0, 0x00                 # PPLV=0, PIE=0, PWE=0
+        csrwr       $t0, LOONGARCH_CSR_PRMD
+        li.w        $t0, 0x00                 # FPE=0, SXE=0, ASXE=0, BTE=0
+        csrwr       $t0, LOONGARCH_CSR_EUEN
 
-        # invtlb      0x0,$zero,$zero # 清除所有页表项
+        invtlb      0x0,$zero,$zero # 清除所有页表项
 	# set up a stack for C.
         # boot_stack_top is declared in start.c,
         # with a 4096-byte stack per CPU.

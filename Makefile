@@ -183,6 +183,9 @@ LDFLAGS = -z max-page-size=4096
 # 	@cd kernel && make -f net.mk liblwip.a
 
 # Compile Kernel
+$T/kernel.bin: $T/kernel
+	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
+
 $T/kernel: $(OBJS) $(linker) # $U/initcode
 	if [ ! -d "./target" ]; then mkdir target; fi
 	$(LD) $(LDFLAGS) -T $(linker) -o $T/kernel $(OBJS)

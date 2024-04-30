@@ -12,5 +12,12 @@
         "thread.h": "c",
         "context.h": "c",
         "string.h": "c"
-    }
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/dorain/git/AVX-LoongArch64/kernel",
+            "binaryPath": "/home/dorain/git/AVX-LoongArch64/kernel/entry",
+            "binaryArgs": []
+        }
+    ]
 }

@@ -8,7 +8,7 @@
 #define  CSR_CRMD_IE			        ( 0x1 << CSR_CRMD_IE_SHIFT )
 
 #define  EXT_INT_EN_SHIFT         48
-
+// 串口索引部分
 #define LOONGARCH_IOCSR_EXTIOI_EN_BASE		    0x1600
 #define LOONGARCH_IOCSR_EXTIOI_ISR_BASE		    0x1800
 #define LOONGARCH_IOCSR_EXTIOI_MAP_BASE       0x14c0

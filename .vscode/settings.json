@@ -12,6 +12,9 @@
         "thread.h": "c",
         "context.h": "c",
         "string.h": "c",
-        "ring_buffer.h": "c"
+        "ring_buffer.h": "c",
+        "printf.h": "c",
+        "param.h": "c",
+        "kalloc.h": "c"
     }
 }

@@ -63,7 +63,7 @@ struct proc {
 
   // p->lock must be held when using these:
   enum procstate state;        // Process state
-  struct proc *parent;         // Parent process
+
   void *chan;                  // If non-zero, sleeping on chan
   int killed;                  // If non-zero, have been killed
   int xstate;                  // Exit status to be returned to parent's wait
@@ -72,6 +72,10 @@ struct proc {
   int gid;                     // Process Group ID
   int pgid;
 
+  // wait_lock 
+  struct proc *parent;         // Parent process
+
+  // private
   uint64 filelimit;
 
   // these are private to the process, so p->lock need not be held.
@@ -87,7 +91,7 @@ struct proc {
   int *exec_close;             // Open files
   struct dirent *cwd;          // Current directory
   char name[16];               // Process name (debugging)
-  int tmask;                    // trace mask
+  int tmask;                   // trace mask
   struct vma *vma;
   int ktime;
   int utime;

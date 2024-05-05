@@ -29,6 +29,7 @@ struct spinlock pid_lock;
 
 extern void forkret(void);
 extern int magic_count;
+// swtch.S 实现 swtch
 extern void swtch(struct context *, struct context *);
 static void wakeup1(struct proc *chan);
 static void freeproc(struct proc *p);
@@ -37,22 +38,10 @@ extern thread threads[];
 extern char trampoline[];       // trampoline.S
 extern char signalTrampoline[]; // signalTrampoline.S
 
-// void reg_info(void) {
-//   printf("register info: {\n");
-//   printf("sstatus: %p\n", r_sstatus());
-//   printf("sip: %p\n", r_sip());
-//   printf("sie: %p\n", r_sie());
-//   printf("sepc: %p\n", r_sepc());
-//   printf("stvec: %p\n", r_stvec());
-//   printf("satp: %p\n", r_satp());
-//   printf("scause: %p\n", r_scause());
-//   printf("stval: %p\n", r_stval());
-//   printf("sp: %p\n", r_sp());
-//   printf("tp: %p\n", r_tp());
-//   printf("ra: %p\n", r_ra());
-//   printf("}\n");
-// }
+// reg_info
+// 批量输出寄存器属性
 
+// 正常：从cpu池中分配cpu
 void cpuinit(void) { //smp
   struct cpu *it;
   for (it = cpus; it < &cpus[NCPU]; it++) {
@@ -276,7 +265,7 @@ found:
   p->main_thread->kstack = p->kstack;
   p->thread_queue = p->main_thread;
   if (mappages(p->kpagetable, p->kstack - PGSIZE, PGSIZE,
-               (uint64)(p->main_thread->trapframe), PTE_R | PTE_W) < 0)
+               (uint64)(p->main_thread->trapframe), ~PTE_NR & PTE_W) < 0)
     panic("allocproc: map thread trapframe failed");
   p->main_thread->vtf = p->kstack - PGSIZE;
   return p;
@@ -354,20 +343,20 @@ pagetable_t proc_pagetable(struct proc *p) {
   // only the supervisor uses it, on the way
   // to/from user space, so not PTE_U.
   if (mappages(pagetable, TRAMPOLINE, PGSIZE, (uint64)trampoline,
-               PTE_R | PTE_X) < 0) {
+               ~(~PTE_NR & ~PTE_NX)) < 0) {
     uvmfree(pagetable, 0);
     return NULL;
   }
 
   // map the trapframe just below TRAMPOLINE, for trampoline.S.
   if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
-               PTE_R | PTE_W) < 0) {
+               ~PTE_NR & PTE_W) < 0) {
     vmunmap(pagetable, TRAMPOLINE, 1, 0);
     uvmfree(pagetable, 0);
     return NULL;
   }
   if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
-               PTE_R | PTE_X | PTE_U) < 0) {
+               PTE_P | PTE_MAT | PTE_PLV) < 0) {
     vmunmap(pagetable, TRAMPOLINE, 1, 0);
     vmunmap(pagetable, TRAPFRAME, 1, 0);
     uvmfree(pagetable, 0);
@@ -429,7 +418,7 @@ int growproc(int n) {
   sz = p->sz;
   if (n > 0) {
     if ((sz = uvmalloc(p->pagetable, p->kpagetable, sz, sz + n,
-                       PTE_R | PTE_W)) == 0) {
+                       ~PTE_NR & PTE_W)) == 0) {
       return -1;
     }
   } else if (n < 0) {
@@ -1076,14 +1065,14 @@ uint64 thread_clone(uint64 stackVa, uint64 ptid, uint64 tls, uint64 ctid) {
   thread *t = allocNewThread();
   t->p = p;
   if (mappages(p->kpagetable, p->kstack - PGSIZE * p->thread_num * 2, PGSIZE,
-               (uint64)(t->trapframe), PTE_R | PTE_W) < 0)
+               (uint64)(t->trapframe), ~PTE_NR & PTE_W) < 0)
     panic("thread_clone: mappages");
   t->vtf = p->kstack - PGSIZE * p->thread_num * 2;
   void *kstack_pa = kalloc();
   if (NULL == kstack_pa)
     panic("thread_clone: kalloc kstack failed");
   if (mappages(p->kpagetable, p->kstack - PGSIZE * (1 + p->thread_num * 2),
-               PGSIZE, (uint64)kstack_pa, PTE_R | PTE_W) < 0)
+               PGSIZE, (uint64)kstack_pa, ~PTE_NR & PTE_W) < 0)
     panic("thread_clone: mappages");
   thread_stack_param tmp;
 

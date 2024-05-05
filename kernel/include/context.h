@@ -21,6 +21,7 @@ typedef struct context { //上下文语法
   uint64 s9;
   uint64 s10;
   uint64 s11;
+  uint64 fp;
 }context;
 
 #endif

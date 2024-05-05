@@ -47,11 +47,13 @@ struct cpu {
   // 中断保存，禁用中断
   // noff存放push_off() 深度：push_off() 被intr_off()替代
   int noff;                   // Depth of push_off() nesting.
+  // 中断许可标志
   int intena;                 // Were interrupts enabled before push_off()?
 };
 
 extern struct cpu cpus[NCPU];
 
+// 进程状态
 enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // 标准的riscv 进程结构体，未经修改可以使用

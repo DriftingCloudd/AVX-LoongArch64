@@ -317,6 +317,7 @@ intr_off()
 
 #define MAXVA (1L << (9 + 12 - 1)) //Lower half virtual address
 
+
 typedef uint64 pte_t;//typde of pte
 typedef uint64 *pagetable_t;
 

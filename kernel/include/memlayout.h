@@ -7,7 +7,7 @@
 // 0x1fe001e0 -- uart16550 serial port
 // 0x90000000 -- RAM used by user pages
 
-#define DMWIN_MASK 0x9000000000000000
+// #define DMWIN_MASK 0x9000000000000000
 
 // qemu puts UART registers here in virtual memory.
 #define UART0 (0x1fe001e0UL | DMWIN_MASK)
@@ -88,6 +88,8 @@
 // unused RAM after 80000000.
 
 #define VIRT_OFFSET             0x3F00000000L
+// Direct Memory Window：直接内存映射窗口
+#define DMWIN_MASK 0x9000000000000000
 
 // qemu puts UART registers here in physical memory.
 #define UART                    0x10000000L

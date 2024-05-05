@@ -27,7 +27,7 @@ tlbinit(void)
 {
   asm volatile("invtlb  0x0,$zero,$zero");
   w_csr_stlbps(0xcU);
-  w_csr_asid(0x0U);//todo
+  w_csr_asid(0x0U);
   w_csr_tlbrehi(0xcU);
 }
 
@@ -36,6 +36,7 @@ void kvminit() {
   // 内核页表面
   tcpip_pagetable = NULL;
   kernel_pagetable = (pagetable_t)kalloc();
+
 #ifdef DEBUG
   printf("kernel_pagetable: %p\n", kernel_pagetable);
 #endif
@@ -100,7 +101,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
   for (int level = 3; level > 0; level--) {
     pte_t *pte = &pagetable[PX(level, va)];
     if (*pte & PTE_V) {
-      pagetable = (pagetable_t)PTE2PA(*pte);
+      pagetable = (pagetable_t)(PTE2PA(*pte) | DMWIN_MASK);    
     } else {
       if (!alloc || (pagetable = (pde_t *)kalloc()) == NULL) {
         // printf("walk: not valid\n");
@@ -110,6 +111,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
       *pte = PA2PTE(pagetable) | PTE_V;
     }
   }
+  // 返回页表的查询
   return &pagetable[PX(0, va)];
 }
 
@@ -158,6 +160,7 @@ void kvmmap(uint64 va, uint64 pa, uint64 sz, int perm) {
 // assumes va is page aligned.
 uint64 kvmpa(uint64 va) { return kwalkaddr(kernel_pagetable, va); }
 
+// kwalkaddr: 在内核页表分配页面的操作
 uint64 kwalkaddr(pagetable_t kpt, uint64 va) {
   uint64 off = va % PGSIZE;
   pte_t *pte;
@@ -165,9 +168,9 @@ uint64 kwalkaddr(pagetable_t kpt, uint64 va) {
 
   pte = walk(kpt, va, 0);
   if (pte == 0)
-    panic("kvmpa");
+    panic("kvmpa: pte==0");
   if ((*pte & PTE_V) == 0)
-    panic("kvmpa");
+    panic("kvmpa: pte & PTE_V == 0");
   pa = PTE2PA(*pte);
   return pa + off;
 }
@@ -178,10 +181,14 @@ uint64 kwalkaddr(pagetable_t kpt, uint64 va) {
 // allocate a needed page-table page.
 int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa,
              int perm) {
+  // 访问，陷入脏位
+  perm |= PTE_D;
   // for visionfive 2
   // perm |= PTE_A | PTE_D;
   uint64 a, last;
   pte_t *pte;
+  // size != 0 error
+  if(size == 0) panic("mappages: size");
 
   a = PGROUNDDOWN(va);
   last = PGROUNDDOWN(va + size - 1);
@@ -221,8 +228,10 @@ void vmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free) {
     if (PTE_FLAGS(*pte) == PTE_V)
       panic("vmunmap: not a leaf");
     if (do_free) {
+      // 外部指令判断是否释放空间
+      // 释放空间
       uint64 pa = PTE2PA(*pte);
-      kfree((void *)pa);
+      kfree((void *)(pa | DMWIN_MASK));
     }
     *pte = 0;
   }
@@ -250,14 +259,15 @@ void uvminit(pagetable_t pagetable, pagetable_t kpagetable, uchar *src,
     mem = kalloc();
     // printf("[uvminit]kalloc: %p\n", mem);
     memset(mem, 0, PGSIZE);
-    mappages(pagetable, i, PGSIZE, (uint64)mem, (PTE_W &  ~PTE_NR & ~PTE_NX) | PTE_PLV);
-    mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W & ~PTE_NR & ~PTE_NX);
+    mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P|PTE_W|PTE_PLV|PTE_MAT);
+    // 内核页表
+    mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W | PTE_MAT | PTE_P);
     memmove(mem, src + i, PGSIZE);
   }
   mem = kalloc();
   memset(mem, 0, PGSIZE);
-  mappages(pagetable, i, PGSIZE, (uint64)mem, (PTE_W &  ~PTE_NR & ~PTE_NX) | PTE_PLV);
-  mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W & ~PTE_NR & ~PTE_NX);
+  mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P|PTE_W|PTE_PLV|PTE_MAT);
+  mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W | PTE_MAT | PTE_P);
   memmove(mem, src + i, sz % PGSIZE);
   debug_print("uvminit done sz:%d\n", sz);
   // for (int i = 0; i < sz; i ++) {
@@ -278,6 +288,12 @@ uint64 uvmalloc1(pagetable_t pagetable, uint64 start, uint64 end, int perm) {
       return -1;
     }
     memset(mem, 0, PGSIZE);
+    // xv6的执行顺序有点不同：
+    // if(mappages(pagetable, a, PGSIZE, (uint
+    // 64)mem, PTE_P|PTE_W|PTE_PLV|PTE_MAT|PTE_D)
+    //  != 0){
+    // 把perm放在函数里面进行判断了，avx实现将perm 定义
+    // 放在函数外实现
     if (mappages(pagetable, a, PGSIZE, (uint64)mem, perm) != 0) {
       kfree(mem);
       uvmdealloc1(pagetable, start, a);
@@ -302,6 +318,7 @@ uint64 uvmdealloc1(pagetable_t pagetable, uint64 start, uint64 end) {
 
 // Allocate PTEs and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
+// 在给定的页表分配虚拟内存
 uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
                 uint64 newsz, int perm) {
   char *mem;
@@ -318,13 +335,17 @@ uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
       return 0;
     }
     memset(mem, 0, PGSIZE);
+    // #pragma endregion
+    // PTE_P|PTE_W|PTE_PLV|PTE_MAT|PTE_D
     if (mappages(pagetable, a, PGSIZE, (uint64)mem, perm | PTE_PLV) != 0) {
       kfree(mem);
       uvmdealloc(pagetable, kpagetable, a, oldsz);
       return 0;
     }
+    // 
     if (mappages(kpagetable, a, PGSIZE, (uint64)mem, perm) != 0) {
       int npages = (a - oldsz) / PGSIZE;
+      // 第4个参数01分别表示是否do_free()
       vmunmap(pagetable, oldsz, npages + 1,
               1); // plus the page allocated above.
       vmunmap(kpagetable, oldsz, npages, 0);
@@ -338,6 +359,7 @@ uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
 // newsz.  oldsz and newsz need not be page-aligned, nor does newsz
 // need to be less than oldsz.  oldsz can be larger than the actual
 // process size.  Returns the new process size.
+// 
 uint64 uvmdealloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
                   uint64 newsz) {
   if (newsz >= oldsz)
@@ -345,6 +367,7 @@ uint64 uvmdealloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
 
   if (PGROUNDUP(newsz) < PGROUNDUP(oldsz)) {
     int npages = (PGROUNDUP(oldsz) - PGROUNDUP(newsz)) / PGSIZE;
+  
     vmunmap(kpagetable, PGROUNDUP(newsz), npages, 0);
     vmunmap(pagetable, PGROUNDUP(newsz), npages, 1);
   }
@@ -358,14 +381,17 @@ void freewalk(pagetable_t pagetable) {
   // there are 2^9 = 512 PTEs in a page table.
   for (int i = 0; i < 512; i++) {
     pte_t pte = pagetable[i];
-    if ((pte & PTE_V) && (pte & (~PTE_NR | PTE_W | ~PTE_NX)) == 0) {
-      // this PTE points to a lower-level page table.
-      uint64 child = PTE2PA(pte);
+    // 如果是低水平的页表而不是叶子结点
+    // this PTE points to a lower-level page table.
+    if ((pte & PTE_V) && (PTE_FLAGS(pte) == PTE_V)) {
+      // DMWIN_MASK 和loongarch内存的映射窗口选择有关系
+      uint64 child = PTE2PA(pte) | DMWIN_MASK;
       freewalk((pagetable_t)child);
       pagetable[i] = 0;
     } else if (pte & PTE_V) {
-      // panic("freewalk: leaf");
-      continue;
+        // 如果是叶子结点，页表项仍然有PTE_V == 1
+        panic("freewalk: leaf");
+        continue;
     }
   }
   kfree((void *)pagetable);
@@ -377,6 +403,7 @@ void uvmfree(pagetable_t pagetable, uint64 sz) {
   if (sz > 0)
     vmunmap(pagetable, 0, PGROUNDUP(sz) / PGSIZE, 1);
   freewalk(pagetable);
+
 }
 
 // Given a parent process's page table, copy
@@ -400,7 +427,7 @@ int uvmcopy(pagetable_t old, pagetable_t new, pagetable_t knew, uint64 sz) {
     flags = PTE_FLAGS(*pte);
     if ((mem = kalloc()) == NULL)
       goto err;
-    memmove(mem, (char *)pa, PGSIZE);
+    memmove(mem, (char *)(pa | DMWIN_MASK), PGSIZE);
     if (mappages(new, i, PGSIZE, (uint64)mem, flags) != 0) {
       kfree(mem);
       goto err;

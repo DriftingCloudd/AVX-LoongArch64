@@ -15,6 +15,9 @@
         "ring_buffer.h": "c",
         "printf.h": "c",
         "param.h": "c",
-        "kalloc.h": "c"
+        "kalloc.h": "c",
+        "semaphore": "c",
+        "stop_token": "c",
+        "mutex": "c"
     }
 }

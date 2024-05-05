@@ -15,6 +15,7 @@
 #define LOONGARCH_IOCSR_EXTIOI_ROUTE_BASE	    0x1c00
 #define LOONGARCH_IOCSR_EXRIOI_NODETYPE_BASE  0x14a0
 
+
 // read and write tp, the thread pointer, which holds
 // this core's hartid (core number), the index into cpus[].
 

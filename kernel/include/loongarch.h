@@ -1,12 +1,13 @@
 #ifndef _LOONGARCH_H
 #define _LOONGARCH_H
 
-// #include <larchintrin.h>
+#include <larchintrin.h>
 #include "types.h"
-#define  NULL                     0
+
+
 #define  CSR_CRMD_IE_SHIFT		    2
 #define  CSR_CRMD_IE			        ( 0x1 << CSR_CRMD_IE_SHIFT )
-
+#define  NULL 0
 #define  EXT_INT_EN_SHIFT         48
 // 串口索引部分
 #define LOONGARCH_IOCSR_EXTIOI_EN_BASE		    0x1600

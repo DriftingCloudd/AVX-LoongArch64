@@ -4,18 +4,16 @@
 #include <larchintrin.h>
 #include "types.h"
 
-
 #define  CSR_CRMD_IE_SHIFT		    2
 #define  CSR_CRMD_IE			        ( 0x1 << CSR_CRMD_IE_SHIFT )
-#define  NULL 0
+
 #define  EXT_INT_EN_SHIFT         48
-// 串口索引部分
+
 #define LOONGARCH_IOCSR_EXTIOI_EN_BASE		    0x1600
 #define LOONGARCH_IOCSR_EXTIOI_ISR_BASE		    0x1800
 #define LOONGARCH_IOCSR_EXTIOI_MAP_BASE       0x14c0
 #define LOONGARCH_IOCSR_EXTIOI_ROUTE_BASE	    0x1c00
 #define LOONGARCH_IOCSR_EXRIOI_NODETYPE_BASE  0x14a0
-
 
 // read and write tp, the thread pointer, which holds
 // this core's hartid (core number), the index into cpus[].
@@ -270,7 +268,6 @@ static inline void iocsr_writeq(uint64 val, uint32 reg)
 static inline int
 intr_get()
 {
-  // 读crmd寄存器
   uint32 x = r_csr_crmd();
   return (x & CSR_CRMD_IE) != 0;
 }
@@ -318,11 +315,9 @@ intr_off()
 
 #define MAXVA (1L << (9 + 12 - 1)) //Lower half virtual address
 
-
 typedef uint64 pte_t;//typde of pte
 typedef uint64 *pagetable_t;
 
-#endif
 static inline uint64
 r_time()
 {
@@ -332,3 +327,5 @@ r_time()
   asm volatile("rdtime.d %0" : "=r" (x) );
   return x;
 }
+
+#endif

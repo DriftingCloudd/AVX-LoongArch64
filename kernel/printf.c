@@ -1,7 +1,7 @@
 //
 // formatted console output -- printf, panic.
 //
-
+// 标准字符串头文件
 #include <stdarg.h>
 
 #include "include/console.h"

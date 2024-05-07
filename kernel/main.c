@@ -40,10 +40,10 @@ void main(unsigned long hartid, unsigned long dtb_pa) {
   if (r_tp() == 0) {
   //  tcp_start_listen = 0;
   //  first = 1;
-    cpuinit();
-    consoleinit();
-    printfinit(); // init a lock for printf
-    kinit();        // physical page allocator
+    // cpuinit();
+    // consoleinit();
+    // printfinit(); // init a lock for printf
+    // kinit();        // physical page allocator
     // kvminit();      // create kernel page table
     // kvminithart();  // turn on paging
     // timerinit();    // init a lock for timer

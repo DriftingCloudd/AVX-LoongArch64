@@ -11,7 +11,11 @@
         "elf.h": "c",
         "thread.h": "c",
         "context.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "intr.h": "c",
+        "printf.h": "c",
+        "larchintrin.h": "c",
+        "param.h": "c"
     },
     "makefile.launchConfigurations": [
         {

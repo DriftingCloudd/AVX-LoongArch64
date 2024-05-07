@@ -44,8 +44,9 @@ void main() {
     consoleinit();
     printfinit(); // init a lock for printf
     printf("test");
-    // kinit();        // physical page allocator
-    // kvminit();      // create kernel page table
+    // 内存映射 //
+    kinit();        // physical page allocator
+    kvminit();      // create kernel page table
     // kvminithart();  // turn on paging
     // timerinit();    // init a lock for timer
     // trapinithart(); // install kernel trap vector, including interrupt handler

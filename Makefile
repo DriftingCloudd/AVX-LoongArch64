@@ -18,8 +18,8 @@ OBJS += \
   $K/main.o \
   $K/proc.o \
   $K/console.o \
-#  $K/kalloc.o \
-#  $K/vm.o \
+  $K/kalloc.o \
+  $K/vm.o \
 #  $K/swtch.o \
 #  $K/trampoline.o \
 #  $K/trap.o \

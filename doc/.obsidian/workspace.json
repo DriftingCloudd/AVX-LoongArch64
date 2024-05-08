@@ -133,7 +133,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 309.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -149,6 +149,10 @@
   "lastOpenFiles": [
     "Loongarch架构介绍.md",
     "la和rv架构比较.md",
+    "AVX-LA开发记录/picture",
+    "AVX-LA开发记录",
+    "assets/image.png",
+    "assets/exception.csv",
     "assets/Pasted image 20240508185805.png",
     "assets/Pasted image 20240508185358.png",
     "assets/Pasted image 20240508182241.png",

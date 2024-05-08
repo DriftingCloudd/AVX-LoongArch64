@@ -5,7 +5,7 @@
 _entry:
         # entry只对每个CPU设定自己的栈空间，然后跳转到main函数
 
-        li.d        $t0, 0x8000000000000000   
+        li.d        $t0, 0x8000000000000001   
         csrwr       $t0, LOONGARCH_CSR_DMWIN0   # 设置设备操作空间
         li.d        $t0, 0x9000000000000011   
         csrwr       $t0, LOONGARCH_CSR_DMWIN1   # 设置指令数据访问空间

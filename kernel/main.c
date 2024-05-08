@@ -3,30 +3,30 @@
 
 #include "include/loongarch.h"
 #include "loongarchregs.h"
-/* #include "include/buf.h"
+// #include "include/buf.h"
 #include "include/console.h"
-#include "include/disk.h"
-#include "include/kalloc.h"
+// #include "include/disk.h"
+// #include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/param.h"
-#include "include/plic.h"
+// #include "include/plic.h"
 #include "include/printf.h"
 #include "include/proc.h"
-#include "include/riscv.h"
-#include "include/sbi.h"
-#include "include/socket.h"
-#include "include/sysinfo.h"
-#include "include/thread.h"
-#include "include/timer.h"
-#include "include/trap.h"
-#include "include/types.h"
-#include "include/vm.h"
-#ifndef QEMU
-#include "include/sd_final.h"
-#include "include/uart8250.h"
-extern void _start(void);
-#endif
-*/
+// #include "include/riscv.h"
+// #include "include/sbi.h"
+// #include "include/socket.h"
+// #include "include/sysinfo.h"
+// #include "include/thread.h"
+// #include "include/timer.h"
+// #include "include/trap.h"
+// #include "include/types.h"
+// #include "include/vm.h"
+// #ifndef QEMU
+// #include "include/sd_final.h"
+// #include "include/uart8250.h"
+#include "include/uart.h"
+// extern void _start(void);
+// #endif
 extern void _entry(void);
 
 
@@ -36,13 +36,14 @@ extern void boot_stack(void);
 extern void boot_stack_top(void);
 // extern void initlogbuffer(void);
 // extern int tcp_start_listen;
-void main(unsigned long hartid, unsigned long dtb_pa) {
+void main() {
   if (r_tp() == 0) {
 //    tcp_start_listen = 0;
 //    first = 1;
-    // cpuinit();
-    // consoleinit();
-    // printfinit(); // init a lock for printf
+    cpuinit();
+    consoleinit();
+    printfinit(); // init a lock for printf
+    printf("test");
     // kinit();        // physical page allocator
     // kvminit();      // create kernel page table
     // kvminithart();  // turn on paging

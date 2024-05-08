@@ -1,0 +1,162 @@
+{
+  "main": {
+    "id": "63c5d376f9f2f59d",
+    "type": "split",
+    "children": [
+      {
+        "id": "3d3ca01975b9c257",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c937a9a2e3531473",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "la和rv架构比较.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "dc629bba634a598a",
+    "type": "split",
+    "children": [
+      {
+        "id": "49fae187a7430edf",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "23d5be72d02fe63c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "bf32d54438a2e216",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "5b139152fe6de0ce",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "b17f7aab1ff490a0",
+    "type": "split",
+    "children": [
+      {
+        "id": "14e9fd6d2c06fc7c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f44e585789908dc5",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "la和rv架构比较.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "fbdc3988be7959f8",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "la和rv架构比较.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "f56bf3e7678a5873",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "3fbeee02d77a11a4",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "la和rv架构比较.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "c937a9a2e3531473",
+  "lastOpenFiles": [
+    "Loongarch架构介绍.md",
+    "la和rv架构比较.md",
+    "assets/Pasted image 20240508185805.png",
+    "assets/Pasted image 20240508185358.png",
+    "assets/Pasted image 20240508182241.png",
+    "assets",
+    "assets/Pasted image 20240508170929.png",
+    "Pasted image 20240508170855.png",
+    "image.png",
+    "basic-kernel-v1.1.md",
+    "文件结构.md"
+  ]
+}

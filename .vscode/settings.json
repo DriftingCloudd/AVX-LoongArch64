@@ -18,6 +18,7 @@
         "kalloc.h": "c",
         "semaphore": "c",
         "stop_token": "c",
-        "mutex": "c"
+        "mutex": "c",
+        "uart.h": "c"
     }
 }

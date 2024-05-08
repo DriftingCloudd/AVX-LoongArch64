@@ -6,13 +6,12 @@
 // #include "include/buf.h"
 #include "include/console.h"
 // #include "include/disk.h"
-// #include "include/kalloc.h"
+#include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/param.h"
 // #include "include/plic.h"
 #include "include/printf.h"
 #include "include/proc.h"
-// #include "include/riscv.h"
 // #include "include/sbi.h"
 // #include "include/socket.h"
 // #include "include/sysinfo.h"
@@ -23,7 +22,7 @@
 // #include "include/vm.h"
 // #ifndef QEMU
 // #include "include/sd_final.h"
-// #include "include/uart8250.h"
+// #include "include/uart16500.h"
 #include "include/uart.h"
 // extern void _start(void);
 // #endif

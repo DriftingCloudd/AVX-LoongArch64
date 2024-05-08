@@ -15,6 +15,7 @@
 #define UART0 (0x1fe20000UL | DMWIN_MASK)
 #define UART0_IRQ 2
 
+// 7段寄存器
 /* ============== LS7A registers =============== */
 #define LS7A_PCH_REG_BASE		(0x10000000UL | DMWIN_MASK)
 

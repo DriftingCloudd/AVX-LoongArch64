@@ -314,14 +314,16 @@ intr_off()
 #define PTE2PA(pte) (pte & PAMASK)
 // shift a physical address to the right place for a PTE.
 #define PA2PTE(pa) (((uint64)pa) & PAMASK)
+// 查看页权限
 #define PTE_FLAGS(pte) ((pte) & 0xE0000000000001FFUL) // 查看页权限
 
 // extract the three 9-bit page table indices from a virtual address.
 #define PXMASK          0x1FF // 9 bits
 #define PXSHIFT(level)  (PGSHIFT+(9*(level)))
 #define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
-
-#define MAXVA (1L << (9 + 12 - 1)) //Lower half virtual address
+// 最大虚拟地址
+// Lower half virtual address
+#define MAXVA (1L << (9 + 12 - 1)) 
 
 typedef uint64 pte_t;//typde of pte
 typedef uint64 *pagetable_t;

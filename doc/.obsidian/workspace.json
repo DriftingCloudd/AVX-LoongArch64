@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "la和rv架构比较.md",
+                "file": "Loongarch介绍/la和rv架构比较.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "la和rv架构比较.md",
+                "file": "Loongarch介绍/la和rv架构比较.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "la和rv架构比较.md",
+                "file": "Loongarch介绍/la和rv架构比较.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "la和rv架构比较.md"
+                "file": "Loongarch介绍/la和rv架构比较.md"
               }
             }
           }
@@ -133,7 +133,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 309.5
+    "width": 309.5,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -145,22 +146,25 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "c937a9a2e3531473",
+  "active": "23d5be72d02fe63c",
   "lastOpenFiles": [
-    "Loongarch架构介绍.md",
-    "la和rv架构比较.md",
+    "基于LA的OS的特点分析",
+    "Loongarch介绍",
+    "AVX-LA 开发记录",
+    "Loongarch介绍/Loongarch架构介绍.md",
+    "Loongarch介绍/la和rv架构比较.md",
     "AVX-LA开发记录/picture",
     "AVX-LA开发记录",
-    "assets/image.png",
-    "assets/exception.csv",
-    "assets/Pasted image 20240508185805.png",
-    "assets/Pasted image 20240508185358.png",
-    "assets/Pasted image 20240508182241.png",
-    "assets",
-    "assets/Pasted image 20240508170929.png",
+    "picture/image.png",
+    "picture/exception.csv",
+    "picture/Pasted image 20240508185805.png",
+    "picture/Pasted image 20240508185358.png",
+    "picture/Pasted image 20240508182241.png",
+    "picture",
+    "picture/Pasted image 20240508170929.png",
     "Pasted image 20240508170855.png",
     "image.png",
-    "basic-kernel-v1.1.md",
-    "文件结构.md"
+    "AVX-LA 开发记录/basic-kernel-v1.1.md",
+    "README.md.md"
   ]
 }

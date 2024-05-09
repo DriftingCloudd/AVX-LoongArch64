@@ -1,2 +1,0 @@
-# AVX-LoongArch64
-AVX是华中科技大学在2023年参加操作系统能力大赛获得二等奖的作品。AVX-LA是基于AVX移植到LoongArch上的操作系统。

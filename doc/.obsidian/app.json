@@ -1,9 +1,0 @@
-{
-  "attachmentFolderPath": "picture/",
-  "showUnsupportedFiles": true,
-  "newLinkFormat": "relative",
-  "alwaysUpdateLinks": true,
-  "promptDelete": false,
-  "strictLineBreaks": false,
-  "useMarkdownLinks": true
-}

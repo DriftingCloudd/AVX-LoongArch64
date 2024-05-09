@@ -1,7 +1,7 @@
 // Copyright (c) 2006-2019 Frans Kaashoek, Robert Morris, Russ Cox,
 //                         Massachusetts Institute of Technology
 
-#include "loongarch.h"
+#include "include/loongarch.h"
 #include "loongarchregs.h"
 // #include "include/buf.h"
 #include "include/console.h"

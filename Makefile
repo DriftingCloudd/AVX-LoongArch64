@@ -10,15 +10,15 @@ linker = ./kernel.ld
 
 OBJS += \
   $K/entry.o \
+  $K/printf.o \
+  $K/uart.o \
+  $K/intr.o \
+  $K/spinlock.o \
+  $K/string.o \
   $K/main.o \
-#  $K/printf.o \
-#  $K/uart.o \
+  $K/proc.o \
+  $K/console.o \
 #  $K/kalloc.o \
-#  $K/intr.o \
-#  $K/spinlock.o \
-#  $K/string.o \
-#  $K/main.o \
-#  $K/proc.o \
 #  $K/vm.o \
 #  $K/swtch.o \
 #  $K/trampoline.o \
@@ -37,7 +37,6 @@ OBJS += \
 #   $K/disk.o \
 #   $K/fat32.o \
 #   $K/plic.o \
-#   $K/console.o \
 #   $K/mmap.o \
 #   $K/fs.o \
 #   $K/vma.o \
@@ -146,7 +145,7 @@ CFLAGS += -ffreestanding -fno-common -nostdlib
 CFLAGS += -fno-pie -no-pie
 CFLAGS += -fno-stack-protector
 CFLAGS += -Ikernel/include
-CFLAGS += -I.
+CFLAGS += -I.kernel -I.
 # CFLAGS += -Ikernel/lwip/include
 # CFLAGS += -Ikernel/lwip/include/arch
 # CFLAGS += -Ikernel/lwip
@@ -183,6 +182,9 @@ LDFLAGS = -z max-page-size=4096
 # 	@cd kernel && make -f net.mk liblwip.a
 
 # Compile Kernel
+$T/kernel.bin: $T/kernel
+	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
+
 $T/kernel: $(OBJS) $(linker) # $U/initcode
 	if [ ! -d "./target" ]; then mkdir target; fi
 	$(LD) $(LDFLAGS) -T $(linker) -o $T/kernel $(OBJS)

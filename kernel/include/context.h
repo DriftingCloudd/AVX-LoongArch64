@@ -4,7 +4,7 @@
 
 #include "types.h"
 
-typedef struct context { //上下文语法
+typedef struct context {
   uint64 ra;
   uint64 sp;
 

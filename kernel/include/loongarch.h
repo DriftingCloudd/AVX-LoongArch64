@@ -34,6 +34,14 @@ r_tp()
   return x;
 }
 
+static inline uint64
+r_fp()
+{
+  uint64 x;
+  asm volatile("addi.d %0, $fp, 0" : "=r" (x) );
+  return x;
+}
+
 static inline uint32
 r_csr_crmd()
 {

@@ -20,8 +20,8 @@ OBJS += \
   $K/console.o \
   $K/kalloc.o \
   $K/vm.o \
-#  $K/swtch.o \
-#  $K/trampoline.o \
+  $K/swtch.o \
+  $K/trampoline.o \
 #  $K/trap.o \
 #  $K/syscall.o \
 #  $K/sysproc.o \

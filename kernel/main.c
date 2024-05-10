@@ -19,7 +19,7 @@
 // #include "include/timer.h"
 // #include "include/trap.h"
 // #include "include/types.h"
-// #include "include/vm.h"
+#include "include/vm.h"
 // #ifndef QEMU
 // #include "include/sd_final.h"
 // #include "include/uart16500.h"

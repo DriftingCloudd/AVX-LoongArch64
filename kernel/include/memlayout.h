@@ -9,6 +9,7 @@
 // 0x1fe20000 -- uart16550 serial port
 // 0x90000000 -- RAM used by user pages
 
+// 低48位掩码
 #define DMWIN_MASK 0x9000000000000000
 
 // 2k1000 puts UART registers here in virtual memory.
@@ -46,5 +47,7 @@
 //   invalid guard page
 //   KSRACK (used for kernel thread)
 //   TRAPFRAME (p->trapframe, used by the uservec)
-#define TRAPFRAME (MAXVA - PGSIZE)
+//   如果要trampoline的情况，应该是在trapframe上面一页的大小（xv6）
+#define TRAMPOLINE (MAXVA - PGSIZE)
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)
 #endif

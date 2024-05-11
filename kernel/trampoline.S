@@ -28,7 +28,8 @@ uservec:
         # so that a0 is TRAPFRAME
         # 交换a0 和 sscratch的位置，交换用户空间和内核空间
         // csrrw a0, sscratch, a0
-        
+        # 数据交换
+        csrxchg $a0, $a0, 0x30
         # save the user registers in TRAPFRAME
         st.d $ra, $a0, 40
         st.d $sp, $a0, 48

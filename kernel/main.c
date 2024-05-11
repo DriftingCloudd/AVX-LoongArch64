@@ -26,13 +26,13 @@
 #include "include/uart.h"
 // extern void _start(void);
 // #endif
-extern void _entry(void);
+// extern void _entry(void);
 
 
 volatile static int started = 0;
 // static int first = 0;
-extern void boot_stack(void);
-extern void boot_stack_top(void);
+// extern void boot_stack(void);
+// extern void boot_stack_top(void);
 // extern void initlogbuffer(void);
 // extern int tcp_start_listen;
 void main() {
@@ -46,11 +46,12 @@ void main() {
     // 内存映射 //
     kinit();        // physical page allocator
     kvminit();      // create kernel page table
-    // kvminithart();  // turn on paging
+    kvminithart();  // turn on paging
+    // 
     // timerinit();    // init a lock for timer
     // trapinithart(); // install kernel trap vector, including interrupt handler
     // threadInit();
-    // procinit();
+    procinit();
     // plicinit();
     // plicinithart();
     // // sd_test();

@@ -16,14 +16,15 @@ pagetable_t kernel_pagetable;
 pagetable_t tcpip_pagetable;
 
 extern char etext[];      // kernel.ld sets this to end of kernel code.
-extern char trampoline[]; // trampoline.S
+// extern char trampoline[]; // trampoline.S
 /*
  * create a direct-map page table for the kernel.
  */
 // 内核创建直接映射模式页表，掩码为 DWM_MASK
 void kvminit() {
 // tcp 网络端口创建页表
-//   tcpip_pagetable = NULL;
+// tcpip_pagetable = NULL;
+// 分配页表空间
   kernel_pagetable = (pagetable_t)kalloc();
 #ifdef DEBUG
   printf("kernel_pagetable: %p\n", kernel_pagetable);
@@ -59,8 +60,8 @@ void kvminit() {
 
   // map the trampoline for trap entry/exit to
   // the highest virtual address in the kernel.
-  
-  kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_W | PTE_MAT | PTE_PLV | PTE_P);
+  // 暂时放在那里，Trampoline.S 没有更新
+  // kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_W | PTE_MAT | PTE_PLV | PTE_P);
 
 #ifdef DEBUG
   printf("kvminit\n");
@@ -80,19 +81,24 @@ tlbinit(void)
 // Switch h/w page table register to the kernel's page table,
 // and enable paging.
 
-// void kvminithart() {
-//   // flush the tlb(tlbinit)
-//   tlbinit();
-//   // sfence_vma();
-// // todo
-//   w_satp(MAKE_SATP(kernel_pagetable));
-//   // 修改uart的地址映射
-//   uart8250_change_base_addr(UART_V);
-// // sfence_vma();
-// #ifdef DEBUG
-//   printf("kvminithart\n");
-// #endif
-// }
+void kvminithart() {
+  // flush the tlb(tlbinit)
+  tlbinit();
+  // AVX 实现时没有体现顺序性，fence
+  // sfence_vma();
+  // 构造正确的 satp值
+  // todo
+  // w_satp(MAKE_SATP(kernel_pagetable));
+
+  // 修改uart的地址映射
+  // uart
+  // uart8250_change_base_addr(UART_V);
+// sfence_vma();
+
+#ifdef DEBUG
+  printf("kvminithart\n");
+#endif
+}
 
 // Return the address of the PTE in page table pagetable
 // that corresponds to virtual address va.  If alloc!=0,

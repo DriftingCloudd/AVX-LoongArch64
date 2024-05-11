@@ -21,8 +21,9 @@ OBJS += \
   $K/kalloc.o \
   $K/vm.o \
   $K/swtch.o \
-  $K/trampoline.o \
+#   $K/trampoline.o \
 #  $K/trap.o \
+	$K/time.o \
 #  $K/syscall.o \
 #  $K/sysproc.o \
 #  $K/bio.o \
@@ -32,8 +33,7 @@ OBJS += \
 #  $K/exec.o \
 #  $K/sysfile.o \
 #   $K/systime.o \
-#   $K/kernelvec.o \
-#   $K/timer.o \
+#   $K/kernelvec.o 
 #   $K/disk.o \
 #   $K/fat32.o \
 #   $K/plic.o \

@@ -280,7 +280,19 @@ intr_get()
   return (x & CSR_CRMD_IE) != 0;
 }
 
+// read_time, visit relevant register
+static inline uint64
+r_time()
+{
+  uint64 x;
+  // asm volatile("csrr %0, time" : "=r" (x) );
+  // this instruction will trap in SBI
+  // LA 仍然以rdtime 访问定时器
+  asm volatile("rdtime %0" : "=r" (x) );
+  return x;
+}
 // enable device interrupts
+
 static inline void
 intr_on()
 {

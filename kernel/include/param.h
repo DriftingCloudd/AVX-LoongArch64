@@ -15,8 +15,10 @@
 #define FSSIZE       1000  // size of file system in blocks
 #define MAXPATH      260   // maximum file path name
 // #ifdef QEMU
+
 // #define CLK_FREQ     10000000
 // #else
+// 根据确切时钟
 #define CLK_FREQ     4000000
 // #endif
 

@@ -50,7 +50,7 @@
 #define LOONGARCH_CSR_EENTRY        0x9	    /* Exception entry address 例外入口地址 */
 
 #define LOONGARCH_CSR_CPUID		    0x20	/* CPU core id */
-
+// 上下文保存寄存器
 #define LOONGARCH_CSR_SAVE0		    0x30    /* Kscratch registers */
 
 #define LOONGARCH_CSR_DMWIN0		0x180	/* 64 direct map win0: MEM & IF */

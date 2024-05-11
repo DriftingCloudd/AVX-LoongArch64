@@ -2,6 +2,10 @@
     "files.associations": {
         "loongarch.h": "c",
         "console.h": "c",
-        "kalloc.h": "c"
+        "kalloc.h": "c",
+        "types.h": "c",
+        "proc.h": "c",
+        "intr.h": "c",
+        "timer.h": "c"
     }
 }

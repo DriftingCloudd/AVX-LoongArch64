@@ -4,28 +4,28 @@
 // #include "include/file.h"
 // #include "include/futex.h"
 #include "include/intr.h"
-// #include "include/kalloc.h"
-// #include "include/memlayout.h"
+#include "include/kalloc.h"
+#include "include/memlayout.h"
 #include "include/param.h"
 #include "include/printf.h"
-// #include "include/loongarch.h"
+#include "include/loongarch.h"
 #include "include/spinlock.h"
 #include "include/string.h"
 // #include "include/trap.h"
 #include "include/types.h"
-// #include "include/vm.h"
+#include "include/vm.h"
 //#include "include/vma.h"
 // extern uchar initcode[];
 // extern int initcodesize;
 // extern thread *free_thread;
 struct cpu cpus[NCPU];
+// 设置进程池
+struct proc proc[NPROC];
+struct proc *initproc;
 
-// struct proc proc[NPROC];
-
-// struct proc *initproc;
-
-// int nextpid = 1;
-// struct spinlock pid_lock;
+int nextpid = 1;
+struct spinlock pid_lock;
+struct spinlock wait_lock;
 
 // extern void forkret(void);
 // extern int magic_count;
@@ -62,7 +62,21 @@ void cpuinit(void) {
   }
 }
 
-// // initialize the proc table at boot time.
+// initialize the proc table at boot time.
+void
+procinit(void)
+{
+  struct proc *p;
+  
+  initlock(&pid_lock, "nextpid");
+  initlock(&wait_lock, "wait_lock");
+  for(p = proc; p < &proc[NPROC]; p++) {
+      initlock(&p->lock, "proc");
+      p->state = UNUSED;
+      p->kstack = KSTACK((int) (p - proc)); 
+  }
+}
+
 // void procinit(void) {
 //   struct proc *p;
 //   magic_count = 0;
@@ -116,6 +130,7 @@ void cpuinit(void) {
 // Must be called with interrupts disabled,
 // to prevent race with process being moved
 // to a different CPU.
+
 int cpuid() {
   int id = r_tp();
   return id;
@@ -124,6 +139,7 @@ int cpuid() {
 // Return this CPU's cpu struct.
 // Interrupts must be disabled.
 struct cpu *mycpu(void) {
+  // get CPU_ID
   int id = cpuid();
   struct cpu *c = &cpus[id];
 

@@ -16,7 +16,7 @@ pagetable_t kernel_pagetable;
 pagetable_t tcpip_pagetable;
 
 extern char etext[];      // kernel.ld sets this to end of kernel code.
-// extern char trampoline[]; // trampoline.S
+extern char trampoline[]; // trampoline.S
 /*
  * create a direct-map page table for the kernel.
  */
@@ -61,7 +61,7 @@ void kvminit() {
   // map the trampoline for trap entry/exit to
   // the highest virtual address in the kernel.
   // 暂时放在那里，Trampoline.S 没有更新
-  // kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_W | PTE_MAT | PTE_PLV | PTE_P);
+  kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_W | PTE_MAT | PTE_PLV | PTE_P);
 
 #ifdef DEBUG
   printf("kvminit\n");
@@ -80,7 +80,7 @@ tlbinit(void)
 
 // Switch h/w page table register to the kernel's page table,
 // and enable paging.
-
+// todo
 void kvminithart() {
   // flush the tlb(tlbinit)
   tlbinit();

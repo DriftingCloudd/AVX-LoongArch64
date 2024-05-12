@@ -73,6 +73,11 @@ procinit(void)
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
+      // p->killed = 0;
+      // p->parent = 0;
+      // p->xstate = 0;
+      // p->pid = 0;//boot_time
+
       p->kstack = KSTACK((int) (p - proc)); 
   }
 }
@@ -147,43 +152,43 @@ struct cpu *mycpu(void) {
 }
 
 // Return the current struct proc *, or zero if none.
-// struct proc *myproc(void) {
-//   push_off();
-//   struct cpu *c = mycpu();
-//   struct proc *p = c->proc;
-//   pop_off();
-//   return p;
-// }
+struct proc *myproc(void) {
+  push_off();
+  struct cpu *c = mycpu();
+  struct proc *p = c->proc;
+  pop_off();
+  return p;
+}
 
-// int allocpid() {
-//   int pid;
+// 分配进程id
+int allocpid() {
+  int pid;
+  // atomic
+  acquire(&pid_lock);
+  pid = nextpid;
+  nextpid = nextpid + 1;
+  release(&pid_lock);
 
-//   acquire(&pid_lock);
-//   pid = nextpid;
-//   nextpid = nextpid + 1;
-//   release(&pid_lock);
+  return pid;
+}
+// 新上下文
+static void copycontext(context *t1, context *t2) {
+  t1->ra = t2->ra;
+  t1->sp = t2->sp;
+  //---// 
+  t1->s0 = t2->s0;
+  t1->s1 = t2->s1;
+  t1->s2 = t2->s2;
+  t1->s3 = t2->s3;
+  t1->s4 = t2->s4;
+  t1->s5 = t2->s5;
+  t1->s6 = t2->s6;
+  t1->s7 = t2->s7;
+  t1->s8 = t2->s8;
+  t1->fp = t2->fp;
+}
 
-//   return pid;
-// }
-
-// static void copycontext(context *t1, context *t2) {
-//   t1->ra = t2->ra;
-//   t1->sp = t2->sp;
-//   t1->s0 = t2->s0;
-//   t1->s1 = t2->s1;
-//   t1->s2 = t2->s2;
-//   t1->s3 = t2->s3;
-//   t1->s4 = t2->s4;
-//   t1->s5 = t2->s5;
-//   t1->s6 = t2->s6;
-//   t1->s7 = t2->s7;
-//   t1->s8 = t2->s8;
-//   t1->s9 = t2->s9;
-//   t1->s10 = t2->s10;
-//   t1->s11 = t2->s11;
-// }
-
-// // copy trapframe f2 to trapframe f1
+// todo trapframe
 // static void copytrapframe(struct trapframe *f1, struct trapframe *f2) {
 //   f1->kernel_satp = f2->kernel_satp;
 //   f1->kernel_sp = f2->kernel_sp;
@@ -350,8 +355,8 @@ struct cpu *mycpu(void) {
 //   p->state = UNUSED;
 // }
 
-// // Create a user page table for a given process,
-// // with no user memory, but with trampoline pages.
+// Create a user page table for a given process,
+// with no user memory, but with trampoline pages.
 // pagetable_t proc_pagetable(struct proc *p) {
 //   pagetable_t pagetable;
 
@@ -374,23 +379,23 @@ struct cpu *mycpu(void) {
 //     return NULL;
 //   }
 
-//   // map the trapframe just below TRAMPOLINE, for trampoline.S.
-//   if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
-//                PTE_R | PTE_W) < 0) {
-//     vmunmap(pagetable, TRAMPOLINE, 1, 0);
-//     uvmfree(pagetable, 0);
-//     return NULL;
-//   }
-//   if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
-//                PTE_R | PTE_X | PTE_U) < 0) {
-//     vmunmap(pagetable, TRAMPOLINE, 1, 0);
-//     vmunmap(pagetable, TRAPFRAME, 1, 0);
-//     uvmfree(pagetable, 0);
-//     return NULL;
-//   }
+  // map the trapframe just below TRAMPOLINE, for trampoline.S.
+  if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
+               PTE_R | PTE_W) < 0) {
+    vmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmfree(pagetable, 0);
+    return NULL;
+  }
+  if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
+               PTE_R | PTE_X | PTE_U) < 0) {
+    vmunmap(pagetable, TRAMPOLINE, 1, 0);
+    vmunmap(pagetable, TRAPFRAME, 1, 0);
+    uvmfree(pagetable, 0);
+    return NULL;
+  }
 
-//   return pagetable;
-// }
+  return pagetable;
+}
 
 // // Free a process's page table, and free the
 // // physical memory it refers to.
@@ -797,15 +802,16 @@ struct cpu *mycpu(void) {
 // }
 
 // // Give up the CPU for one scheduling round.
-// void yield(void) {
-//   struct proc *p = myproc();
-//   acquire(&p->lock);
-//   // printf("pid %d yield\n, epc: %p", p->pid, p->trapframe->epc);
-//   p->state = RUNNABLE;
-//   p->main_thread->state = t_RUNNABLE;
-//   sched();
-//   release(&p->lock);
-// }
+void yield(void) {
+  struct proc *p = myproc();
+  acquire(&p->lock);
+  // printf("pid %d yield\n, epc: %p", p->pid, p->trapframe->epc);
+  p->state = RUNNABLE;
+  // todo：线程部分
+  // p->main_thread->state = t_RUNNABLE;
+  sched();
+  release(&p->lock);
+}
 
 // // A fork child's very first scheduling by scheduler()
 // // will swtch to forkret.
@@ -864,17 +870,17 @@ struct cpu *mycpu(void) {
 
 // // Wake up all processes sleeping on chan.
 // // Must be called without any p->lock.
-// void wakeup(void *chan) {
-//   struct proc *p;
+void wakeup(void *chan) {
+  struct proc *p;
 
-//   for (p = proc; p < &proc[NPROC]; p++) {
-//     acquire(&p->lock);
-//     if (p->state == SLEEPING && p->chan == chan) {
-//       p->state = RUNNABLE;
-//     }
-//     release(&p->lock);
-//   }
-// }
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->state == SLEEPING && p->chan == chan) {
+      p->state = RUNNABLE;
+    }
+    release(&p->lock);
+  }
+}
 
 // // Wake up p if it is sleeping in wait(); used by exit().
 // // Caller must hold p->lock.
@@ -1227,11 +1233,12 @@ struct cpu *mycpu(void) {
 //   return p;
 // }
 
-// int get_proc_addr_num(struct proc *p) {
-//   for (int i = 0; i < NPROC; i++) {
-//     if (&proc[i] == p) {
-//       return i;
-//     }
-//   }
-//   return -1;
-// }
+// 获取proc
+int get_proc_addr_num(struct proc *p) {
+  for (int i = 0; i < NPROC; i++) {
+    if (&proc[i] == p) {
+      return i;
+    }
+  }
+  return -1;
+}

@@ -1,92 +1,81 @@
-	#
-        # code to switch between user and kernel space.
-        #
-        # this code is mapped at the same virtual address
-        # (TRAMPOLINE) in user and kernel space so that
-        # it continues to work when it switches page tables.
-	#
-	# kernel.ld.d causes this to be aligned
+# code to switch between user and kernel space.
+
+	# kernel.ld causes this to be aligned
         # to a page boundary.
         #
-	.section trampsec
+# include "asm.h"
+
 .globl trampoline
 trampoline:
 .align 4
-.globl uservec
+
 uservec:    
 	#
-        # trap.c sets stvec to point here, so
+        # trap.c sets eentry to point here, so
         # traps from user space start here,
-        # in supervisor mode, but with a
+        # in privilege0, but with a
         # user page table.
         #
-        # sscratch points to where the process's p->trapframe is
+        # CSR.SAVE points to where the process's p->trapframe is
         # mapped into user space, at TRAPFRAME.
         #
         
-	# swap a0 and sscratch
+	# swap a0 and SAVE
         # so that a0 is TRAPFRAME
-        # 交换a0 和 sscratch的位置，交换用户空间和内核空间
-        // csrrw a0, sscratch, a0
-        # 数据交换
-        csrxchg $a0, $a0, 0x30
+        csrwr  $a0, LOONGARCH_CSR_SAVE0
+
         # save the user registers in TRAPFRAME
-        st.d $ra, $a0, 40
-        st.d $sp, $a0, 48
-        st.d gp, 56(a0)
-        st.d tp, 64(a0)
-        st.d t0, 72(a0)
-        st.d t1, 80(a0)
-        st.d t2, 88(a0)
-        st.d s0, 96(a0)
-        st.d s1, 104(a0)
-        st.d a1, 120(a0)
-        st.d a2, 128(a0)
-        st.d a3, 136(a0)
-        st.d a4, 144(a0)
-        st.d a5, 152(a0)
-        st.d a6, 160(a0)
-        st.d a7, 168(a0)
-        st.d s2, 176(a0)
-        st.d s3, 184(a0)
-        st.d s4, 192(a0)
-        st.d s5, 200(a0)
-        st.d s6, 208(a0)
-        st.d s7, 216(a0)
-        st.d s8, 224(a0)
-        st.d s9, 232(a0)
-        st.d s10, 240(a0)
-        st.d s11, 248(a0)
-        st.d t3, 256(a0)
-        st.d t4, 264(a0)
-        st.d t5, 272(a0)
-        st.d t6, 280(a0)
+        st.d   $ra, $a0, 0
+        st.d   $tp, $a0, 8
+        st.d   $sp, $a0, 16
+        st.d   $a1, $a0, 32
+        st.d   $a2, $a0, 40
+        st.d   $a3, $a0, 48
+        st.d   $a4, $a0, 56
+        st.d   $a5, $a0, 64
+        st.d   $a6, $a0, 72
+        st.d   $a7, $a0, 80
+        st.d   $t0, $a0, 88
+        st.d   $t1, $a0, 96
+        st.d   $t2, $a0, 104
+        st.d   $t3, $a0, 112
+        st.d   $t4, $a0, 120
+        st.d   $t5, $a0, 128
+        st.d   $t6, $a0, 136
+        st.d   $t7, $a0, 144
+        st.d   $t8, $a0, 152
+        st.d   $r21, $a0,160
+        st.d   $fp, $a0, 168
+        st.d   $s0, $a0, 176
+        st.d   $s1, $a0, 184
+        st.d   $s2, $a0, 192
+        st.d   $s3, $a0, 200
+        st.d   $s4, $a0, 208
+        st.d   $s5, $a0, 216
+        st.d   $s6, $a0, 224
+        st.d   $s7, $a0, 232
+        st.d   $s8, $a0, 240
 
 	# save the user a0 in p->trapframe->a0
-        csrr t0, sscratch
-        st.d t0, 112(a0)
+        csrrd  $t0, LOONGARCH_CSR_SAVE0
+        st.d   $t0, $a0, 24
 
         # restore kernel stack pointer from p->trapframe->kernel_sp
-        ld.d sp, 8(a0)
+        ld.d   $sp, $a0, 248
 
-        # make tp hold.d the current hartid, from p->trapframe->kernel_hartid
-        ld.d tp, 32(a0)
+        # make tp hold the current hartid, from p->trapframe->kernel_hartid
+        ld.d   $tp, $a0, 272
 
         # load the address of usertrap(), p->trapframe->kernel_trap
-        ld.d t0, 16(a0)
+        ld.d   $t0, $a0, 256
 
-        # restore kernel page table from p->trapframe->kernel_satp
-        ld.d t1, 0(a0)
-        csrw satp, t1
-
-        # sfence.vma zero, zero
-        sfence.vma
-
-        # a0 is no longer valid, since the kernel page
-        # table does not specially map p->tf.
+        # restore kernel page table from p->trapframe->kernel_pgdl
+        ld.d   $t1, $a0, 280
+        csrwr  $t1, LOONGARCH_CSR_PGDL
+        invtlb 0x0,$zero, $zero
 
         # jump to usertrap(), which does not return
-        jr t0
+        jirl   $zero ,$t0, 0
 
 .globl userret
 userret:
@@ -94,56 +83,52 @@ userret:
         # switch from kernel to user.
         # usertrapret() calls here.
         # a0: TRAPFRAME, in user page table.
-        # a1: user page table, for satp.
+        # a1: user page table, for pgdl.
 
         # switch to the user page table.
+        csrwr  $a1, LOONGARCH_CSR_PGDL
+        invtlb 0x0,$zero,$zero
 
-
-        csrw satp, a1
-
-        # sfence.vma zero, zero
-        sfence.vma
-        
-        # put the saved user a0 in sscratch, so we
+        # put the saved user a0 in SAVE0, so we
         # can swap it with our a0 (TRAPFRAME) in the last step.
-        ld.d t0, 112(a0)
-        csrw sscratch, t0
+        ld.d   $t0, $a0, 24
+        csrwr  $t0, LOONGARCH_CSR_SAVE0
 
         # restore all but a0 from TRAPFRAME
-        ld.d ra, 40(a0)
-        ld.d sp, 48(a0)
-        ld.d gp, 56(a0)
-        ld.d tp, 64(a0)
-        ld.d t0, 72(a0)
-        ld.d t1, 80(a0)
-        ld.d t2, 88(a0)
-        ld.d s0, 96(a0)
-        ld.d s1, 104(a0)
-        ld.d a1, 120(a0)
-        ld.d a2, 128(a0)
-        ld.d a3, 136(a0)
-        ld.d a4, 144(a0)
-        ld.d a5, 152(a0)
-        ld.d a6, 160(a0)
-        ld.d a7, 168(a0)
-        ld.d s2, 176(a0)
-        ld.d s3, 184(a0)
-        ld.d s4, 192(a0)
-        ld.d s5, 200(a0)
-        ld.d s6, 208(a0)
-        ld.d s7, 216(a0)
-        ld.d s8, 224(a0)
-        ld.d s9, 232(a0)
-        ld.d s10, 240(a0)
-        ld.d s11, 248(a0)
-        ld.d t3, 256(a0)
-        ld.d t4, 264(a0)
-        ld.d t5, 272(a0)
-        ld.d t6, 280(a0)
+        ld.d   $ra, $a0, 0
+        ld.d   $tp, $a0, 8
+        ld.d   $sp, $a0, 16
+        ld.d   $a1, $a0, 32
+        ld.d   $a2, $a0, 40
+        ld.d   $a3, $a0, 48
+        ld.d   $a4, $a0, 56
+        ld.d   $a5, $a0, 64
+        ld.d   $a6, $a0, 72
+        ld.d   $a7, $a0, 80
+        ld.d   $t0, $a0, 88
+        ld.d   $t1, $a0, 96
+        ld.d   $t2, $a0, 104
+        ld.d   $t3, $a0, 112
+        ld.d   $t4, $a0, 120
+        ld.d   $t5, $a0, 128
+        ld.d   $t6, $a0, 136
+        ld.d   $t7, $a0, 144
+        ld.d   $t8, $a0, 152
+        ld.d   $r21, $a0,160
+        ld.d   $fp, $a0, 168
+        ld.d   $s0, $a0, 176
+        ld.d   $s1, $a0, 184
+        ld.d   $s2, $a0, 192
+        ld.d   $s3, $a0, 200
+        ld.d   $s4, $a0, 208
+        ld.d   $s5, $a0, 216
+        ld.d   $s6, $a0, 224
+        ld.d   $s7, $a0, 232
+        ld.d   $s8, $a0, 240
 
-	# restore user a0, and save TRAPFRAME in sscratch
-        csrrw a0, sscratch, a0
-
+	# restore user a0, and save TRAPFRAME in SAVE0
+        csrwr  $a0, LOONGARCH_CSR_SAVE0
+        
         # return to user mode and user pc.
-        # usertrapret() set up sstatus and sepc.
-        sret
+        # usertrapret() set up prmd and era.
+        ertn

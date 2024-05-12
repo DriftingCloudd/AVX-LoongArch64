@@ -5,7 +5,7 @@
 #include "loongarch.h"
 #include "types.h"
 #include "spinlock.h"
-// #include "file.h"
+#include "file.h"
 // #include "fat32.h"
 // #include "thread.h"
 // #include "trap.h"
@@ -75,11 +75,11 @@ struct proc
   uint64 kstack;               // Virtual address of kernel stack
   uint64 sz;                   // Size of process memory (bytes)
   pagetable_t pagetable;    // User lower half address page table
-
+  // todo： 中断保存寄存器
   // struct trapframe *trapframe; // data page for uservec.S, use DMW address
   struct context context;      // swtch() here to run process
-  // struct file *ofile[NOFILE];  // Open files
-  // struct inode *cwd;           // Current directory
+  struct file *ofile[NOFILE];  // Open files
+  struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 };
 
@@ -158,7 +158,7 @@ int             cpuid(void);
 // int             tgkill(int, int, int);
 struct cpu*     mycpu(void);
 // struct cpu*     getmycpu(void);
-// struct proc*    myproc();
+struct proc*    myproc();
 void            procinit(void);
 // void            scheduler(void) __attribute__((noreturn));
 // void            sched(void);
@@ -166,7 +166,7 @@ void            procinit(void);
 // void            sleep(void*, struct spinlock*);
 // void            userinit(void);
 // int             wait(uint64);
-// void            wakeup(void*);
+void            wakeup(void*);
 // void            yield(void);
 // void            t_yield(void);
 // int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);

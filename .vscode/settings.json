@@ -6,6 +6,7 @@
         "types.h": "c",
         "proc.h": "c",
         "intr.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "printf.h": "c"
     }
 }

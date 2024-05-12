@@ -130,10 +130,10 @@ void timer_tick() {
 //   return 0;
 // }
 
-// struct timeval get_timeval() {
-//   uint64 time = r_time();
-//   return (struct timeval){
-//       .tv_sec = time / (CLK_FREQ),
-//       .tv_usec = time / (CLK_FREQ / 1000),
-//   };
-// }
+struct timeval get_timeval() {
+  uint64 time = r_time();
+  return (struct timeval){
+      .tv_sec = time / (CLK_FREQ),
+      .tv_usec = time / (CLK_FREQ / 1000),
+  };
+}

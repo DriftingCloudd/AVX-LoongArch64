@@ -10,6 +10,7 @@
         "printf.h": "c",
         "string.h": "c",
         "vm.h": "c",
-        "memlayout.h": "c"
+        "memlayout.h": "c",
+        "ring_buffer.h": "c"
     }
 }

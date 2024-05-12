@@ -22,6 +22,7 @@ OBJS += \
   $K/vm.o \
   $K/swtch.o \
   $K/trampoline.o \
+  $K/ring_buffer.o \
 #  $K/trap.o \
 	$K/time.o \
 #  $K/syscall.o \

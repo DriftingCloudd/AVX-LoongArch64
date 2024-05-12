@@ -44,28 +44,28 @@ void timerinit() {
 //   sbi_set_timer(r_time() + INTERVAL);
 // }
 
-// void timer_tick() {
-//   acquire(&tickslock);
-//   ticks++;
-//   wakeup(&ticks);
-//   release(&tickslock);
-//   set_next_timeout();
+void timer_tick() {
+  acquire(&tickslock);
+  ticks++;
+  wakeup(&ticks);
+  release(&tickslock);
+  set_next_timeout();
 
-//   // printf("ticks:%d\n",ticks);
-//   if (hastimer) {
-//     // printf("begin timer\n");
-//     for (int i = 0; i < NTIMERS; i++) {
-//       if (timers[i].pid == 0)
-//         continue;
-//       if (ticks - timers[i].ticks >= 80) {
-//         // printf("timer pid %d\n",timers[i].pid);
-//         kill(timers[i].pid, SIGALRM);
-//         timers[i].pid = 0;
-//         hastimer = 0;
-//       }
-//     }
-//   }
-// }
+  // printf("ticks:%d\n",ticks);
+  if (hastimer) {
+    // printf("begin timer\n");
+    for (int i = 0; i < NTIMERS; i++) {
+      if (timers[i].pid == 0)
+        continue;
+      if (ticks - timers[i].ticks >= 80) {
+        // printf("timer pid %d\n",timers[i].pid);
+        kill(timers[i].pid, SIGALRM);
+        timers[i].pid = 0;
+        hastimer = 0;
+      }
+    }
+  }
+}
 
 // uint64 sys_times() {
 //   struct tms ptms;

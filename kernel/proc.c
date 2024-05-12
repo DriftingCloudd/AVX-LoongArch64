@@ -29,7 +29,7 @@ struct spinlock wait_lock;
 
 // extern void forkret(void);
 // extern int magic_count;
-// extern void swtch(struct context *, struct context *);
+extern void swtch(struct context *, struct context *);
 // static void wakeup1(struct proc *chan);
 // static void freeproc(struct proc *p);
 
@@ -172,21 +172,21 @@ int allocpid() {
   return pid;
 }
 // 新上下文
-static void copycontext(context *t1, context *t2) {
-  t1->ra = t2->ra;
-  t1->sp = t2->sp;
-  //---// 
-  t1->s0 = t2->s0;
-  t1->s1 = t2->s1;
-  t1->s2 = t2->s2;
-  t1->s3 = t2->s3;
-  t1->s4 = t2->s4;
-  t1->s5 = t2->s5;
-  t1->s6 = t2->s6;
-  t1->s7 = t2->s7;
-  t1->s8 = t2->s8;
-  t1->fp = t2->fp;
-}
+// static void copycontext(context *t1, context *t2) {
+//   t1->ra = t2->ra;
+//   t1->sp = t2->sp;
+//   //---// 
+//   t1->s0 = t2->s0;
+//   t1->s1 = t2->s1;
+//   t1->s2 = t2->s2;
+//   t1->s3 = t2->s3;
+//   t1->s4 = t2->s4;
+//   t1->s5 = t2->s5;
+//   t1->s6 = t2->s6;
+//   t1->s7 = t2->s7;
+//   t1->s8 = t2->s8;
+//   t1->fp = t2->fp;
+// }
 
 // todo trapframe
 // static void copytrapframe(struct trapframe *f1, struct trapframe *f2) {
@@ -380,22 +380,22 @@ static void copycontext(context *t1, context *t2) {
 //   }
 
   // map the trapframe just below TRAMPOLINE, for trampoline.S.
-  if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
-               PTE_R | PTE_W) < 0) {
-    vmunmap(pagetable, TRAMPOLINE, 1, 0);
-    uvmfree(pagetable, 0);
-    return NULL;
-  }
-  if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
-               PTE_R | PTE_X | PTE_U) < 0) {
-    vmunmap(pagetable, TRAMPOLINE, 1, 0);
-    vmunmap(pagetable, TRAPFRAME, 1, 0);
-    uvmfree(pagetable, 0);
-    return NULL;
-  }
+//   if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
+//                PTE_R | PTE_W) < 0) {
+//     vmunmap(pagetable, TRAMPOLINE, 1, 0);
+//     uvmfree(pagetable, 0);
+//     return NULL;
+//   }
+//   if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
+//                PTE_R | PTE_X | PTE_U) < 0) {
+//     vmunmap(pagetable, TRAMPOLINE, 1, 0);
+//     vmunmap(pagetable, TRAPFRAME, 1, 0);
+//     uvmfree(pagetable, 0);
+//     return NULL;
+//   }
 
-  return pagetable;
-}
+//   return pagetable;
+// }
 
 // // Free a process's page table, and free the
 // // physical memory it refers to.
@@ -780,26 +780,28 @@ static void copycontext(context *t1, context *t2) {
 // // be proc->intena and proc->noff, but that would
 // // break in the few places where a lock is held but
 // // there's no process.
-// void sched(void) {
-//   int intena;
-//   struct proc *p = myproc();
-//   // debug_print("sched p->pid %d\n", p->pid);
-//   if (!holding(&p->lock))
-//     panic("sched p->lock");
-//   if (mycpu()->noff != 1) {
-//     debug_print("noff:%d\n", mycpu()->noff);
-//     panic("sched locks");
-//   }
-//   if (p->state == RUNNING || p->main_thread->state == t_RUNNING)
-//     panic("sched running");
-//   if (intr_get())
-//     panic("sched interruptible");
+void sched(void) {
+  int intena;
+  struct proc *p = myproc();
+  // debug_print("sched p->pid %d\n", p->pid);
+  if (!holding(&p->lock))
+    panic("sched p->lock");
+  if (mycpu()->noff != 1) {
+    // debug_print("noff:%d\n", mycpu()->noff);
+    panic("sched locks");
+  }
+  // if (p->state == RUNNING || p->main_thread->state == t_RUNNING) //todo , the thread
+  if(p->state == RUNNING)
+    panic("sched running");
+  if (intr_get())
+    panic("sched interruptible");
 
-//   copytrapframe(p->main_thread->trapframe, p->trapframe);
-//   intena = mycpu()->intena;
-//   swtch(&p->context, &mycpu()->context);
-//   mycpu()->intena = intena;
-// }
+  // 切换线程上下文
+  // copytrapframe(p->main_thread->trapframe, p->trapframe);
+  intena = mycpu()->intena;
+  swtch(&p->context, &mycpu()->context);
+  mycpu()->intena = intena;
+}
 
 // // Give up the CPU for one scheduling round.
 void yield(void) {
@@ -809,6 +811,7 @@ void yield(void) {
   p->state = RUNNABLE;
   // todo：线程部分
   // p->main_thread->state = t_RUNNABLE;
+  // 执行调度，以进程（线程）为基本单位
   sched();
   release(&p->lock);
 }

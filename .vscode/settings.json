@@ -7,6 +7,9 @@
         "proc.h": "c",
         "intr.h": "c",
         "timer.h": "c",
-        "printf.h": "c"
+        "printf.h": "c",
+        "string.h": "c",
+        "vm.h": "c",
+        "memlayout.h": "c"
     }
 }

@@ -161,13 +161,13 @@ struct cpu*     mycpu(void);
 struct proc*    myproc();
 void            procinit(void);
 // void            scheduler(void) __attribute__((noreturn));
-// void            sched(void);
+void            sched(void);
 // void            setproc(struct proc*);
 // void            sleep(void*, struct spinlock*);
 // void            userinit(void);
 // int             wait(uint64);
 void            wakeup(void*);
-// void            yield(void);
+void            yield(void);
 // void            t_yield(void);
 // int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 // int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
@@ -180,5 +180,5 @@ void            wakeup(void*);
 // uint64          thread_clone(uint64 stackVa,uint64 ptid,uint64 tls,uint64 ctid);
 
 // struct proc*    threadalloc(void (*fn)(void *), void *arg);
-// int             get_proc_addr_num(struct proc *p);
+int             get_proc_addr_num(struct proc *p);
 #endif

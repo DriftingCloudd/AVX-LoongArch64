@@ -3,8 +3,8 @@
 	# kernel.ld causes this to be aligned
         # to a page boundary.
         #
-# include "asm.h"
 
+#include "include/loongarchregs.h"
 .globl trampoline
 trampoline:
 .align 4

@@ -18,11 +18,11 @@ struct vma {
     uint64 addr;   //vma映射的内存地址是什么
     uint64 sz;   //vma映射的大小是什么
     uint64 end;   //vma映射的结束地址
-    int flags;   
+    int flags;   // vma进程的权限设置
     int fd;  
     uint64 f_off;
     struct vma *prev;   //链表结构，按照addr排序
-    struct vma *next;
+    struct vma *next;   
 };
 
 struct vma *vma_init(struct proc *p);

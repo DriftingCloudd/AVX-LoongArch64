@@ -69,8 +69,7 @@ void kvminit() {
 }
 // flush tlb, fill '0'
 
-void
-tlbinit(void)
+void tlbinit(void)
 {
   asm volatile("invtlb  0x0,$zero,$zero");
   w_csr_stlbps(0xcU);// reset
@@ -597,114 +596,116 @@ int copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max) {
   }
 }
 
-// int copyinstr2(char *dst, uint64 srcva, uint64 max) {
-//   int got_null = 0;
-//   uint64 sz = myproc()->sz;
-//   while (srcva < sz && max > 0) {
-//     char *p = (char *)srcva;
-//     if (*p == '\0') {
-//       *dst = '\0';
-//       got_null = 1;
-//       break;
-//     } else {
-//       *dst = *p;
-//     }
-//     --max;
-//     srcva++;
-//     dst++;
-//   }
-//   if (got_null) {
-//     return 0;
-//   } else {
-//     return -1;
-//   }
-// }
+int copyinstr2(char *dst, uint64 srcva, uint64 max) {
+  int got_null = 0;
+  uint64 sz = myproc()->sz;
+  while (srcva < sz && max > 0) {
+    char *p = (char *)srcva;
+    if (*p == '\0') {
+      *dst = '\0';
+      got_null = 1;
+      break;
+    } else {
+      *dst = *p;
+    }
+    --max;
+    srcva++;
+    dst++;
+  }
+  if (got_null) {
+    return 0;
+  } else {
+    return -1;
+  }
+}
 
 // initialize kernel pagetable for each process.
-// pagetable_t proc_kpagetable(struct proc *p) {
-//   pagetable_t kpt = (pagetable_t)kalloc();
-//   if (kpt == NULL)
-//     return NULL;
-//   if (tcpip_pagetable != NULL) {
-//     memmove(kpt, tcpip_pagetable, PGSIZE);
-//     return kpt;
-//   } else {
-//     memmove(kpt, kernel_pagetable, PGSIZE);
-//   }
+pagetable_t proc_kpagetable(struct proc *p) {
+  pagetable_t kpt = (pagetable_t)kalloc();
+  if (kpt == NULL)
+    return NULL;
+  // if (tcpip_pagetable != NULL) {
+  //   memmove(kpt, tcpip_pagetable, PGSIZE);
+  //   return kpt;
+  // } else {
+    memmove(kpt, kernel_pagetable, PGSIZE);
+  // }
   
-//   int procaddrnum = get_proc_addr_num(p);
+  int procaddrnum = get_proc_addr_num(p);
 
-//   char *mem;
-//   uint64 a;
-//   uint64 start = PROCVKSTACK(procaddrnum);
-//   uint64 end = start + KSTACKSIZE;
-//   for (a = start; a < end; a += PGSIZE) {
-//     mem = kalloc();
-//     if (mem == NULL) {
-//       vmunmap(kpt, start, (a - start) / PGSIZE, 1);
-//       printf("kpagetable kalloc failed\n");
-//       goto fail;
-//     }
-//     memset(mem, 0, PGSIZE);
-//     if (mappages(kpt, a, PGSIZE, (uint64)mem, PTE_R | PTE_W) != 0) {
-//       kfree(mem);
-//       vmunmap(kpt, start, (a - start) / PGSIZE, 1);
-//       printf("[kpagetable]map page failed\n");
-//       goto fail;
-//     }
-//   }
+  char *mem;
+  uint64 a;
+  uint64 start = PROCVKSTACK(procaddrnum);
+  uint64 end = start + KSTACKSIZE;
+  for (a = start; a < end; a += PGSIZE) {
+    mem = kalloc();
+    if (mem == NULL) {
+      vmunmap(kpt, start, (a - start) / PGSIZE, 1);
+      printf("kpagetable kalloc failed\n");
+      goto fail;
+    }
+    memset(mem, 0, PGSIZE);
+    if (mappages(kpt, a, PGSIZE, (uint64)mem, PTE_P | PTE_W) != 0) {
+      kfree(mem);
+      vmunmap(kpt, start, (a - start) / PGSIZE, 1);
+      printf("[kpagetable]map page failed\n");
+      goto fail;
+    }
+  }
 
-//   return kpt;
+  return kpt;
 
-// fail:
-//   kvmfree(kpt, 1, p);
-//   return NULL;
-// }
+fail:
+  kvmfree(kpt, 1, p);
+  return NULL;
+}
 
 // only free page table, not physical pages
-// void kfreewalk(pagetable_t kpt) {
-//   for (int i = 0; i < 512; i++) {
-//     pte_t pte = kpt[i];
-//     if ((pte & PTE_V) && (pte & (PTE_MAT | PTE_W | PTE_P)) == 0) {
-//       kfreewalk((pagetable_t)PTE2PA(pte));
-//       kpt[i] = 0;
-//     } else if (pte & PTE_V) {
-//       break;
-//     }
-//   }
-//   kfree((void *)kpt);
-// }
+void kfreewalk(pagetable_t kpt) {
+  for (int i = 0; i < 512; i++) {
+    pte_t pte = kpt[i];
+    if ((pte & PTE_V) && (pte & (PTE_MAT | PTE_W | PTE_P)) == 0) {
+      kfreewalk((pagetable_t)PTE2PA(pte));
+      kpt[i] = 0;
+    } else if (pte & PTE_V) {
+      break;
+    }
+  }
+  kfree((void *)kpt);
+}
 
-// void kvmfreeusr(pagetable_t kpt) {
-//   pte_t pte;
-//   for (int i = 0; i < PX(2, MAXVA); i++) {
-//     pte = kpt[i];
-//     if ((pte & PTE_V) && (pte & (PTE_MAT | PTE_W | PTE_)) == 0) {
-//       kfreewalk((pagetable_t)PTE2PA(pte));
-//       kpt[i] = 0;
-//     }
-//   }
-// }
+void kvmfreeusr(pagetable_t kpt) {
+  pte_t pte;
+  for (int i = 0; i < PX(2, MAXVA); i++) {
+    pte = kpt[i];
+    if ((pte & PTE_V) && (pte & (PTE_MAT | PTE_W | PTE_P)) == 0) {
+      kfreewalk((pagetable_t)PTE2PA(pte));
+      kpt[i] = 0;
+    }
+  }
+}
 
-// void kvmfree(pagetable_t kpt, int stack_free, struct proc *p) {
-//   if (stack_free && tcpip_pagetable == NULL) {
-//     uint64 procaddrnum = get_proc_addr_num(p);
-//     uint64 prockstack = PROCVKSTACK(procaddrnum);
-//     vmunmap(kpt, prockstack, KSTACKSIZE / PGSIZE, 1);
-//     pte_t pte = kpt[PX(2, prockstack - PGSIZE)];
-//     if ((pte & PTE_V) && (pte & (PTE_R | PTE_W | PTE_X)) == 0) {
-//       kfreewalk((pagetable_t)PTE2PA(pte));
-//     }
-//     // for(uint64 a = prockstack; a < prockstack + KSTACKSIZE; a += PGSIZE){
-//     //   pte = kpt[PX(2, a)];
-//     //   if ((pte & PTE_V) && (pte & (PTE_R|PTE_W|PTE_X)) == 0) {
-//     //     kfreewalk((pagetable_t) PTE2PA(pte));
-//     //   }
-//     // }
-//   }
-//   kvmfreeusr(kpt);
-//   kfree(kpt);
-// }
+void kvmfree(pagetable_t kpt, int stack_free, struct proc *p) {
+  // if (stack_free && tcpip_pagetable == NULL) {
+    if(stack_free) {
+    uint64 procaddrnum = get_proc_addr_num(p);
+    // prockstack: 保护栈
+    uint64 prockstack = PROCVKSTACK(procaddrnum);
+    vmunmap(kpt, prockstack, KSTACKSIZE / PGSIZE, 1);
+    pte_t pte = kpt[PX(2, prockstack - PGSIZE)];
+    if ((pte & PTE_V) && (pte & (PTE_P | PTE_W | PTE_MAT)) == 0) {
+      kfreewalk((pagetable_t)PTE2PA(pte));
+    }
+    // for(uint64 a = prockstack; a < prockstack + KSTACKSIZE; a += PGSIZE){
+    //   pte = kpt[PX(2, a)];
+    //   if ((pte & PTE_V) && (pte & (PTE_R|PTE_W|PTE_X)) == 0) {
+    //     kfreewalk((pagetable_t) PTE2PA(pte));
+    //   }
+    // }
+  }
+  kvmfreeusr(kpt);
+  kfree(kpt);
+}
 
 // void vmprint(pagetable_t pagetable) {
 //   const int capacity = 512;

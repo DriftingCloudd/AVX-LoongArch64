@@ -30,7 +30,8 @@ struct inode {
   short minor;
   short nlink;
   uint size;
-//   uint addrs[NDIRECT+1];
+  // fs.h
+  // uint addrs[NDIRECT+1];
 };
 
 // map major device number to device functions.
@@ -39,8 +40,10 @@ struct devsw {
   int (*write)(int, uint64, int);
 };
 
-extern struct devsw devsw[];
+// extern struct devsw devsw[];
 
 #define CONSOLE 1
 
 struct file* filedup(struct file *f);
+void fileinit(void);
+void fileclose(struct file *f);

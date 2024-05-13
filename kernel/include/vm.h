@@ -5,6 +5,7 @@
 #include "loongarch.h"
 #include "proc.h"
 void            kvminit(void);
+void            tlbinit(void);
 void            kvminithart(void);
 uint64          kvmpa(uint64);
 void            kvmmap(uint64, uint64, uint64, int);

@@ -1,6 +1,6 @@
 // Support functions for system calls that involve file descriptors.
 
-#include "types.h"
+#include "types.h"    
 #include "loongarch.h"
 // #include "defs.h"
 #include "param.h"
@@ -17,15 +17,19 @@ struct {
   struct file file[NFILE];
 } ftable;
 
-void
-fileinit(void)
-{
+void fileinit(void) {
   initlock(&ftable.lock, "ftable");
+  struct file *f;
+  for (f = ftable.file; f < ftable.file + NFILE; f++) {
+    memset(f, 0, sizeof(struct file));
+  }
+#ifdef DEBUG
+  printf("fileinit\n");
+#endif
 }
 
 // Allocate a file structure.
-struct file*
-filealloc(void)
+struct file* filealloc(void)
 {
   struct file *f;
 
@@ -53,8 +57,7 @@ struct file* filedup(struct file *f)
 }
 
 // Close file f.  (Decrement ref count, close when reaches 0.)
-void
-fileclose(struct file *f)
+void fileclose(struct file *f)
 {
   struct file ff;
   acquire(&ftable.lock);

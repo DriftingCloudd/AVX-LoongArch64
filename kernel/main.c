@@ -4,6 +4,7 @@
 #include "loongarch.h"
 #include "loongarchregs.h"
 // #include "include/buf.h"
+// #include "include/file.h"
 #include "include/console.h"
 // #include "include/disk.h"
 #include "include/kalloc.h"
@@ -26,7 +27,7 @@
 #include "include/uart.h"
 // extern void _start(void);
 // #endif
-// extern void _entry(void);
+extern void _entry(void);
 
 
 volatile static int started = 0;
@@ -48,7 +49,7 @@ void main() {
     kvminit();      // create kernel page table
     kvminithart();  // turn on paging
     // 
-    // timerinit();    // init a lock for timer
+    timerinit();    // init a lock for timer
     // trapinithart(); // install kernel trap vector, including interrupt handler
     // threadInit();
     procinit();
@@ -59,13 +60,13 @@ void main() {
     // // init_socket();
     // binit(); // buffer cache
     // initlogbuffer();
-    // fileinit(); // file table
-    // userinit(); // first user process
+    fileinit(); // file table
+    userinit(); // first user process
     // tcpip_init_with_loopback();
     // printf("hart %d init done\n", hartid);
 
 
-    // __sync_synchronize();
+    __sync_synchronize();
     // started = 1;
     while (1);
     

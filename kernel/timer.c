@@ -6,7 +6,6 @@
 #include "include/printf.h"
 #include "include/proc.h"
 #include <signal.h>
-// #include "include/riscv.h"
 // #include "include/sbi.h"
 #include "include/spinlock.h"
 #include "include/loongarch.h"

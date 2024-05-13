@@ -23,6 +23,8 @@ OBJS += \
   $K/swtch.o \
   $K/trampoline.o \
   $K/ring_buffer.o \
+  $K/kernelvec.o \
+#   $K/file.o \
 #  $K/trap.o \
 	$K/time.o \
 #  $K/syscall.o \
@@ -44,7 +46,6 @@ OBJS += \
 #   $K/signal.o \
 #   $K/syssig.o \
 #   $K/bin.o \
-#   $K/ring_buffer.o \
 #   $K/socket_new.o \
 #   $K/sem.o \
 #   $K/syssocket.o \

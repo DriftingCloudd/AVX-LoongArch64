@@ -12,6 +12,8 @@
         "vm.h": "c",
         "memlayout.h": "c",
         "ring_buffer.h": "c",
-        "param.h": "c"
+        "param.h": "c",
+        "file.h": "c",
+        "spinlock.h": "c"
     }
 }

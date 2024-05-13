@@ -53,7 +53,7 @@ extern struct cpu cpus[NCPU];
 // enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
-// struct proc {
+struct proc {
 //   struct spinlock lock;
 
 //   // p->lock must be held when using these:
@@ -62,7 +62,7 @@ extern struct cpu cpus[NCPU];
 //   void *chan;                  // If non-zero, sleeping on chan
 //   int killed;                  // If non-zero, have been killed
 //   int xstate;                  // Exit status to be returned to parent's wait
-//   int pid;                     // Process ID
+int pid;                     // Process ID
 //   int uid;                     // Process User ID
 //   int gid;                     // Process Group ID
 //   int pgid;
@@ -98,7 +98,7 @@ extern struct cpu cpus[NCPU];
 //   //kernel thread
 //   void (*fn)(void *);
 //   void *arg;
-// };
+};
 
 // typedef struct rlimit {
 //   uint64 rlim_cur;
@@ -128,15 +128,15 @@ int             cpuid(void);
 // int             tgkill(int, int, int);
 struct cpu*     mycpu(void);
 // struct cpu*     getmycpu(void);
-// struct proc*    myproc();
+struct proc*    myproc();
 // void            procinit(void);
 // void            scheduler(void) __attribute__((noreturn));
 // void            sched(void);
 // void            setproc(struct proc*);
-// void            sleep(void*, struct spinlock*);
+void            sleep(void*, struct spinlock*);
 // void            userinit(void);
 // int             wait(uint64);
-// void            wakeup(void*);
+void            wakeup(void*);
 // void            yield(void);
 // void            t_yield(void);
 // int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);

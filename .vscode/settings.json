@@ -15,7 +15,8 @@
         "intr.h": "c",
         "printf.h": "c",
         "larchintrin.h": "c",
-        "param.h": "c"
+        "param.h": "c",
+        "buf.h": "c"
     },
     "makefile.launchConfigurations": [
         {

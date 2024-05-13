@@ -16,7 +16,7 @@
 // #include "include/socket.h"
 // #include "include/sysinfo.h"
 // #include "include/thread.h"
-// #include "include/timer.h"
+#include "include/timer.h"
 // #include "include/trap.h"
 // #include "include/types.h"
 #include "include/vm.h"
@@ -62,7 +62,7 @@ void main() {
     // fileinit(); // file table
     // userinit(); // first user process
     // tcpip_init_with_loopback();
-    // debug_print("hart %d init done\n", hartid);
+    // printf("hart %d init done\n", hartid);
 
 
     // __sync_synchronize();

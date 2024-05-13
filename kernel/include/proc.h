@@ -75,60 +75,24 @@ struct proc
   uint64 kstack;               // Virtual address of kernel stack
   uint64 sz;                   // Size of process memory (bytes)
   pagetable_t pagetable;    // User lower half address page table
+  // 内核进程页表 Kernel page table
+  pagetable_t kpagetable;    // User lower half address page table
   // todo： 中断保存寄存器
   // struct trapframe *trapframe; // data page for uservec.S, use DMW address
   struct context context;      // swtch() here to run process
   struct file *ofile[NOFILE];  // Open files
+  // 进程当前目录 
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  //
+  uint64 filelimit;
+  // timer
+  int ktime;
+  int utime;
+  // vma
+  struct vma *vma;
 };
 
-// struct proc {
-//   stru ct spinlock lock;
-
-//   // p->lock must be held when using these:
-//   enum procstate state;        // Process state
-//   struct proc *parent;         // Parent process
-//   void *chan;                  // If non-zero, sleeping on chan
-//   int killed;                  // If non-zero, have been killed
-//   int xstate;                  // Exit status to be returned to parent's wait
-//   int pid;                     // Process ID
-//   int uid;                     // Process User ID
-//   int gid;                     // Process Group ID
-//   int pgid;
-
-//   uint64 filelimit;
-
-//   // these are private to the process, so p->lock need not be held.
-//   thread *main_thread;         // Main thread per process
-//   thread *thread_queue;        // thread_queue
-//   uint64 kstack;               // Virtual address of kernel stack
-//   uint64 sz;                   // Size of process memory (bytes)
-//   pagetable_t pagetable;       // User page table
-//   pagetable_t kpagetable;      // Kernel page table
-//   struct trapframe *trapframe; // data page for trampoline.S
-//   struct context context;      // swtch() here to run process
-//   struct file *ofile[NOFILE];  // Open files
-//   int *exec_close;             // Open files
-//   struct dirent *cwd;          // Current directory
-//   char name[16];               // Process name (debugging)
-//   int tmask;                    // trace mask
-//   struct vma *vma;
-//   int ktime;
-//   int utime;
-//   int thread_num;
-//   int char_count;   // not used
-//   uint64 clear_child_tid;
-//   //signal
-//   sigaction sigaction[SIGRTMAX + 1]; // signal action
-//   __sigset_t sig_set; // signal mask
-//   __sigset_t sig_pending; // pending signal
-//   struct trapframe *sig_tf; // trapframe for signal
-
-//   //kernel thread
-//   void (*fn)(void *);
-//   void *arg;
-// };   ````````````````````````````````````
 
 // typedef struct rlimit {
 //   uint64 rlim_cur;
@@ -140,17 +104,16 @@ struct proc
 //   uint64 arg_point;
 // }thread_stack_param;
 
-// #define NOFILEMAX(p) (p->filelimit<NOFILE?p->filelimit:NOFILE)
-// #define LOG_PROCESS_NUM 7
+#define NOFILEMAX(p) (p->filelimit<NOFILE?p->filelimit:NOFILE)
+#define LOG_PROCESS_NUM 7
 // #define THREAD_TOTAL_NUMBER (1 << LOG_PROCESS_NUM)
 // #define PROCESS_OFFSET(processId) ((processId) & (THREAD_TOTAL_NUMBER - 1))
-
 
  void            cpuinit(void);
 // void            reg_info(void);
 int             cpuid(void);
-// void            exit(int);
-// int             fork(void);
+void            exit(int);
+int             fork(void);
 // int             growproc(int);
 // pagetable_t     proc_pagetable(struct proc *);
 // void            proc_freepagetable(pagetable_t, uint64);

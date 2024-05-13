@@ -48,6 +48,7 @@
 //   KSRACK (used for kernel thread)
 //   TRAPFRAME (p->trapframe, used by the uservec)
 //   如果要trampoline的情况，应该是在trapframe上面一页的大小（xv6）
+
 #define TRAMPOLINE (MAXVA - PGSIZE)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
 #endif

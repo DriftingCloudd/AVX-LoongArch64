@@ -11,6 +11,7 @@
         "string.h": "c",
         "vm.h": "c",
         "memlayout.h": "c",
-        "ring_buffer.h": "c"
+        "ring_buffer.h": "c",
+        "param.h": "c"
     }
 }

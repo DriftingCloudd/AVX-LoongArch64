@@ -67,26 +67,27 @@ void timer_tick() {
   }
 }
 
-// uint64 sys_times() {
-//   struct tms ptms;
-//   uint64 utms;
-//   argaddr(0, &utms);
-//   ptms.tms_utime = myproc()->utime;
-//   ptms.tms_stime = myproc()->ktime;
-//   ptms.tms_cstime = 1;
-//   ptms.tms_cutime = 1;
-//   struct proc *p;
-//   for (p = proc; p < proc + NPROC; p++) {
-//     acquire(&p->lock);
-//     if (p->parent == myproc()) {
-//       ptms.tms_cutime += p->utime;
-//       ptms.tms_cstime += p->ktime;
-//     }
-//     release(&p->lock);
-//   }
-//   copyout(myproc()->pagetable, utms, (char *)&ptms, sizeof(ptms));
-//   return 0;
-// }
+// 进程的时间统计信息
+uint64 sys_times() {
+  struct tms ptms;
+  uint64 utms;
+  argaddr(0, &utms);
+  ptms.tms_utime = myproc()->utime;
+  ptms.tms_stime = myproc()->ktime;
+  ptms.tms_cstime = 1;
+  ptms.tms_cutime = 1;
+  struct proc *p;
+  for (p = proc; p < proc + NPROC; p++) {
+    acquire(&p->lock);
+    if (p->parent == myproc()) {
+      ptms.tms_cutime += p->utime;
+      ptms.tms_cstime += p->ktime;
+    }
+    release(&p->lock);
+  }
+  copyout(myproc()->pagetable, utms, (char *)&ptms, sizeof(ptms));
+  return 0;
+}
 
 // uint64 setitimer(int which, const struct itimerval *value,
 //                  struct itimerval *ovalue) {

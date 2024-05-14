@@ -79,7 +79,7 @@ void tlbinit(void)
 
 // Switch h/w page table register to the kernel's page table,
 // and enable paging.
-// todo
+// wty_todo
 void kvminithart() {
   // flush the tlb(tlbinit)
   tlbinit();

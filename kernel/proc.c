@@ -10,7 +10,7 @@
 #include "include/loongarch.h"
 #include "include/spinlock.h"
 #include "include/string.h"
-// #include "include/trap.h"
+#include "include/trap.h"
 #include "include/types.h"
 #include "include/vm.h"
 
@@ -34,6 +34,7 @@ struct spinlock wait_lock;
 
 extern void forkret(void);
 // extern int magic_count;
+
 // swtch.S
 extern void swtch(struct context *, struct context *);
 // used for wait();
@@ -72,8 +73,7 @@ void cpuinit(void) {
 }
 
 // initialize the proc table at boot time.
-void
-procinit(void)
+void procinit(void)
 {
   struct proc *p;
   
@@ -82,11 +82,9 @@ procinit(void)
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
-      // p->killed = 0;
-      // p->parent = 0;
-      // p->xstate = 0;
-      // p->pid = 0;//boot_time
-
+      p->pid = 0;//boot_time
+      for (int i = 0; i < NOFILE; i++)
+        p->ofile[i] = 0;
       p->kstack = KSTACK((int) (p - proc)); 
   }
 }
@@ -109,8 +107,8 @@ procinit(void)
 //     p->pagetable = 0;
 //     p->kpagetable = 0;
 //     p->trapframe = 0;
-//     for (int i = 0; i < NOFILE; i++)
-//       p->ofile[i] = 0;
+      // for (int i = 0; i < NOFILE; i++)
+      //   p->ofile[i] = 0;
 //     p->cwd = 0;
 //     p->name[0] = 0;
 //     p->vma = 0;
@@ -274,9 +272,9 @@ found:
   // memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
   // Allocate a trapframe page.
   // trapframes :TODO
-  // if ((p->trapframe = (struct trapframe *)kalloc()) == NULL) {
-  //   release(&p->lock);
-  //   return NULL;
+  if ((p->trapframe = (struct trapframe *)kalloc()) == NULL) {
+    release(&p->lock);
+    return NULL;
   // }
 
   // An empty user page table.
@@ -287,7 +285,8 @@ found:
     release(&p->lock);
     return NULL;
   }
-  // p->kstack = PROCVKSTACK(get_proc_addr_num(p));
+  
+  p->kstack = PROCVKSTACK(get_proc_addr_num(p));
 
   // p->exec_close = kalloc();
   // for (int fd = 0; fd < NOFILE; fd++)
@@ -296,9 +295,11 @@ found:
   // Set up new context to start executing at forkret,
   // which returns to user space.
   memset(&p->context, 0, sizeof(p->context));
+
   // init 上下文和线程
-  // p->context.ra = (uint64)forkret;
-  // p->context.sp = p->kstack + KSTACKSIZE;
+  p->context.ra = (uint64)forkret;
+  p->context.sp = p->kstack + KSTACKSIZE;
+  // init
   // p->main_thread = allocNewThread();
   // copycontext(&p->main_thread->context, &p->context);
   // p->thread_num++;
@@ -312,17 +313,18 @@ found:
   //   panic("allocproc: map thread trapframe failed");
   // p->main_thread->vtf = p->kstack - PGSIZE;
   return p;
+  }
 }
 
-// // free a proc structure and the data hanging from it,
-// // including user pages.
-// // p->lock must be held.
+// free a proc structure and the data hanging from it,
+// including user pages.
+// p->lock must be held.
 static void freeproc(struct proc *p) {
-  // if (p->trapframe)
-  //   kfree((void *)p->trapframe);
+  if (p->trapframe)
+    kfree((void *)p->trapframe);
 
   // kfree((void *)p->exec_close);
-  // p->trapframe = 0;
+  p->trapframe = 0;
 
   // thread *t = p->thread_queue;
   // while (NULL != t) {
@@ -395,12 +397,12 @@ pagetable_t proc_pagetable(struct proc *p) {
 
   // map the trapframe just below TRAMPOLINE, for trampoline.S.
   // todo_trapframe
-  // if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
-  //              PTE_R | PTE_W) < 0) {
-  //   vmunmap(pagetable, TRAMPOLINE, 1, 0);
-  //   uvmfree(pagetable, 0);
-  //   return NULL;
-  // }
+  if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
+               PTE_P | PTE_W) < 0) {
+    vmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmfree(pagetable, 0);
+    return NULL;
+  }
   // signal ：交互信号
   // if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
   //              PTE_R | PTE_X | PTE_U) < 0) {
@@ -447,8 +449,8 @@ void userinit(void)
   p->sz = PGSIZE;
 
   // prepare for the very first "return" from kernel to user.
-  // p->trapframe->era = 0;      // user program counter
-  // p->trapframe->sp = PGSIZE;  // user stack pointer 
+  p->trapframe->era = 0;      // user program counter
+  p->trapframe->sp = PGSIZE;  // user stack pointer 
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/"); 
@@ -513,10 +515,10 @@ int fork(void) {
   // np->tmask = p->tmask;
 
   // copy saved user registers.
-  // *(np->trapframe) = *(p->trapframe);
+  *(np->trapframe) = *(p->trapframe);
 
   // Cause fork to return 0 in the child.
-  // np->trapframe->a0 = 0;
+  np->trapframe->a0 = 0;
   // copytrapframe(np->main_thread->trapframe, np->trapframe);
   // increment reference counts on open file descriptors.
   // 分配新的进程号
@@ -759,7 +761,7 @@ void scheduler(void) {
         p->state = RUNNING;
         // futexClear(p->main_thread);
         c->proc = p;
-        // todo
+        // wty_todo
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma() -> tlb_init(); //  清空tlb
         tlbinit();
@@ -820,7 +822,7 @@ void sched(void) {
 void yield(void) {
   struct proc *p = myproc();
   acquire(&p->lock);
-  // printf("pid %d yield\n, epc: %p", p->pid, p->trapframe->epc);
+  printf("pid %d yield\n, era: %p", p->pid, p->trapfram/e->era);
   p->state = RUNNABLE;
   // todo：线程部分
   // p->main_thread->state = t_RUNNABLE;
@@ -1199,10 +1201,10 @@ uint64 clone(uint64 new_stack, uint64 new_fn) {
   // np->tmask = p->tmask;
 
   // copy saved user registers.
-  // *(np->trapframe) = *(p->trapframe);
+  *(np->trapframe) = *(p->trapframe);
 
   // Cause fork to return 0 in the child.
-  // np->trapframe->a0 = 0;
+  np->trapframe->a0 = 0;
 
   // increment reference counts on open file descriptors.
   for (i = 0; i < NOFILE; i++)
@@ -1215,8 +1217,8 @@ uint64 clone(uint64 new_stack, uint64 new_fn) {
 
   np->state = RUNNABLE;
   // trapframe //todo
-  // np->trapframe->epc = new_fn;
-  // np->trapframe->sp = new_stack;
+  np->trapframe->era = new_fn;
+  np->trapframe->sp = new_stack;
 
   release(&np->lock);
   return pid;

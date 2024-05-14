@@ -8,8 +8,8 @@
 #include "file.h"
 // #include "fat32.h"
 // #include "thread.h"
-// #include "trap.h"
-// #include "vma.h"
+#include "trap.h"
+#include "vma.h"
 // #include "signal.h"
 #include "context.h"
 
@@ -78,7 +78,7 @@ struct proc
   // 内核进程页表 Kernel page table
   pagetable_t kpagetable;    // User lower half address page table
   // todo： 中断保存寄存器
-  // struct trapframe *trapframe; // data page for uservec.S, use DMW address
+  struct trapframe *trapframe; // data page for uservec.S, use DMW address
   struct context context;      // swtch() here to run process
   struct file *ofile[NOFILE];  // Open files
   // 进程当前目录 

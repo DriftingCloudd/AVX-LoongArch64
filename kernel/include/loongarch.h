@@ -58,6 +58,7 @@ w_csr_crmd(uint32 x)
 
 #define PRMD_PPLV (3U << 0)  // Previous Privilege
 #define PRMD_PIE  (1U << 2)  // Previous Int_enable
+#define PRMD_PWE  (1U << 3)  // Previous Write_enable
 
 static inline uint32
 r_csr_prmd()

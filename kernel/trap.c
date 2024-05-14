@@ -188,6 +188,8 @@ devintr()
   uint32 estat = r_csr_estat();
   uint32 ecfg = r_csr_ecfg();
 
+  
+  //CSR.ESTAT.IS & CSR.ECFG.LIE -> int_vec(13bits stand for irq type)
   if(estat & ecfg & HWI_VEC) {
     // this is a hardware interrupt, via IOCR.
 

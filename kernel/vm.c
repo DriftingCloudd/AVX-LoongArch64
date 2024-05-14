@@ -731,6 +731,7 @@ void kvmfree(pagetable_t kpt, int stack_free, struct proc *p) {
 //   return;
 // }
 
+// 在给定的页表，为指定的虚拟地址设置权限
 uint64 experm(pagetable_t pagetable, uint64 va, uint64 perm) {
   pte_t *pte;
   uint64 pa;

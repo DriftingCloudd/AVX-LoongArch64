@@ -11,7 +11,6 @@
 enum segtype {NONE, MMAP, STACK};
 
 struct proc;
-
 struct vma {
     enum segtype type;  //分配的vma的作用是干什么
     int perm;   //这个vma的权限是什么

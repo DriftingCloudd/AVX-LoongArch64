@@ -12,6 +12,7 @@
 
 // 初始化进程的vma,在proc.c中调用
 struct vma *vma_init(struct proc *p) {
+  // 为进程分配初始化的vma
   if (NULL == p) {
     printf("p is not existing\n");
     return NULL;
@@ -23,18 +24,15 @@ struct vma *vma_init(struct proc *p) {
   }
 
   vma->type = NONE;
+  // next 结构
   vma->prev = vma->next = vma;
   p->vma = vma;
-
+  
   if (NULL == alloc_mmap_vma(p, 0, USER_MMAP_START, 0, 0, 0, 0)) {
     // free_vma_list(p);
     kfree(vma);
     return NULL;
   }
-  // if(alloc_vma_stack(p) != 0){
-  //     kfree(vma);
-  //     return NULL;
-  // }
 
   return vma;
 }
@@ -94,8 +92,10 @@ struct vma *alloc_vma(struct proc *p, enum segtype type, uint64 addr, uint64 sz,
 }
 
 struct vma *find_mmap_vma(struct vma *head) {
+  // 单项链表？
   struct vma *vma = head->next;
   while (vma != head) {
+    // vma 映射类型是： MMAP
     if (MMAP == vma->type)
       return vma;
     vma = vma->next;
@@ -122,6 +122,7 @@ struct vma *alloc_mmap_vma(struct proc *p, int flags, uint64 addr, uint64 sz,
 }
 
 struct vma *vma_copy(struct proc *np, struct vma *head) {
+  // kalloc -> malloc
   struct vma *new_vma = (struct vma *)kalloc();
   if (NULL == new_vma) {
     printf("vma copy failed\n");
@@ -134,7 +135,7 @@ struct vma *vma_copy(struct proc *np, struct vma *head) {
   struct vma *pre_vma = head->next;
   struct vma *nvma = NULL;
   while (pre_vma != head) {
-    nvma = (struct vma *)kalloc(); // TODO: fix this
+    nvma = (struct vma *)kalloc();
     if (NULL == nvma) {
       goto failure;
     }
@@ -264,13 +265,14 @@ uint64 alloc_vma_stack(struct proc *p) {
     return -1;
   }
 
-  if (uvmalloc1(p->pagetable, start, end, PTE_R | PTE_W | PTE_U) != 0) {
+  if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV) != 0) {
+    // 判断读权限
     printf("user stack vma alloc failed\n");
     kfree(vma);
     return -1;
   }
   vma->type = STACK;
-  vma->perm = PTE_R | PTE_W;
+  vma->perm = PTE_P | PTE_W;
   vma->addr = start;
   vma->end = end;
   vma->sz = INIT_STACK_SIZE;
@@ -309,7 +311,7 @@ uint64 handle_stack_page_fault(struct proc *p, uint64 va) {
   }
   uint64 end = vma->addr;
 
-  if (uvmalloc1(p->pagetable, start, end, PTE_R | PTE_W | PTE_U) != 0) {
+  if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV) != 0) {
     printf("user stack vma alloc failed\n");
     return -1;
   }

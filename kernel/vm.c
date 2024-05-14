@@ -72,8 +72,11 @@ void kvminit() {
 void tlbinit(void)
 {
   asm volatile("invtlb  0x0,$zero,$zero");
-  w_csr_stlbps(0xcU);// reset
+  // 设置tlb页大小
+  w_csr_stlbps(0xcU);
+  // 设置asid 表项
   w_csr_asid(0x0U);
+  // 设置高位tlbehi项， 虚页号相关消息
   w_csr_tlbrehi(0xcU);
 }
 
@@ -86,7 +89,7 @@ void kvminithart() {
   // AVX 实现时没有体现顺序性，fence
   // sfence_vma();
   // 构造正确的 satp值
-  // todo
+  //  更新页表消息
   // w_satp(MAKE_SATP(kernel_pagetable));
 
   // 修改uart的地址映射

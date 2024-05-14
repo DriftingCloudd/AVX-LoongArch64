@@ -73,14 +73,14 @@ void fileclose(struct file *f)
   release(&ftable.lock);
 
   // 管道和其他设备 ; todo
-  // if(ff.type == FD_PIPE){
-  //   pipeclose(ff.pipe, ff.writable);
-  // } else 
-  // if(ff.type == FD_INODE || ff.type == FD_DEVICE){
-  //   begin_op();
-  //   iput(ff.ip);
-  //   end_op();
-  // }
+  if(ff.type == FD_PIPE){
+    pipeclose(ff.pipe, ff.writable);
+  } else 
+  if(ff.type == FD_INODE || ff.type == FD_DEVICE){
+    begin_op();
+    iput(ff.ip);
+    end_op();
+  }
 }
 
 // Get metadata about file f.

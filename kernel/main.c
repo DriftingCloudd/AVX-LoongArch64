@@ -4,26 +4,26 @@
 #include "loongarch.h"
 #include "loongarchregs.h"
 // #include "include/buf.h"
+// #include "include/file.h"
 #include "include/console.h"
 // #include "include/disk.h"
-// #include "include/kalloc.h"
+#include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/param.h"
 // #include "include/plic.h"
 #include "include/printf.h"
 #include "include/proc.h"
-// #include "include/riscv.h"
 // #include "include/sbi.h"
 // #include "include/socket.h"
 // #include "include/sysinfo.h"
 // #include "include/thread.h"
-// #include "include/timer.h"
+#include "include/timer.h"
 // #include "include/trap.h"
 // #include "include/types.h"
-// #include "include/vm.h"
+#include "include/vm.h"
 // #ifndef QEMU
 // #include "include/sd_final.h"
-// #include "include/uart8250.h"
+// #include "include/uart16500.h"
 #include "include/uart.h"
 // extern void _start(void);
 // #endif
@@ -32,8 +32,8 @@ extern void _entry(void);
 
 volatile static int started = 0;
 // static int first = 0;
-extern void boot_stack(void);
-extern void boot_stack_top(void);
+// extern void boot_stack(void);
+// extern void boot_stack_top(void);
 // extern void initlogbuffer(void);
 // extern int tcp_start_listen;
 void main() {
@@ -44,13 +44,15 @@ void main() {
     consoleinit();
     printfinit(); // init a lock for printf
     printf("test");
-    // kinit();        // physical page allocator
-    // kvminit();      // create kernel page table
-    // kvminithart();  // turn on paging
-    // timerinit();    // init a lock for timer
+    // 内存映射 //
+    kinit();        // physical page allocator
+    kvminit();      // create kernel page table
+    kvminithart();  // turn on paging
+    // 
+    timerinit();    // init a lock for timer
     // trapinithart(); // install kernel trap vector, including interrupt handler
     // threadInit();
-    // procinit();
+    procinit();
     // plicinit();
     // plicinithart();
     // // sd_test();
@@ -58,13 +60,13 @@ void main() {
     // // init_socket();
     // binit(); // buffer cache
     // initlogbuffer();
-    // fileinit(); // file table
-    // userinit(); // first user process
+    fileinit(); // file table
+    userinit(); // first user process
     // tcpip_init_with_loopback();
-    // debug_print("hart %d init done\n", hartid);
+    // printf("hart %d init done\n", hartid);
 
 
-    // __sync_synchronize();
+    __sync_synchronize();
     // started = 1;
     while (1);
     

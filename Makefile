@@ -18,11 +18,15 @@ OBJS += \
   $K/main.o \
   $K/proc.o \
   $K/console.o \
-#  $K/kalloc.o \
-#  $K/vm.o \
-#  $K/swtch.o \
-#  $K/trampoline.o \
+  $K/kalloc.o \
+  $K/vm.o \
+  $K/swtch.o \
+  $K/trampoline.o \
+  $K/ring_buffer.o \
+  $K/kernelvec.o \
+#   $K/file.o \
 #  $K/trap.o \
+	$K/time.o \
 #  $K/syscall.o \
 #  $K/sysproc.o \
 #  $K/bio.o \
@@ -32,8 +36,7 @@ OBJS += \
 #  $K/exec.o \
 #  $K/sysfile.o \
 #   $K/systime.o \
-#   $K/kernelvec.o \
-#   $K/timer.o \
+#   $K/kernelvec.o 
 #   $K/disk.o \
 #   $K/fat32.o \
 #   $K/plic.o \
@@ -43,7 +46,6 @@ OBJS += \
 #   $K/signal.o \
 #   $K/syssig.o \
 #   $K/bin.o \
-#   $K/ring_buffer.o \
 #   $K/socket_new.o \
 #   $K/sem.o \
 #   $K/syssocket.o \

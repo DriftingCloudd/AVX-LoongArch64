@@ -5,8 +5,8 @@
 #include "types.h"
 
 typedef struct context {
-  uint64 ra;
-  uint64 sp;
+  uint64 ra; //0
+  uint64 sp; //8
 
   // callee-saved
   uint64 s0;
@@ -18,9 +18,8 @@ typedef struct context {
   uint64 s6;
   uint64 s7;
   uint64 s8;
-  uint64 s9;
-  uint64 s10;
-  uint64 s11;
+  
+  uint64 fp;
 }context;
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef __PARAM_H
 #define __PARAM_H
 
+// 进程和cpud 的最大数量
 #define NPROC        50  // maximum number of processes
 #define NCPU          2  // maximum number of CPUs
 #define NOFILE       128  // open files per process
@@ -15,8 +16,10 @@
 #define FSSIZE       1000  // size of file system in blocks
 #define MAXPATH      260   // maximum file path name
 // #ifdef QEMU
+
 // #define CLK_FREQ     10000000
 // #else
+// 根据确切时钟
 #define CLK_FREQ     4000000
 // #endif
 

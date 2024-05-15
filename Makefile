@@ -1,6 +1,6 @@
 # platform	:= visionfive
 # platform	:= qemu
-# mode := debug
+mode := debug
 # mode := release
 
 K=kernel
@@ -153,9 +153,9 @@ CFLAGS += -I.kernel -I.
 # CFLAGS += -Ikernel/lwip
 # CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 
-# ifeq ($(mode), debug) 
-# CFLAGS += -DDEBUG 
-# endif 
+ifeq ($(mode), debug) 
+CFLAGS += -DDEBUG 
+endif 
 
 # ifeq ($(exam), yes) 
 # CFLAGS += -DEXAM 

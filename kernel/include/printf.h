@@ -21,6 +21,6 @@ void printstring(const char* s);
 
 void printint(int xx, int base, int sign);
 
-// void checkup1(struct proc *p);
+void checkup1(struct proc *p);
 
 #endif 

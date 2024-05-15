@@ -49,36 +49,36 @@ uartinit(void)
   initlock(&uart_tx_lock, "uart");
 }
 
-// // add a character to the output buffer and tell the
-// // UART to start sending if it isn't already.
-// // blocks if the output buffer is full.
-// // because it may block, it can't be called
-// // from interrupts; it's only suitable for use
-// // by write().
-// void
-// uartputc(int c)
-// {
-//   acquire(&uart_tx_lock);
+// add a character to the output buffer and tell the
+// UART to start sending if it isn't already.
+// blocks if the output buffer is full.
+// because it may block, it can't be called
+// from interrupts; it's only suitable for use
+// by write().
+void
+uartputc(int c)
+{
+  acquire(&uart_tx_lock);
 
-//   if(panicked){
-//     for(;;)
-//       ;
-//   }
+  if(panicked){
+    for(;;)
+      ;
+  }
 
-//   while(1){
-//     if(uart_tx_w == uart_tx_r + UART_TX_BUF_SIZE){
-//       // buffer is full.
-//       // wait for uartstart() to open up space in the buffer.
-//       sleep(&uart_tx_r, &uart_tx_lock);
-//     } else {
-//       uart_tx_buf[uart_tx_w % UART_TX_BUF_SIZE] = c;
-//       uart_tx_w += 1;
-//       uartstart();
-//       release(&uart_tx_lock);
-//       return;
-//     }
-//   }
-// }
+  while(1){
+    if(uart_tx_w == uart_tx_r + UART_TX_BUF_SIZE){
+      // buffer is full.
+      // wait for uartstart() to open up space in the buffer.
+      sleep(&uart_tx_r, &uart_tx_lock);
+    } else {
+      uart_tx_buf[uart_tx_w % UART_TX_BUF_SIZE] = c;
+      uart_tx_w += 1;
+      uartstart();
+      release(&uart_tx_lock);
+      return;
+    }
+  }
+}
 
 // alternate version of uartputc() that doesn't 
 // use interrupts, for use by kernel printf() and
@@ -102,35 +102,35 @@ uartputc_sync(int c)
   pop_off();
 }
 
-// // if the UART is idle, and a character is waiting
-// // in the transmit buffer, send it.
-// // caller must hold uart_tx_lock.
-// // called from both the top- and bottom-half.
-// void
-// uartstart()
-// {
-//   while(1){
-//     if(uart_tx_w == uart_tx_r){
-//       // transmit buffer is empty.
-//       return;
-//     }
+// if the UART is idle, and a character is waiting
+// in the transmit buffer, send it.
+// caller must hold uart_tx_lock.
+// called from both the top- and bottom-half.
+void
+uartstart()
+{
+  while(1){
+    if(uart_tx_w == uart_tx_r){
+      // transmit buffer is empty.
+      return;
+    }
     
-//     if((ReadReg(LSR) & LSR_TX_IDLE) == 0){
-//       // the UART transmit holding register is full,
-//       // so we cannot give it another byte.
-//       // it will interrupt when it's ready for a new byte.
-//       return;
-//     }
+    if((ReadReg(LSR) & LSR_TX_IDLE) == 0){
+      // the UART transmit holding register is full,
+      // so we cannot give it another byte.
+      // it will interrupt when it's ready for a new byte.
+      return;
+    }
     
-//     int c = uart_tx_buf[uart_tx_r % UART_TX_BUF_SIZE];
-//     uart_tx_r += 1;
+    int c = uart_tx_buf[uart_tx_r % UART_TX_BUF_SIZE];
+    uart_tx_r += 1;
     
-//     // maybe uartputc() is waiting for space in the buffer.
-//     wakeup(&uart_tx_r);
+    // maybe uartputc() is waiting for space in the buffer.
+    wakeup(&uart_tx_r);
     
-//     WriteReg(THR, c);
-//   }
-// }
+    WriteReg(THR, c);
+  }
+}
 
 // read one input character from the UART.
 // return -1 if none is waiting.
@@ -145,22 +145,22 @@ uartgetc(void)
   }
 }
 
-// // handle a uart interrupt, raised because input has
-// // arrived, or the uart is ready for more output, or
-// // both. called from trap.c.
-// void
-// uartintr(void)
-// {
-//   // read and process incoming characters.
-//   while(1){
-//     int c = uartgetc();
-//     if(c == -1)
-//       break;
-//     consoleintr(c);
-//   }
+// handle a uart interrupt, raised because input has
+// arrived, or the uart is ready for more output, or
+// both. called from trap.c.
+void
+uartintr(void)
+{
+  // read and process incoming characters.
+  while(1){
+    int c = uartgetc();
+    if(c == -1)
+      break;
+    consoleintr(c);
+  }
 
-//   // send buffered characters.
-//   acquire(&uart_tx_lock);
-//   uartstart();
-//   release(&uart_tx_lock);
-// }
+  // send buffered characters.
+  acquire(&uart_tx_lock);
+  uartstart();
+  release(&uart_tx_lock);
+}

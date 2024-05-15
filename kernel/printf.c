@@ -236,6 +236,10 @@ void backtrace() {
 void printfinit(void) {
   initlock(&pr.lock, "pr");
   pr.locking = 1; // changed, used to be 1
+  
+  #ifdef DEBUG
+  printf("DEBUG:printf initialzie.\n");
+  #endif
 }
 
 // #ifdef QEMU

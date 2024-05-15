@@ -3,10 +3,10 @@
 
 #include "loongarch.h"
 #include "loongarchregs.h"
-// #include "include/buf.h"
-// #include "include/file.h"
+#include "include/buf.h"
+#include "include/file.h"
 #include "include/console.h"
-// #include "include/disk.h"
+#include "include/disk.h"
 #include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/param.h"
@@ -38,12 +38,17 @@ volatile static int started = 0;
 // extern int tcp_start_listen;
 void main() {
   if (r_tp() == 0) {
+    int cpuid = r_tp();
 //    tcp_start_listen = 0;
 //    first = 1;
     cpuinit();
     consoleinit();
     printfinit(); // init a lock for printf
-    printf("test");
+
+    #ifdef DEBUG
+    print("DEBUG:hart %d enter main()...\n", cpuid);
+    #endif
+
     // 内存映射 //
     kinit();        // physical page allocator
     kvminit();      // create kernel page table
@@ -63,11 +68,11 @@ void main() {
     fileinit(); // file table
     userinit(); // first user process
     // tcpip_init_with_loopback();
-    // printf("hart %d init done\n", hartid);
+    printf("cpu %d init done\n", cpuid);
 
 
     __sync_synchronize();
-    // started = 1;
+    started = 1;
     while (1);
     
   } else {

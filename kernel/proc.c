@@ -587,7 +587,7 @@ void exit(int status) {
   // file_system
   // eput(p->cwd);
   p->cwd = 0;
-  checkup1(p);
+  // checkup1(p);
   // we might re-parent a child to init. we can't be precise about
   // waking up init, since we can't acquire its lock once we've
   // acquired any other proc lock. so wake up init whether that's

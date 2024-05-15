@@ -2,12 +2,12 @@
 
 #include "include/spinlock.h"
 #include "include/intr.h"
-// #include "include/memlayout.h"
-// #include "include/param.h"
+#include "include/memlayout.h"
+#include "include/param.h"
 #include "include/printf.h"
-// #include "include/proc.h"
-// #include "include/loongarch.h"
-// #include "include/types.h"
+#include "include/proc.h"
+#include "include/loongarch.h"
+#include "include/types.h"
 
 void initlock(struct spinlock *lk, char *name) {
   lk->name = name;

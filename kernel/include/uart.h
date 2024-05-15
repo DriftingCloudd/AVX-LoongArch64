@@ -43,10 +43,10 @@
 
 
 void uartinit(void);
-// void uartputc(int c);
+void uartputc(int c);
 void uartputc_sync(int c);
-// void uartstart();
+void uartstart();
 int uartgetc(void);
-// void uartintr(void);
+void uartintr(void);
 
 #endif

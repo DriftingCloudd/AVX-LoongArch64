@@ -76,27 +76,27 @@ static struct dirent root;
  *          -1      if fail
  */
 int fat32_init() {
-// #ifdef DEBUG
+  #ifdef DEBUG
   printf("[fat32_init] enter!\n");
-// #endif
+  #endif
   struct buf *b;
 //#ifdef visionfive
-  int getfat32 = 0;
-  for (uint64 i = 0; i < 33554432; i++) {
-    b = bread(0, i);
-    if (strncmp((char const *)(b->data + 82), "FAT32", 5) == 0) {
-      getfat32 = 1;
-      break;
-    } else {
-      brelse(b);
-    }
-  }
-  if (getfat32 == 0) {
-    panic("not FAT32 volume");
-  }
+  // int getfat32 = 0;
+  // for (uint64 i = 0; i < 33554432; i++) {
+  //   b = bread(0, i);
+  //   if (strncmp((char const *)(b->data + 82), "FAT32", 5) == 0) {
+  //     getfat32 = 1;
+  //     break;
+  //   } else {
+  //     brelse(b);
+  //   }
+  // }
+  // if (getfat32 == 0) {
+  //   panic("not FAT32 volume");
+  // }
 // // struct buf *b = bread(0, 2048);
 // #else
-//  b = bread(0, 0);
+  b = bread(0, 0);
 // #endif
   if (strncmp((char const *)(b->data + 82), "FAT32", 5))
     panic("not FAT32 volume");

@@ -11,6 +11,7 @@ linker = ./kernel.ld
 OBJS += \
   $K/entry.o \
   $K/printf.o \
+  $K/extioi.o \
   $K/uart.o \
   $K/intr.o \
   $K/spinlock.o \
@@ -21,31 +22,34 @@ OBJS += \
   $K/kalloc.o \
   $K/vm.o \
   $K/swtch.o \
-  $K/trampoline.o \
+  $K/apic.o \
+  $K/uservec.o \
+  $K/tlbrefill.o \
+  $K/merror.o \
   $K/ring_buffer.o \
   $K/kernelvec.o \
-#   $K/file.o \
-#  $K/trap.o \
-	$K/time.o \
-#  $K/syscall.o \
-#  $K/sysproc.o \
-#  $K/bio.o \
-#  $K/sleeplock.o \
-#  $K/file.o \
-#  $K/pipe.o \
-#  $K/exec.o \
-#  $K/sysfile.o \
-#   $K/systime.o \
+  $K/trap.o \
+  $K/timer.o \
+  $K/syscall.o \
+  $K/sysproc.o \
+  
+  $K/bio.o \
+  $K/sleeplock.o \
+  $K/file.o \
+  $K/pipe.o \
+#  $K/exec.o 
+  $K/sysfile.o \
+#   $K/systime.o 
 #   $K/kernelvec.o 
-#   $K/disk.o \
-#   $K/fat32.o \
-#   $K/plic.o \
-#   $K/mmap.o \
-#   $K/fs.o \
-#   $K/vma.o \
+   $K/disk.o \
+   $K/fat32.o \
+#   $K/plic.o 
+   $K/mmap.o \
+   $K/fs.o \
+   $K/vma.o \
 #   $K/signal.o \
-#   $K/syssig.o \
-#   $K/bin.o \
+#   $K/syssig.o 
+   $K/bin.o \
 #   $K/socket_new.o \
 #   $K/sem.o \
 #   $K/syssocket.o \
@@ -167,7 +171,7 @@ endif
 # CFLAGS += -D k210
 # else ifeq ($(platform), visionfive)
 # CFLAGS += -D visionfive
-# OBJS += $K/sddata.o $K/ramdisk.o
+OBJS += $K/sddata.o $K/ramdisk.o
 # endif
 
 LDFLAGS = -z max-page-size=4096 
@@ -210,27 +214,27 @@ $T/kernel: $(OBJS) $(linker) # $U/initcode
 # image = $T/kernel.bin
 
 
-# $U/initcode: $U/initcode.S
-# 	$(CC) $(CFLAGS) -march=rv64g -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
-#	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o $U/initcode.out $U/initcode.o
-#	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
-#	$(OBJDUMP) -S $U/initcode.o > $U/initcode.asm
+$U/initcode: $U/initcode.S
+	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
+	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o $U/initcode.out $U/initcode.o
+	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
+	$(OBJDUMP) -S $U/initcode.o > $U/initcode.asm
 
 tags: $(OBJS) _init
 	etags *.S *.c
 
-# ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
+ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
 
 _%: %.o # $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
-# $U/usys.S : $U/usys.pl
-# 	@perl $U/usys.pl > $U/usys.S
+$U/usys.S : $U/usys.pl
+ 	@perl $U/usys.pl > $U/usys.S
 
-# $U/usys.o : $U/usys.S
-# 	$(CC) $(CFLAGS) -c -o $U/usys.o $U/usys.S
+$U/usys.o : $U/usys.S
+   $(CC) $(CFLAGS) -c -o $U/usys.o $U/usys.S
 
 # $U/_forktest: $U/forktest.o $(ULIB)
 # 	# forktest has less library code linked in - needs to be small

@@ -12,6 +12,7 @@
 #include "vma.h"
 // #include "signal.h"
 #include "context.h"
+#include "loongarch.h"
 
 // #define CLONE_VM	0x00000100
 // #define CLONE_FS	0x00000200

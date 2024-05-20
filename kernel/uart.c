@@ -2,14 +2,8 @@
 // low-level driver routines for 16550a UART.
 //
 
-#include "uart.h"
-#include "types.h"
-#include "param.h"
-#include "memlayout.h"
-#include "loongarch.h"
-#include "intr.h"
-#include "spinlock.h"
-#include "proc.h"
+#include "include/uart.h"
+
 // #include "defs.h"
 
 

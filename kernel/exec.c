@@ -542,9 +542,11 @@ int exec(char *path, char **argv, char **env) {
   
   // w_satp(MAKE_SATP(p->kpagetable));
   //change to pwcl & pwch
-  // w_csr_pwcl
+  volatile uint64 pgdl = (uint64)(p->pagetable);
+  w_csr_pgdl(pgdl);
   // sfence_vma();
-  // kvmfree(oldkpagetable, 0, myproc());
+  flush_TLB();
+  kvmfree(oldkpagetable, 0, myproc());
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 

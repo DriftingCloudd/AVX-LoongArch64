@@ -10,8 +10,10 @@
 // 0x90000000 -- RAM used by user pages
 
 // 低48位掩码
-// #define DMWIN_MASK 0x9000000000000000
-#define DMWIN_MASK 0x9 << 60
+#define DMWIN_MASK 0x9000000000000000
+// #define DMWIN_MASK 0x9 << 0x60
+// by llh
+// #define DMWIN_MASK ((__uint128_t)0x9 << 0x60)
 // 地址转换模式 by wty
 #define MAKE_DMWIN(pagetable) (DMWIN | (((uint64)pagetable) >> 12))
 

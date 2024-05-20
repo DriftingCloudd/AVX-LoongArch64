@@ -276,7 +276,7 @@ found:
   if ((p->trapframe = (struct trapframe *)kalloc()) == NULL) {
     release(&p->lock);
     return NULL;
-  // }
+  }
 
   // An empty user page table.
   // And an identical kernel page table for this proc.
@@ -315,7 +315,7 @@ found:
   // p->main_thread->vtf = p->kstack - PGSIZE;
   return p;
   }
-}
+
 
 // free a proc structure and the data hanging from it,
 // including user pages.
@@ -453,7 +453,7 @@ void userinit(void)
   p->trapframe->sp = PGSIZE;  // user stack pointer 
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
-  p->cwd = namei("/"); 
+  p->cwd = ename("/"); 
   p->state = RUNNABLE;
   release(&p->lock);
 }
@@ -696,7 +696,7 @@ void scheduler(void) {
   struct proc *p;
   struct cpu *c = mycpu();
   // vm.c 
-  extern pagetable_t kernel_pagetable;
+  // extern pagetable_t kernel_pagetable;
 
   c->proc = 0;
   for (;;) {
@@ -941,18 +941,18 @@ int kill(int pid, int sig) {
   return -1;
 }
 
-static int cmp_parent(int pid,int sid){
-  struct proc* p;
-  for(p = proc;p < &proc[NPROC];p++){
-    if(p->pid == sid) break;
-  }
-  while(p){
-    p = p->parent;
-    if(!p)break;
-    if(p->pid == pid) return 1;
-  }
-  return 0;
-}
+// static int cmp_parent(int pid,int sid){
+//   struct proc* p;
+//   for(p = proc;p < &proc[NPROC];p++){
+//     if(p->pid == sid) break;
+//   }
+//   while(p){
+//     p = p->parent;
+//     if(!p)break;
+//     if(p->pid == pid) return 1;
+//   }
+//   return 0;
+// }
 
 int tgkill(int tid, int pid, int sig) {
   // if(!cmp_parent(pid,tid)) {printf("pid:%d, tid:%d\n");return -1;}

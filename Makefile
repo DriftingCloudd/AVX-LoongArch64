@@ -35,21 +35,23 @@ OBJS += \
   $K/sysfile.o \
   $K/exec.o \
   $K/kernelvec.o \
-  $K/pipe.o \ 
-  $K/futex.o \
+  $K/pipe.o \
   $K/bio.o \
   $K/sleeplock.o \
   $K/file.o \
+  $K/disk.o \
+  $K/fat32.o \
+  $K/mmap.o \
+  $K/fs.o \
+  $K/vma.o \
+  $K/bin.o \
+  $K/signal.o \
+  # $K/syssig.o 
+
+# $K/futex.o \
 #   $K/systime.o 
-   $K/disk.o \
-   $K/fat32.o \
 #   $K/plic.o 
-   $K/mmap.o \
-   $K/fs.o \
-   $K/vma.o \
-#   $K/signal.o \
-#   $K/syssig.o 
-   $K/bin.o \
+  
 #   $K/socket_new.o \
 #   $K/sem.o \
 #   $K/syssocket.o \
@@ -231,10 +233,10 @@ _%: %.o # $(ULIB)
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
 $U/usys.S : $U/usys.pl
- 	@perl $U/usys.pl > $U/usys.S
+	@perl $U/usys.pl > $U/usys.S
 
 $U/usys.o : $U/usys.S
-   $(CC) $(CFLAGS) -c -o $U/usys.o $U/usys.S
+	$(CC) $(CFLAGS) -c -o $U/usys.o $U/usys.S
 
 # $U/_forktest: $U/forktest.o $(ULIB)
 # 	# forktest has less library code linked in - needs to be small

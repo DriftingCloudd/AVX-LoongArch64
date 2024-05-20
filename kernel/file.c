@@ -97,7 +97,8 @@ void fileclose(struct file *f) {
   } else if (ff.type == FD_DEVICE) {
 
   } else if (ff.type == FD_SOCK) {
-    close_socket(ff.socketnum);
+    //TODO: llh
+    // close_socket(ff.socketnum);
   }
 }
 
@@ -538,7 +539,7 @@ uint64 file_send(struct file *fin, struct file *fout, uint64 addr, uint64 n) {
     rlen = fileinput(fin, 0, (uint64)&buf, rlen, off);
     if (fin->type != FD_PIPE)
       fileiounlock(fin);
-    debug_print("[filesend] send rlen %p\n", rlen);
+    printf("[filesend] send rlen %p\n", rlen);
     off += rlen;
     n -= rlen;
     if (!rlen) {
@@ -549,7 +550,7 @@ uint64 file_send(struct file *fin, struct file *fout, uint64 addr, uint64 n) {
     wlen = fileoutput(fout, 0, (uint64)&buf, rlen, fout->off);
     if (fout->type != FD_PIPE)
       fileiounlock(fout);
-    debug_print("[filesend] send wlen:%p\n", rlen, wlen);
+    printf("[filesend] send wlen:%p\n", rlen, wlen);
     fout->off += wlen;
     ret += wlen;
   }

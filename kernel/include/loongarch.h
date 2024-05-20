@@ -281,15 +281,19 @@ intr_get()
 }
 
 // read_time, visit relevant register
+// by llh : change the instructions
 static inline uint64
 r_time()
 {
-  uint64 x;
-  // asm volatile("csrr %0, time" : "=r" (x) );
-  // this instruction will trap in SBI
-  // LA 仍然以rdtime 访问定时器
-  asm volatile("rdtime %0" : "=r" (x) );
-  return x;
+  int rID = 0;
+  uint64 val = 0;
+
+  asm volatile(
+    "rdtime.d %0, %1 \n\t" 
+    : "=r" (val) , "=r" (rID) 
+    : 
+  );
+  return val;
 }
 // enable device interrupts
 
@@ -308,12 +312,9 @@ intr_off()
 
 // flush the TLB.
 static inline void
-sfence_vma()
+flush_TLB()
 {
-  // the zero, zero means flush all TLB entries.
-  asm volatile("sfence.vma zero, zero");
-  //asm volatile("sfence.vma x0, x0");
-  //asm volatile("sfence.vma");
+  asm volatile("invtlb 0x0,$zero,$zero");
 }
 
 #define PGSIZE 4096 // bytes per page

@@ -1,4 +1,5 @@
-#include "include/futex.h"
+// #include "include/futex.h"
+#include "include/signal.h"
 #include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/mmap.h"
@@ -9,7 +10,7 @@
 #include "include/rusage.h"
 #include "include/spinlock.h"
 #include "include/string.h"
-#include "include/syscall.h"`
+#include "include/syscall.h"
 #include "include/timer.h"
 #include "include/types.h"
 #include "include/uname.h"
@@ -18,36 +19,38 @@
 extern int exec(char *path, char **argv, char **env);
 
 uint64 sys_clone(void) {
-  debug_print("sys_clone: start\n");
+  printf("sys_clone: start\n");
   uint64 new_stack, new_fn;
   uint64 ptid, tls, ctid;
   argaddr(1, &new_stack);
   if (argaddr(0, &new_fn) < 0) {
-    debug_print("sys_clone: argaddr(0, &new_fn) < 0\n");
+    printf("sys_clone: argaddr(0, &new_fn) < 0\n");
     return -1;
   }
   if (argaddr(2, &ptid) < 0) {
-    debug_print("sys_clone: argaddr(2, &ptid) < 0\n");
+    printf("sys_clone: argaddr(2, &ptid) < 0\n");
     return -1;
   }
   if (argaddr(3, &tls) < 0) {
-    debug_print("sys_clone: argaddr(3, &tls) < 0\n");
+    printf("sys_clone: argaddr(3, &tls) < 0\n");
     return -1;
   }
   if (argaddr(4, &ctid) < 0) {
-    debug_print("sys_clone: argaddr(4, &ctid) < 0\n");
+    printf("sys_clone: argaddr(4, &ctid) < 0\n");
     return -1;
   }
-  debug_print("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
+  printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
               "ctid = %p\n",
               new_stack, new_fn, ptid, tls, ctid);
   if (new_stack == 0) {
     return fork();
   }
-  if (new_fn & CLONE_VM)
-    return thread_clone(new_stack, ptid, tls, ctid);
-  else
-    return clone(new_stack, new_fn);
+
+  return clone(new_stack, new_fn);
+  // if (new_fn & CLONE_VM)
+  //   return thread_clone(new_stack, ptid, tls, ctid);
+  // else
+  //   return clone(new_stack, new_fn);
 }
 
 uint64 sys_prlimit64() {
@@ -89,17 +92,17 @@ uint64 sys_exec(void) {
   uint64 uargv, uarg;
 
   if (argstr(0, path, FAT32_MAX_PATH) < 0 || argaddr(1, &uargv) < 0) {
-    debug_print("[sys_exec] fetch arg error\n");
+    printf("[sys_exec] fetch arg error\n");
     return -1;
   }
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
-      debug_print("[sys_exec] too many arguments\n");
+      printf("[sys_exec] too many arguments\n");
       goto bad;
     }
     if (fetchaddr(uargv + sizeof(uint64) * i, (uint64 *)&uarg) < 0) {
-      debug_print("[sys_exec] fetch %d addr error uargv:%p\n", i, uargv);
+      printf("[sys_exec] fetch %d addr error uargv:%p\n", i, uargv);
       goto bad;
     }
     if (uarg == 0) {
@@ -108,11 +111,11 @@ uint64 sys_exec(void) {
     }
     argv[i] = kalloc();
     if (argv[i] == 0) {
-      debug_print("[sys_exec] kalloc error\n");
+      printf("[sys_exec] kalloc error\n");
       goto bad;
     }
     if (fetchstr(uarg, argv[i], PGSIZE) < 0) {
-      debug_print("[sys_exec] fetchstr error\n");
+      printf("[sys_exec] fetchstr error\n");
       goto bad;
     }
   }
@@ -125,7 +128,7 @@ uint64 sys_exec(void) {
   return ret;
 
 bad:
-  debug_print("[sys_exec]: bad\n");
+  printf("[sys_exec]: bad\n");
   for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
     kfree(argv[i]);
   return -1;
@@ -143,7 +146,7 @@ uint64 sys_execve(void) {
       argaddr(2, &uenv)) {
     return -1;
   }
-  debug_print("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
+  printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
@@ -177,7 +180,7 @@ bad:
 }
 
 uint64 sys_exit(void) {
-  debug_print("sys_exit\n");
+  printf("sys_exit\n");
   int n;
   if (argint(0, &n) < 0)
     return -1;
@@ -344,11 +347,11 @@ uint64 sys_kill(void) {
   if (argint(1, &sig) < 0)
     return -1;
   if (pid <= 0) {
-    debug_print("[kill]pid <= 0 do not implement\n");
+    printf("[kill]pid <= 0 do not implement\n");
     return -1;
   }
   if (sig < 0 || sig >= SIGRTMAX) {
-    debug_print("[kill]sig < 0 || sig >= SIGRTMAX\n");
+    printf("[kill]sig < 0 || sig >= SIGRTMAX\n");
     return -1;
   }
   pid = myproc()->pid;
@@ -426,17 +429,17 @@ uint64 sys_chroot(void) { return 0; }
 
 uint64 sys_exit_group(void) { return 0; }
 
-uint64 sys_set_tid_address(void) {
-  uint64 address;
-  if (argaddr(0, &address) < 0)
-    return -1;
-  struct proc *p = myproc();
-  p->main_thread->clear_child_tid = address;
-  int tid = p->main_thread->tid;
-  copyout(myproc()->pagetable, address, (char *)&tid, sizeof(int));
+// uint64 sys_set_tid_address(void) {
+//   uint64 address;
+//   if (argaddr(0, &address) < 0)
+//     return -1;
+//   struct proc *p = myproc();
+//   p->main_thread->clear_child_tid = address;
+//   int tid = p->main_thread->tid;
+//   copyout(myproc()->pagetable, address, (char *)&tid, sizeof(int));
 
-  return tid;
-}
+//   return tid;
+// }
 
 uint64 sys_uname(void) {
   uint64 addr;
@@ -501,48 +504,48 @@ uint64 sys_uname(void) {
 // para: uint32_t *uaddr, int futex_op, uint32_t val,
 //                     const struct timespec *timeout,   /* or: uint32_t val2 */
 //                     uint32_t *uaddr2, uint32_t val3
-uint64 sys_futex(void) {
-  int futex_op, val, val3, userVal;
-  uint64 uaddr, timeout, uaddr2;
-  struct proc *p = myproc();
-  TimeSpec2 t;
-  if (argaddr(0, &uaddr) < 0 || argint(1, &futex_op) < 0 ||
-      argint(2, &val) < 0 || argaddr(3, &timeout) < 0 || argaddr(4, &uaddr2) ||
-      argint(5, &val3))
-    return -1;
-  futex_op &= (FUTEX_PRIVATE_FLAG - 1);
-  switch (futex_op) {
-  case FUTEX_WAIT:
-    copyin(p->pagetable, (char *)&userVal, uaddr, sizeof(int));
-    if (timeout) {
-      if (copyin(p->pagetable, (char *)&t, timeout, sizeof(TimeSpec2)) < 0) {
-        panic("copy time error!\n");
-      }
-    }
-    // printf("val: %d\n", userVal);
-    if (userVal != val) {
-      return -1;
-    }
+// uint64 sys_futex(void) {
+//   int futex_op, val, val3, userVal;
+//   uint64 uaddr, timeout, uaddr2;
+//   struct proc *p = myproc();
+//   TimeSpec2 t;
+//   if (argaddr(0, &uaddr) < 0 || argint(1, &futex_op) < 0 ||
+//       argint(2, &val) < 0 || argaddr(3, &timeout) < 0 || argaddr(4, &uaddr2) ||
+//       argint(5, &val3))
+//     return -1;
+//   futex_op &= (FUTEX_PRIVATE_FLAG - 1);
+//   switch (futex_op) {
+//   case FUTEX_WAIT:
+//     copyin(p->pagetable, (char *)&userVal, uaddr, sizeof(int));
+//     if (timeout) {
+//       if (copyin(p->pagetable, (char *)&t, timeout, sizeof(TimeSpec2)) < 0) {
+//         panic("copy time error!\n");
+//       }
+//     }
+//     // printf("val: %d\n", userVal);
+//     if (userVal != val) {
+//       return -1;
+//     }
 
-    futexWait(uaddr, myproc()->main_thread, timeout ? &t : 0);
-    break;
-  case FUTEX_WAKE:
-    futexWake(uaddr, val);
-    break;
-  case FUTEX_REQUEUE:
-    futexRequeue(uaddr, val, uaddr2);
-    break;
-  default:
-    panic("Futex type not support!\n");
-  }
-  return 0;
-};
+//     futexWait(uaddr, myproc()->main_thread, timeout ? &t : 0);
+//     break;
+//   case FUTEX_WAKE:
+//     futexWake(uaddr, val);
+//     break;
+//   case FUTEX_REQUEUE:
+//     futexRequeue(uaddr, val, uaddr2);
+//     break;
+//   default:
+//     panic("Futex type not support!\n");
+//   }
+//   return 0;
+// };
 
-uint64 sys_gettid(void) {
-  struct proc *p = myproc();
+// uint64 sys_gettid(void) {
+//   struct proc *p = myproc();
 
-  return p->main_thread->tid;
-}
+//   return p->main_thread->tid;
+// }
 
 // TODO
 uint64 sys_umask(void) { return 0; }

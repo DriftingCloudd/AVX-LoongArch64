@@ -92,7 +92,7 @@ struct proc {
   int ktime;
   int utime;
   // int thread_num;
-  // int char_count;   // not used
+  int char_count;   
   // uint64 clear_child_tid;
   //signal
   // sigaction sigaction[SIGRTMAX + 1]; // signal action
@@ -142,10 +142,10 @@ struct proc {
 // };
 
 
-// typedef struct rlimit {
-//   uint64 rlim_cur;
-//   uint64 rlim_max;
-// }rlimit;
+typedef struct rlimit {
+  uint64 rlim_cur;
+  uint64 rlim_max;
+}rlimit;
 
 // typedef struct thread_stack_param {
 //   uint64 func_point;

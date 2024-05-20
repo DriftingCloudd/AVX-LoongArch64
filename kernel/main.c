@@ -1,8 +1,8 @@
 // Copyright (c) 2006-2019 Frans Kaashoek, Robert Morris, Russ Cox,
 //                         Massachusetts Institute of Technology
 
-#include "loongarch.h"
-#include "loongarchregs.h"
+#include "include/loongarch.h"
+#include "include/loongarchregs.h"
 #include "include/buf.h"
 #include "include/file.h"
 #include "include/console.h"
@@ -10,7 +10,6 @@
 #include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/param.h"
-// #include "include/plic.h"
 #include "include/printf.h"
 #include "include/proc.h"
 // #include "include/sbi.h"
@@ -18,8 +17,8 @@
 // #include "include/sysinfo.h"
 // #include "include/thread.h"
 #include "include/timer.h"
-// #include "include/trap.h"
-// #include "include/types.h"
+#include "include/trap.h"
+#include "include/types.h"
 #include "include/vm.h"
 // #ifndef QEMU
 // #include "include/sd_final.h"
@@ -45,9 +44,10 @@ void main() {
     consoleinit();
     printfinit(); // init a lock for printf
 
-    #ifdef DEBUG
-    print("DEBUG:hart %d enter main()...\n", cpuid);
-    #endif
+    // #ifdef DEBUG
+    // printf("DEBUG:hart %d enter main()...\n", cpuid);
+    // #endif
+    printf("DEBUG:hart %d enter main()...\n", cpuid);
 
     // 内存映射 //
     kinit();        // physical page allocator

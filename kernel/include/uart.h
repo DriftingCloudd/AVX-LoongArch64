@@ -11,6 +11,8 @@
 #include "loongarch.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "intr.h"
+#include "console.h"
 // #include "defs.h"
 
 // the UART control registers are memory-mapped

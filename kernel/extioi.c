@@ -1,8 +1,4 @@
-#include "types.h"
-#include "param.h"
-#include "memlayout.h"
-#include "loongarch.h"
-#include "defs.h"
+#include "include/extioi.h"
 
 void extioi_init(void)
 {

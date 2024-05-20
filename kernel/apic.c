@@ -1,12 +1,6 @@
-#include "types.h"
-#include "param.h"
-#include "memlayout.h"
-#include "loongarch.h"
-#include "defs.h"
+#include "include/apic.h"
 
-//
-// the loongarch 7A1000 I/O Interrupt Controller Registers.
-//
+
 
 void
 apic_init(void)

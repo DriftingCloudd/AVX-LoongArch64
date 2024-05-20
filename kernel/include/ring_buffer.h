@@ -26,6 +26,6 @@ int ring_buffer_used(struct ring_buffer *rbuf);
 int ring_buffer_free(struct ring_buffer *rbuf);
 int ring_buffer_empty(struct ring_buffer *rbuf);
 int ring_buffer_full(struct ring_buffer *rbuf);
-uint read_ring_buffer(struct ring_buffer *rbuf, char *buf, size_t size);
-uint write_ring_buffer(struct ring_buffer *rbuf, char *buf, size_t size);
+uint read_ring_buffer(struct ring_buffer *rbuf, char *buf, uint size);
+uint write_ring_buffer(struct ring_buffer *rbuf, char *buf, uint size);
 #endif

@@ -39,17 +39,20 @@ OBJS += \
   $K/futex.o \
   $K/bio.o \
   $K/sleeplock.o \
-$K/file.o \
-#   $K/systime.o \
-$K/disk.o \
-$K/fat32.o \
-#   $K/plic.o \
-   $K/mmap.o \
-   $K/fs.o \
-   $K/vma.o \
-#   $K/signal.o \
-#   $K/syssig.o  \
-   $K/bin.o \
+  $K/file.o \
+  $K/disk.o \
+  $K/fat32.o \
+  $K/mmap.o \
+  $K/fs.o \
+  $K/vma.o \
+  $K/bin.o \
+  $K/signal.o \
+  # $K/syssig.o 
+
+# $K/futex.o \
+#   $K/systime.o 
+#   $K/plic.o 
+  
 #   $K/socket_new.o \
 #   $K/sem.o \
 #   $K/syssocket.o \

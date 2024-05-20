@@ -91,7 +91,6 @@ void kvminithart() {
   // 构造正确的 satp值
   //  更新页表消息
   // w_satp(MAKE_SATP(kernel_pagetable));
-
   // 修改uart的地址映射
   // uart
   // uart8250_change_base_addr(UART_V);

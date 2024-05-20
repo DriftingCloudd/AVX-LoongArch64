@@ -1,6 +1,7 @@
 #ifndef __TRAP_H
 #define __TRAP_H
 #include "types.h"
+
 // per-process data for the trap handling code in trampoline.S.
 // sits in a page by itself just under the trampoline page in the
 // user page table. not specially mapped in the kernel page table.

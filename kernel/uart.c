@@ -10,6 +10,7 @@
 #include "intr.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "include/console.h"
 // #include "defs.h"
 
 

@@ -5,10 +5,11 @@
         #
 #include "include/loongarchregs.h"
 
-.section u_eentry
-.globl uservec
+        .section trampsec
+.globl trampoline
+trampoline:
 .align 4
-
+.globl uservec
 uservec:    
 	#
         # trap.c sets eentry to point here, so

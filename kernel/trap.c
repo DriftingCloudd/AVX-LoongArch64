@@ -122,7 +122,7 @@ usertrapret(void)
   intr_off();
 
   // send syscalls, interrupts, and exceptions to uservec.S
-  w_csr_eentry((uint64)uservec);  //maybe todo
+  w_csr_eentry(TRAMPOLINE + ((uint64)uservec - trampoline));  //maybe todo
 
   // set up trapframe values that uservec will need when
   // the process next re-enters the kernel.

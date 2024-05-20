@@ -28,19 +28,19 @@ OBJS += \
   $K/merror.o \
   $K/ring_buffer.o \
   $K/kernelvec.o \
+  $K/file.o \
   $K/trap.o \
-  $K/timer.o \
   $K/syscall.o \
   $K/sysproc.o \
-  
+  $K/sysfile.o \
+  $K/exec.o \
+  $K/kernelvec.o \
+  $K/pipe.o \ 
+  $K/futex.o \
   $K/bio.o \
   $K/sleeplock.o \
   $K/file.o \
-  $K/pipe.o \
-#  $K/exec.o 
-  $K/sysfile.o \
 #   $K/systime.o 
-#   $K/kernelvec.o 
    $K/disk.o \
    $K/fat32.o \
 #   $K/plic.o 
@@ -55,9 +55,9 @@ OBJS += \
 #   $K/syssocket.o \
 #   $K/SignalTrampoline.o \
 #   $K/thread.o \
-#   $K/futex.o \
 #   $K/pselect.o \
 #   $K/uart8250.o \
+#   $K/time.o \
 
 
 # ifeq ($(platform), qemu)

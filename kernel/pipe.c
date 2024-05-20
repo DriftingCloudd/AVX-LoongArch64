@@ -1,24 +1,19 @@
-#include "types.h"
-#include "loongarch.h"
+#include "include/types.h"
+#include "include/loongarch.h"
 // #include "defs.h"
-#include "param.h"
-#include "spinlock.h"
-#include "proc.h"
+#include "include/param.h"
+#include "include/spinlock.h"
+#include "include/proc.h"
 // #include "fs.h"
 // #include "sleeplock.h"
 #include "file.h"
 #include "kalloc.h"
 
+#include "include/pipe.h"
+
 #define PIPESIZE 512
 
-struct pipe {
-  struct spinlock lock;
-  char data[PIPESIZE];
-  uint nread;     // number of bytes read
-  uint nwrite;    // number of bytes written
-  int readopen;   // read fd is still open
-  int writeopen;  // write fd is still open
-};
+
 
 int pipealloc(struct file **f0, struct file **f1)
 {
@@ -126,4 +121,27 @@ piperead(struct pipe *pi, uint64 addr, int n)
   wakeup(&pi->nwrite);  //DOC: piperead-wakeup
   release(&pi->lock);
   return i;
+}
+
+int pipe_full(struct pipe *pi) {
+  int ans = 0;
+  acquire(&pi->lock);
+  // int ans = __pipe_full(pi);
+  if (pi->nwrite == pi->nread + PIPESIZE) {
+    ans = 1;
+  }
+
+  release(&pi->lock);
+  return ans;
+}
+
+int pipe_empty(struct pipe *pi) {
+  int ans = 0;
+  acquire(&pi->lock);
+  // int ans = __pipe_empty(pi);
+  if (pi->nread == pi->nwrite) {
+    ans = 1;
+  }
+  release(&pi->lock);
+  return ans;
 }

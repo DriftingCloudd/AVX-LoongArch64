@@ -306,6 +306,16 @@ intr_off()
   w_csr_crmd(r_csr_crmd() & ~CSR_CRMD_IE);
 }
 
+// flush the TLB.
+static inline void
+sfence_vma()
+{
+  // the zero, zero means flush all TLB entries.
+  asm volatile("sfence.vma zero, zero");
+  //asm volatile("sfence.vma x0, x0");
+  //asm volatile("sfence.vma");
+}
+
 #define PGSIZE 4096 // bytes per page
 #define PGSHIFT 12  // bits of offset within a page
 

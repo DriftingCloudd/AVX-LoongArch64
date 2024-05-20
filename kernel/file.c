@@ -25,6 +25,7 @@ struct {
 } ftable;
 
 static int hashpath(char *name) {
+  // Hash 表路径
   int hashvalue = 0;
   for (int i = 0; name[i]; i++) {
     hashvalue = hashvalue * 128;

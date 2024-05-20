@@ -33,7 +33,7 @@ struct spinlock pid_lock;
 struct spinlock wait_lock;
 
 extern void forkret(void);
-// extern int magic_count;
+extern int magic_count;
 
 // swtch.S
 extern void swtch(struct context *, struct context *);
@@ -73,71 +73,71 @@ void cpuinit(void) {
 }
 
 // initialize the proc table at boot time.
-void procinit(void)
-{
-  struct proc *p;
+// void procinit(void)
+// {
+//   struct proc *p;
   
+//   initlock(&pid_lock, "nextpid");
+//   initlock(&wait_lock, "wait_lock");
+//   for(p = proc; p < &proc[NPROC]; p++) {
+//       initlock(&p->lock, "proc");
+//       p->state = UNUSED;
+//       p->pid = 0;//boot_time
+//       for (int i = 0; i < NOFILE; i++)
+//         p->ofile[i] = 0;
+//       p->kstack = KSTACK((int) (p - proc)); 
+//   }
+// }
+
+void procinit(void) {
+  struct proc *p;
+  magic_count = 0;
   initlock(&pid_lock, "nextpid");
-  initlock(&wait_lock, "wait_lock");
-  for(p = proc; p < &proc[NPROC]; p++) {
-      initlock(&p->lock, "proc");
-      p->state = UNUSED;
-      p->pid = 0;//boot_time
+  for (p = proc; p < &proc[NPROC]; p++) {
+    initlock(&p->lock, "proc");
+    p->state = UNUSED;
+    p->parent = 0;
+    // p->main_thread = 0;
+    p->chan = 0;
+    p->killed = 0;
+    p->xstate = 0;
+    p->pid = 0;
+    p->kstack = 0;
+    p->sz = 0;
+    p->pagetable = 0;
+    p->kpagetable = 0;
+    p->trapframe = 0;
       for (int i = 0; i < NOFILE; i++)
         p->ofile[i] = 0;
-      p->kstack = KSTACK((int) (p - proc)); 
+    p->cwd = 0;
+    p->name[0] = 0;
+    p->vma = 0;
+    p->tmask = 0;
+    p->ktime = 0;
+    p->utime = 0;
+    // memset(p->sigaction, 0, sizeof(p->sigaction));
+    // memset(p->sig_set.__val, 0, sizeof(p->sig_set));
+    // memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
+    // p->sig_tf = NULL;
+    // Allocate a page for the process's kernel stack.
+    // Map it high in memory, followed by an invalid
+    // guard page.
+    // char *pa = kalloc();
+    // // printf("[procinit]kernel stack: %p\n", (uint64)pa);
+    // if(pa == 0)
+    //   panic("kalloc");
+    // uint64 va = KSTACK((int) (p - proc));
+    // // printf("[procinit]kvmmap va %p to pa %p\n", va, (uint64)pa);
+    // kvmmap(va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
+    // p->kstack = va;
   }
+  // kvminithart();
+
+  memset(cpus, 0, sizeof(cpus));
+#ifdef DEBUG
+  printf("procinit\n");
+#endif
 }
-
-// void procinit(void) {
-//   struct proc *p;
-//   magic_count = 0;
-//   initlock(&pid_lock, "nextpid");
-//   for (p = proc; p < &proc[NPROC]; p++) {
-//     initlock(&p->lock, "proc");
-//     p->state = UNUSED;
-//     p->parent = 0;
-//     p->main_thread = 0;
-//     p->chan = 0;
-//     p->killed = 0;
-//     p->xstate = 0;
-//     p->pid = 0;
-//     p->kstack = 0;
-//     p->sz = 0;
-//     p->pagetable = 0;
-//     p->kpagetable = 0;
-//     p->trapframe = 0;
-      // for (int i = 0; i < NOFILE; i++)
-      //   p->ofile[i] = 0;
-//     p->cwd = 0;
-//     p->name[0] = 0;
-//     p->vma = 0;
-//     p->tmask = 0;
-//     p->ktime = 0;
-//     p->utime = 0;
-//     memset(p->sigaction, 0, sizeof(p->sigaction));
-//     memset(p->sig_set.__val, 0, sizeof(p->sig_set));
-//     memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
-//     p->sig_tf = NULL;
-//     // Allocate a page for the process's kernel stack.
-//     // Map it high in memory, followed by an invalid
-//     // guard page.
-//     // char *pa = kalloc();
-//     // // printf("[procinit]kernel stack: %p\n", (uint64)pa);
-//     // if(pa == 0)
-//     //   panic("kalloc");
-//     // uint64 va = KSTACK((int) (p - proc));
-//     // // printf("[procinit]kvmmap va %p to pa %p\n", va, (uint64)pa);
-//     // kvmmap(va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
-//     // p->kstack = va;
-//   }
-//   // kvminithart();
-
-//   memset(cpus, 0, sizeof(cpus));
-// #ifdef DEBUG
-//   printf("procinit\n");
-// #endif
-// }
 
 // Must be called with interrupts disabled,
 // to prevent race with process being moved
@@ -255,14 +255,15 @@ static struct proc *allocproc(void) {
 found:
   p->pid = allocpid();
   freemem_amount();
-  // printf("alloc proc:%d freemem_mount:%p\n", p->pid, freemem_amount());
+  printf("alloc proc:%d freemem_mount:%p\n", p->pid, freemem_amount());
   p->vma = NULL;
   p->filelimit = NOFILE;
   p->ktime = 1;
   p->utime = 1;
-  // p->uid = 0;
-  // p->gid = 0;
-  // p->pgid = 0;
+  p->uid = 0;
+  p->gid = 0;
+  p->pgid = 0;
+  // thread
   // p->thread_num = 0;
   // p->char_count = 0;
   // p->clear_child_tid = NULL;
@@ -355,7 +356,7 @@ static void freeproc(struct proc *p) {
   }
   // TODO: free threads
   freemem_amount();
-  // printf("free proc : %d freemem_mount:%p\n",p->pid, freemem_amount());
+  printf("free proc : %d freemem_mount:%p\n",p->pid, freemem_amount());
   p->pagetable = 0;
   p->vma = NULL;
   p->sz = 0;
@@ -396,7 +397,6 @@ pagetable_t proc_pagetable(struct proc *p) {
   }
 
   // map the trapframe just below TRAMPOLINE, for trampoline.S.
-  // todo_trapframe
   if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
                PTE_P | PTE_W) < 0) {
     vmunmap(pagetable, TRAMPOLINE, 1, 0);
@@ -512,7 +512,7 @@ int fork(void) {
   np->sz = p->sz;
   np->parent = p;
   // copy tracing mask from parent.
-  // np->tmask = p->tmask;
+  np->tmask = p->tmask;
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
@@ -522,12 +522,11 @@ int fork(void) {
   // copytrapframe(np->main_thread->trapframe, np->trapframe);
   // increment reference counts on open file descriptors.
   // 分配新的进程号
-  // 文件系统 //todo
+
   for (i = 0; i < NOFILE; i++)
     if (p->ofile[i])
       np->ofile[i] = filedup(p->ofile[i]);
-  // fat32 
-  // np->cwd = edup(p->cwd);
+  np->cwd = edup(p->cwd);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
@@ -585,7 +584,7 @@ void exit(int status) {
     }
   }
   // file_system
-  // eput(p->cwd);
+  eput(p->cwd);
   p->cwd = 0;
   // checkup1(p);
   // we might re-parent a child to init. we can't be precise about
@@ -760,10 +759,10 @@ void scheduler(void) {
         // p->main_thread->awakeTime = 0;
         p->state = RUNNING;
         // futexClear(p->main_thread);
-        c->proc = p;
         // wty_todo
+        // 更改页表权限和配置，在satp寄存器中
         // w_satp(MAKE_SATP(p->kpagetable));
-        // sfence_vma() -> tlb_init(); //  清空tlb
+        // sfence_vma();
         tlbinit();
         swtch(&c->context, &p->context);
         // copycontext(&p->main_thread->context, &p->context);
@@ -822,7 +821,7 @@ void sched(void) {
 void yield(void) {
   struct proc *p = myproc();
   acquire(&p->lock);
-  printf("pid %d yield\n, era: %p", p->pid, p->trapfram/e->era);
+  printf("pid %d yield\n, era: %p", p->pid, p->trapframe->era);
   p->state = RUNNABLE;
   // todo：线程部分
   // p->main_thread->state = t_RUNNABLE;
@@ -848,11 +847,11 @@ void forkret(void) {
     // printf("[forkret]first scheduling\n");
     first = 0;
     // file_sysytem: todo
-    // fat32_init();
+    fat32_init();
     myproc()->cwd = ename("/");
   }
   // trap.c 
-  // usertrapret();
+  usertrapret();
 }
 
 // // Atomically release lock and sleep on chan.
@@ -1035,7 +1034,7 @@ struct proc *findchild(struct proc *p, int pid, struct proc **child) {
     if ((pid == -1 || np->pid == pid) && np->parent == p) {
       acquire(&np->lock);
       *child = np;
-      // printf("state : %d\n", np->state);
+      printf("state : %d\n", np->state);
       if (np->state == ZOMBIE) {
         return np;
       }
@@ -1198,7 +1197,7 @@ uint64 clone(uint64 new_stack, uint64 new_fn) {
   np->parent = p;
   // todo
   // copy tracing mask from parent.
-  // np->tmask = p->tmask;
+  np->tmask = p->tmask;
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
@@ -1210,7 +1209,7 @@ uint64 clone(uint64 new_stack, uint64 new_fn) {
   for (i = 0; i < NOFILE; i++)
     if (p->ofile[i])// file.h
       np->ofile[i] = filedup(p->ofile[i]);
-  // np->cwd = edup(p->cwd);
+  np->cwd = edup(p->cwd);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
   pid = np->pid;

@@ -10,7 +10,7 @@
 // #include "thread.h"
 #include "trap.h"
 #include "vma.h"
-// #include "signal.h"
+#include "signal.h"
 #include "context.h"
 #include "loongarch.h"
 
@@ -95,10 +95,10 @@ struct proc {
   int char_count;   
   // uint64 clear_child_tid;
   //signal
-  // sigaction sigaction[SIGRTMAX + 1]; // signal action
-  // __sigset_t sig_set; // signal mask
-  // __sigset_t sig_pending; // pending signal
-  // struct trapframe *sig_tf; // trapframe for signal
+  sigaction sigaction[SIGRTMAX + 1]; // signal action
+  __sigset_t sig_set; // signal mask
+  __sigset_t sig_pending; // pending signal
+  struct trapframe *sig_tf; // trapframe for signal
 
   //kernel thread
   // void (*fn)(void *);

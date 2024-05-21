@@ -46,7 +46,7 @@ uint64 sys_rt_sigaction(void) {
       return -1;
     }
   }
-  debug_print("sys_rt_sigaction: signum = %d, act fp:%p \n", signum,
+  printf("sys_rt_sigaction: signum = %d, act fp:%p \n", signum,
               act.__sigaction_handler.sa_handler);
   return 0;
 }
@@ -81,7 +81,7 @@ uint64 sys_rt_sigprocmask(void) {
                              SIGSET_LEN * 8) < 0) {
     return -1;
   }
-  debug_print("sys_rt_sigprocmask: how = %d, set = %p\n", how, set.__val[0]);
+  printf("sys_rt_sigprocmask: how = %d, set = %p\n", how, set.__val[0]);
   return 0;
 }
 

@@ -55,7 +55,7 @@ void main() {
     kvminithart();  // turn on paging
     // 
     timerinit();    // init a lock for timer
-    // trapinithart(); // install kernel trap vector, including interrupt handler
+    trapinit(); // install kernel trap vector, including interrupt handler
     // threadInit();
     procinit();
     // plicinit();

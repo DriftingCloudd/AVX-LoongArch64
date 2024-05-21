@@ -18,15 +18,17 @@
 #include "include/extioi.h"
 #include "include/apic.h"
 
-struct spinlock tickslock;
-uint ticks;
+// struct spinlock tickslock;
+// uint ticks;
+
+extern char trampoline[], uservec[], userret[]; 
 
 // in kernelvec.S, calls kerneltrap().
-void kernelvec();
-void uservec();
+extern void kernelvec();
+// void uservec();
 void handle_tlbr();
 void handle_merr();
-void userret(uint64, uint64);
+// void userret(uint64, uint64);
 
 extern int devintr();
 
@@ -122,7 +124,7 @@ usertrapret(void)
   intr_off();
 
   // send syscalls, interrupts, and exceptions to uservec.S
-  w_csr_eentry(TRAMPOLINE + ((uint64)uservec - trampoline));  //maybe todo
+  w_csr_eentry(TRAMPOLINE + (uservec - trampoline));  //maybe todo
 
   // set up trapframe values that uservec will need when
   // the process next re-enters the kernel.
@@ -149,7 +151,9 @@ usertrapret(void)
   // jump to uservec.S at the top of memory, which 
   // switches to the user page table, restores user registers,
   // and switches to user mode with ertn.
-  userret(TRAPFRAME, pgdl);
+  uint64 fn = TRAMPOLINE + (userret - trampoline);
+  ((void (*)(uint64, uint64))fn)(TRAPFRAME, pgdl);
+  // userret(TRAPFRAME, pgdl);
 }
 
 // interrupts and exceptions from kernel code go here via kernelvec,

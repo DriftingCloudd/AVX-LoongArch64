@@ -18,6 +18,7 @@ OBJS += \
   $K/spinlock.o \
   $K/string.o \
   $K/main.o \
+  $K/bin.o \
   $K/proc.o \
   $K/kalloc.o \
   $K/vm.o \
@@ -34,23 +35,22 @@ OBJS += \
   $K/sysproc.o \
   $K/sysfile.o \
   $K/exec.o \
-  $K/kernelvec.o \
   $K/pipe.o \
-  $K/futex.o \
   $K/bio.o \
   $K/sleeplock.o \
-  $K/file.o \
   $K/disk.o \
   $K/fat32.o \
+  $K/timer.o \
   $K/mmap.o \
-  $K/fs.o \
   $K/vma.o \
-  $K/bin.o \
   $K/signal.o \
-  # $K/syssig.o 
-
+  $K/syssig.o \
+  $K/systime.o 
+  # $K/fs.o \
+  # $K/futex.o \
+  
 # $K/futex.o \
-#   $K/systime.o 
+#   
 #   $K/plic.o 
   
 #   $K/socket_new.o \
@@ -147,7 +147,8 @@ OBJCOPY = $(TOOLPREFIX)objcopy
 OBJDUMP = $(TOOLPREFIX)objdump
 
 ASFLAGS = -march=loongarch64 -mabi=lp64s
-CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb -g
+CFLAGS = -Wall  -O -fno-omit-frame-pointer -ggdb -g
+# -Werror
 CFLAGS += -MD
 CFLAGS += -march=loongarch64 -mabi=lp64s
 CFLAGS += -ffreestanding -fno-common -nostdlib
@@ -216,6 +217,8 @@ $T/kernel: $(OBJS) $(linker) # $U/initcode
 
 # image = $T/kernel.bin
 
+# $K/bin.S:$U/initcode $U/init-for-test
+$K/bin.S:$U/initcode
 
 $U/initcode: $U/initcode.S
 	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o

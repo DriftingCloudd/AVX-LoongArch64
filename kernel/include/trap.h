@@ -54,7 +54,7 @@ struct trapframe {
   /* 280 */ uint64 kernel_pgdl;   // saved kernel pagetable
 };
 
-void            trapinithart(void);
+void            trapinit(void);
 void            usertrapret(void);
 void            trapframedump(struct trapframe *tf);
 

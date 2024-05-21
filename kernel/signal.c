@@ -59,16 +59,16 @@ uint64 rt_sigreturn(void) {
 void sighandle(void) {
   struct proc *p = myproc();
   int signum = p->killed;
-  // debug_print("sighandle %p a0:%d a7:%d\n", p->sig_pending.__val[0],
+  // printf("sighandle %p a0:%d a7:%d\n", p->sig_pending.__val[0],
   // p->trapframe->a0, p->trapframe->a7);
   if (p->sigaction[signum].__sigaction_handler.sa_handler != NULL) {
     p->sig_tf = kalloc();
     memcpy(p->sig_tf, p->trapframe, sizeof(struct trapframe));
-    p->trapframe->epc =
+    p->trapframe->era =
         (uint64)p->sigaction[signum].__sigaction_handler.sa_handler;
     p->trapframe->ra = (uint64)SIGTRAMPOLINE;
     p->trapframe->sp = p->trapframe->sp - PGSIZE;
-    debug_print("sighandle epc:%p ra:%p\n", p->trapframe->epc,
+    printf("sighandle epc:%p ra:%p\n", p->trapframe->era,
                 p->trapframe->ra);
     p->sig_pending.__val[0] &= ~(1ul << signum);
     if (p->sig_pending.__val[0] == 0) {

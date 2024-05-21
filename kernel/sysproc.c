@@ -1,5 +1,4 @@
 // #include "include/futex.h"
-#include "include/signal.h"
 #include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/mmap.h"
@@ -10,7 +9,7 @@
 #include "include/rusage.h"
 #include "include/spinlock.h"
 #include "include/string.h"
-#include "include/syscall.h"
+#include "include/syscall.h"`
 #include "include/timer.h"
 #include "include/types.h"
 #include "include/uname.h"
@@ -45,12 +44,11 @@ uint64 sys_clone(void) {
   if (new_stack == 0) {
     return fork();
   }
-
-  return clone(new_stack, new_fn);
   // if (new_fn & CLONE_VM)
   //   return thread_clone(new_stack, ptid, tls, ctid);
   // else
   //   return clone(new_stack, new_fn);
+  return clone(new_stack, new_fn);
 }
 
 uint64 sys_prlimit64() {
@@ -556,13 +554,19 @@ uint64 sys_mprotect() {
   if (argaddr(0, &addr) < 0 || argaddr(1, &len) < 0 || argint(2, &prot) < 0)
     return -1;
   struct proc *p = myproc();
-  int perm = PTE_U | PTE_A | PTE_D;
+  int perm = PTE_PLV | PTE_MAT | PTE_D;
+
   if (prot & PROT_READ)
-    perm |= PTE_R;
+    //LA64  架构下，0表示可读
+    perm &= ~PTE_NR;
   if (prot & PROT_WRITE)
+    // 1 表示可写
     perm |= PTE_W;
-  if (prot & PROT_EXEC)
-    perm |= (PTE_X | PTE_A);
+    // 表示可以执行
+  if (prot & PROT_EXEC){
+    perm |= PTE_MAT | PTE_P;
+    perm &= ~PTE_NX;
+  }
   int page_n = PGROUNDUP(len) >> PGSHIFT;
   uint64 va = addr;
   for (int i = 0; i < page_n; i++) {

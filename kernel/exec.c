@@ -509,7 +509,7 @@ int exec(char *path, char **argv, char **env) {
   p->pagetable = pagetable;
   p->kpagetable = kpagetable;
   p->sz = sz;
-  p->trapframe->epc = program_entry; // initial program counter = main
+  p->trapframe->era = program_entry; // initial program counter = main
   p->trapframe->sp = sp;             // initial stack pointer
   // printf("program entry:%p\n", program_entry);
   // maybe it's wrong

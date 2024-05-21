@@ -64,6 +64,7 @@
 
 #define TRAMPOLINE (MAXVA - PGSIZE)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
+#define SIGTRAMPOLINE (TRAPFRAME - PGSIZE)
 
 // 1<< 32
 // added by wty

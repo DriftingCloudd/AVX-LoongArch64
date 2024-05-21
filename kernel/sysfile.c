@@ -22,6 +22,7 @@
 #include "include/sysinfo.h"
 #include "include/types.h"
 #include "include/vm.h"
+#include "include/kalloc.h"
 
 char syslogbuffer[1024];
 int bufferlength = 0;
@@ -94,6 +95,7 @@ fdalloc3(struct file *f, int new)
 }
 */
 static struct dirent *create(char *path, short type, int mode);
+
 uint64 sys_mkdirat(void) {
   // 目前测试中的mkdir都是调用了mkdirat，并且测试中并没有测试mkdirat
   // 所以我们目前只考虑path，不考虑mkdirat的其他参数
@@ -1266,15 +1268,16 @@ uint64 sys_fcntl(void) {
     p->exec_close[fd] = 1;
 
     return fd;
-  } else if (F_GETFL == cmd) {
-    // handle O_NONBLOCK here; we just need special handling
-    uint64 ret = 0;
-    if (f->type == FD_SOCK) {
-      if (f->socket_type & SOCK_NONBLOCK)
-        ret |= O_NONBLOCK;
-    }
-    return ret;
-  }
+  } 
+  // else if (F_GETFL == cmd) {
+  //   // handle O_NONBLOCK here; we just need special handling
+  //   uint64 ret = 0;
+  //   if (f->type == FD_SOCK) {
+  //     if (f->socket_type & SOCK_NONBLOCK)
+  //       ret |= O_NONBLOCK;
+  //   }
+  //   return ret;
+  // }
 
   return 0;
 }
@@ -1359,7 +1362,8 @@ uint64 sys_readlinkat(void) {
       return -1;
     }
     dp = p->cwd;
-  } else {
+  } 
+  else {
     dp = df->ep;
   }
   printf("arrive b\n");
@@ -1389,7 +1393,7 @@ uint64 sys_readlinkat(void) {
 
 static uint64 creat_file() {
   char path[FAT32_MAX_FILENAME] = "/test.txt";
-  int dirfd, flags, mode, fd;
+  int dirfd, flags, fd;
   struct file *f, *dirf;
   dirf = NULL;
   struct dirent *dp = NULL, *ep;
@@ -1476,7 +1480,8 @@ static uint64 creat_file() {
 uint64 sys_copy_file_range(void) {
   int fd_in, fd_out;
   struct file *fp_in, *fp_out;
-  uint64 off_in, off_out;
+  uint64 off_in;
+  uint64 off_out = NULL;
   uint64 len;
 
   printf("enter here!\n");

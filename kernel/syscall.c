@@ -162,7 +162,7 @@ extern uint64 sys_renameat2();
 extern uint64 sys_rt_sigaction(void);
 extern uint64 sys_rt_sigprocmask(void);
 extern uint64 sys_rt_sigreturn(void);
-extern uint64 sys_ppoll();
+// extern uint64 sys_ppoll();
 extern uint64 sys_getpgid();
 extern uint64 sys_setpgid();
 extern uint64 sys_tgkill();
@@ -291,7 +291,7 @@ static char *sysnames[] = {
     [SYS_fsync] "fsync",
     [SYS_sync] "sync",
     [SYS_ftruncate] "ftruncate",
-    [SYS_pselect6] "pselect6",
+    // [SYS_pselect6] "pselect6",
     [SYS_readlinkat] "readlinkat",
     [SYS_tkill] "tkill",
     [SYS_copy_file_range] "copy_file_range",
@@ -370,7 +370,7 @@ static uint64 (*syscalls[])(void) = {
     [SYS_getegid] sys_getegid,
     [SYS_lseek] sys_lseek,
     [SYS_exit_group] sys_exit_group,
-    [SYS_set_tid_address] sys_set_tid_address,
+    // [SYS_set_tid_address] sys_set_tid_address,
     [SYS_clock_gettime] sys_clock_gettime,
     [SYS_syslog] sys_syslog,
     [SYS_writev] sys_writev,
@@ -385,11 +385,11 @@ static uint64 (*syscalls[])(void) = {
     [SYS_rt_sigprocmask] sys_rt_sigprocmask,
     [SYS_rt_sigreturn] sys_rt_sigreturn,
     [SYS_renameat2] sys_renameat2,
-    [SYS_ppoll] sys_ppoll,
+    // [SYS_ppoll] sys_ppoll,
     [SYS_getpgid] sys_getpgid,
     [SYS_setpgid] sys_setpgid,
     [SYS_tgkill] sys_tgkill,
-    [SYS_gettid] sys_gettid,
+    // [SYS_gettid] sys_gettid,
     [SYS_umask] sys_umask,
     [SYS_readlinkat] sys_readlinkat,
     [SYS_rt_sigtimedwait] sys_rt_sigtimedwait,
@@ -401,8 +401,8 @@ static uint64 (*syscalls[])(void) = {
     [SYS_fsync] sys_fsync,
     [SYS_ftruncate] sys_ftruncate,
     [SYS_setitimer] sys_setitimer,
-    [SYS_pselect6] sys_pselect6,
-    [SYS_tkill] sys_tkill,
+    // [SYS_pselect6] sys_pselect6,
+    // [SYS_tkill] sys_tkill,
     [SYS_copy_file_range] sys_copy_file_range,
 
     // // socket syscalls

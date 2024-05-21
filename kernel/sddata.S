@@ -5,7 +5,7 @@
     .global sddata_end
 sddata_start:
     # .incbin "./sdcard.img"
-    .incbin "/home/byte/OCC/AVX-LoongArch64/kernel/sdcard.img"
+    .incbin "./kernel/sdcard.img"
 sddata_end:
 sddata_size:
     .long sddata_end - sddata_start

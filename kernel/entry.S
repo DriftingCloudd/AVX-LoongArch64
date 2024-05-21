@@ -35,6 +35,8 @@ _entry:
         mul.d       $a0, $a0, $a1               # a0 = 4096 * (CPUID + 1)
         add.d       $sp, $sp, $a0               # sp = boot_stack_top + 4096 * (CPUID + 1)                    
 	# jump to main in main.c
+        li.d        $t0, 0x1
+        cpucfg      $t1, $t0                    # read the CFG
         bl          main
 spin:
         b           spin

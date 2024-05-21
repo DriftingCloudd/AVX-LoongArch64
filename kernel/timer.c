@@ -31,17 +31,16 @@ void timerinit() {
   printf("timerinit\n");
 #endif
 }
-// no set sbi yet
-// --- //
-// void set_next_timeout() {
-//   // There is a very strange bug,
-//   // if comment the `printf` line below
-//   // the timer will not work.
 
-//   // this bug seems to disappear automatically
-//   // printf("");
-//   sbi_set_timer(r_time() + INTERVAL);
-// }
+void set_next_timeout() {
+  // There is a very strange bug,
+  // if comment the `printf` line below
+  // the timer will not work.
+
+  // this bug seems to disappear automatically
+  // printf("");
+  sbi_set_timer(r_time() + INTERVAL);
+}
 
 // void timer_tick() {
 //   acquire(&tickslock);
@@ -98,8 +97,6 @@ uint64 setitimer(int which, const struct itimerval *value,
       break;
     }
   }
-  if (timer == NULL)
-    panic("setitimer:timer not found");
 
   if (ovalue != NULL && timer != NULL) {
     copyout(myproc()->pagetable, (uint64)ovalue, (char *)&((timer->itimer)),
@@ -114,7 +111,7 @@ uint64 setitimer(int which, const struct itimerval *value,
     if (timer == NULL) {
       for (int i = 0; i < NTIMERS; i++) {
         if (timers[i].pid == 0) {
-          // printf("set timer pid %d\n", pid);
+          printf("set timer pid %d\n", pid);
           timer = &timers[i];
           timer->pid = pid;
           timer->which = which;

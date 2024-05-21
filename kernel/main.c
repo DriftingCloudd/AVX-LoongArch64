@@ -73,7 +73,6 @@ void main() {
 
     __sync_synchronize();
     started = 1;
-    while (1);
     
   } else {
     // other hart

@@ -53,6 +53,9 @@
 // 上下文保存寄存器
 #define LOONGARCH_CSR_SAVE0		    0x30    /* Kscratch registers */
 
+#define LOONGARCH_CSR_TID   		0x40	/* Timer ID */
+#define LOONGARCH_CSR_TCFG          0x41    /* Timer config */
+
 #define LOONGARCH_CSR_DMWIN0		0x180	/* 64 direct map win0: MEM & IF */
 #define LOONGARCH_CSR_DMWIN1		0x181	/* 64 direct map win1: MEM & IF */
 #define LOONGARCH_CSR_DMWIN2		0x182	/* 64 direct map win2: MEM */

@@ -506,6 +506,12 @@ int copyout_zero(pagetable_t pagetable, uint64 dstva, uint64 len) {
 // Copy len bytes from src to virtual address dstva in a given page table.
 // Return 0 on success, -1 on error.
 int copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len) {
+  if (dstva > MAXVA)
+    panic("copyout: dstva > MAXVA");
+
+  if (src < DMWIN_MASK)
+    panic("copyout: src < DMWIN_MASK");
+
   uint64 n, va0, pa0;
 
   while (len > 0) {
@@ -538,6 +544,12 @@ int copyout2(uint64 dstva, char *src, uint64 len) {
 // Copy len bytes to dst from virtual address srcva in a given page table.
 // Return 0 on success, -1 on error.
 int copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len) {
+  if (dst < DMWIN_MASK)
+    panic("copyin: dst < DMWIN_MASK");
+
+  if (srcva > MAXVA)
+    panic("copyin: srcva > MAXVA");
+
   uint64 n, va0, pa0;
 
   while (len > 0) {

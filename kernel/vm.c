@@ -15,8 +15,25 @@
 pagetable_t kernel_pagetable;
 pagetable_t tcpip_pagetable;
 
+#ifndef DEBUG
+#define DEBUG 1
+#endif
+
 extern char etext[];      // kernel.ld sets this to end of kernel code.
 extern char trampoline[]; // trampoline.S
+
+void tlbinit(void)
+{
+  asm volatile("invtlb  0x0,$zero,$zero");
+  // 设置tlb页大小
+  w_csr_stlbps(0xcU);
+  // 设置asid 表项
+  w_csr_asid(0x0U);
+  // 设置高位tlbehi项， 虚页号相关消息
+  w_csr_tlbrehi(0xcU);
+}
+
+
 /*
  * create a direct-map page table for the kernel.
  */
@@ -52,51 +69,41 @@ void kvminit() {
 // #endif
 
   // map kernel text executable and read-only.
-  kvmmap(RAMBASE, RAMBASE, (uint64)etext - RAMBASE,
-         PTE_P |PTE_W |PTE_PLV| PTE_MAT);
+  kvmmap(RAMBASE - DMWIN_MASK, RAMBASE, (uint64)etext - RAMBASE,
+        PTE_D |PTE_P| PTE_MAT);
   // map kernel data and the physical RAM we'll make use of.
-  kvmmap((uint64)etext, (uint64)etext, RAMSTOP - (uint64)etext,
-         PTE_P |PTE_W |PTE_PLV| PTE_MAT);
+  kvmmap((uint64)etext - DMWIN_MASK, (uint64)etext, RAMSTOP - (uint64)etext,
+        PTE_NR | PTE_W | PTE_MAT |PTE_D |PTE_P);
 
   // map the trampoline for trap entry/exit to
   // the highest virtual address in the kernel.
   // 暂时放在那里，Trampoline.S 没有更新
-  kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_W | PTE_MAT | PTE_PLV | PTE_P);
+  kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_MAT |PTE_D |PTE_P);
 
 #ifdef DEBUG
   printf("kvminit\n");
 #endif
-}
-// flush tlb, fill '0'
-
-void tlbinit(void)
-{
-  asm volatile("invtlb  0x0,$zero,$zero");
-  // 设置tlb页大小
-  w_csr_stlbps(0xcU);
-  // 设置asid 表项
-  w_csr_asid(0x0U);
-  // 设置高位tlbehi项， 虚页号相关消息
-  w_csr_tlbrehi(0xcU);
 }
 
 // Switch h/w page table register to the kernel's page table,
 // and enable paging.
 // wty_todo
 void kvminithart() {
-  // flush the tlb(tlbinit)
-  tlbinit();
+  
   // AVX 实现时没有体现顺序性，fence
   // sfence_vma();
   // 构造正确的 satp值
   //  更新页表消息
   // w_satp(MAKE_SATP(kernel_pagetable));
+  w_csr_pgdl((uint64)kernel_pagetable);
+  // flush the tlb(tlbinit)
+  tlbinit();
+  w_csr_pwcl((PTEWIDTH << 30)|(DIR2WIDTH << 25)|(DIR2BASE << 20)|(DIR1WIDTH << 15)|(DIR1BASE << 10)|(PTWIDTH << 5)|(PTBASE << 0));
+  w_csr_pwch((DIR4WIDTH << 18)|(DIR3WIDTH << 6)|(DIR3BASE << 0));
   // 修改uart的地址映射
   // uart
   // uart8250_change_base_addr(UART_V);
-  flush_TLB();
-  w_csr_pgdl((uint64)kernel_pagetable);
-  flush_TLB();
+  
 // sfence_vma();
 
 #ifdef DEBUG
@@ -104,10 +111,6 @@ void kvminithart() {
 #endif
 }
 
-// Return the address of the PTE in page table pagetable
-// that corresponds to virtual address va.  If alloc!=0,
-// create any required page-table pages.
-//
 // Return the address of the PTE in page table pagetable
 // that corresponds to virtual address va.  If alloc!=0,
 // create any required page-table pages.
@@ -123,7 +126,6 @@ void kvminithart() {
 //    0..11 -- 12 bits of byte offset within the page.
 // 
 pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
-
   if (va >= MAXVA)
     panic("walk");
 
@@ -135,7 +137,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
     } else {
       if (!alloc || (pagetable = (pde_t *)kalloc()) == NULL) {
         // printf("walk: not valid\n");
-        return NULL;
+        return 0;
       }
       memset(pagetable, 0, PGSIZE);
       *pte = PA2PTE(pagetable) | PTE_V;
@@ -180,6 +182,9 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
 // does not flush TLB or enable paging.
 // 直接映射模式,  va = pa
 void kvmmap(uint64 va, uint64 pa, uint64 sz, int perm) {
+  #if DEBUG
+  printf("kvmmap: va:%p, pa:%p, sz:%p, perm:%p\n", va, pa, sz, perm);
+  #endif
   if (mappages(kernel_pagetable, va, sz, pa, perm) != 0)
     panic("kvmmap");
 } 
@@ -214,6 +219,9 @@ int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa,
   // perm |= PTE_A | PTE_D;
   uint64 a, last;
   pte_t *pte;
+
+  if(size == 0)
+    panic("mappages: size == 0");
 
   a = PGROUNDDOWN(va);
   last = PGROUNDDOWN(va + size - 1);

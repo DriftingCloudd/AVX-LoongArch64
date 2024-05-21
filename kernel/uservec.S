@@ -5,7 +5,7 @@
         #
 #include "include/loongarchregs.h"
 
-        .section trampsec
+.section trampsec
 .globl trampoline
 trampoline:
 .align 4

@@ -346,8 +346,12 @@ flush_TLB()
 #define PXSHIFT(level)  (PGSHIFT+(9*(level)))
 #define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
 // 最大虚拟地址
-// Lower half virtual address
-#define MAXVA (1L << (9 + 12 - 1)) 
+// one beyond the highest possible virtual address.
+// MAXVA is actually one bit less than the max allowed by
+// Sv39, to avoid having to sign-extend virtual addresses
+// that have the high bit set.
+#define MAXVA (1L << (48 - 1)) // 0x40_0000_0000
+
 
 typedef uint64 pte_t;//typde of pte
 typedef uint64 *pagetable_t;

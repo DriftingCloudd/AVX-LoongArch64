@@ -47,21 +47,29 @@ struct proc *initproc;
 extern char trampoline[];       // trampoline.S
 extern char signalTrampoline[]; // signalTrampoline.S
 
-// void reg_info(void) {
-//   printf("register info: {\n");
+void reg_info(void) {
+  printf("register info: {\n");
 //   printf("sstatus: %p\n", r_sstatus());
+printf("prmd: %p\n", r_csr_prmd());
 //   printf("sip: %p\n", r_sip());
+//todo
 //   printf("sie: %p\n", r_sie());
+printf("ecfg: %p\n", r_csr_ecfg());
 //   printf("sepc: %p\n", r_sepc());
+printf("era: %p\n", r_csr_era());
 //   printf("stvec: %p\n", r_stvec());
+printf("eentry: %p\n", r_csr_eentry());
 //   printf("satp: %p\n", r_satp());
+printf("pgdl: %p\n", r_csr_pgdl());
 //   printf("scause: %p\n", r_scause());
+printf("estatus: %p\n", r_csr_estat());
 //   printf("stval: %p\n", r_stval());
-//   printf("sp: %p\n", r_sp());
-//   printf("tp: %p\n", r_tp());
-//   printf("ra: %p\n", r_ra());
-//   printf("}\n");
-// }
+
+  printf("sp: %p\n", r_sp());
+  printf("tp: %p\n", r_tp());
+  // printf("ra: %p\n", r_ra());
+  printf("}\n");
+}
 
 void cpuinit(void) {
   struct cpu *it;
@@ -128,7 +136,7 @@ void procinit(void) {
       panic("kalloc");
     uint64 va = KSTACK((int) (p - proc));
     // printf("[procinit]kvmmap va %p to pa %p\n", va, (uint64)pa);
-    kvmmap(va, (uint64)pa, PGSIZE, ~PTE_NR & PTE_W);
+    kvmmap(va, (uint64)pa, PGSIZE, PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D);
     p->kstack = va;
   }
   kvminithart();
@@ -454,6 +462,7 @@ void userinit(void)
 
   // prepare for the very first "return" from kernel to user.
   p->trapframe->era = 0x0;      // user program counter
+  alloc_vma_stack(p);
   p->trapframe->sp = get_proc_sp(p); // user stack pointer
   // p->trapframe->sp = PGSIZE;  // user stack pointer 
 
@@ -701,7 +710,7 @@ void scheduler(void) {
   struct proc *p;
   struct cpu *c = mycpu();
   // vm.c 
-  // extern pagetable_t kernel_pagetable;
+  extern pagetable_t kernel_pagetable;
 
   c->proc = 0;
   for (;;) {

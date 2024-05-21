@@ -2,12 +2,38 @@
 #define __MEMLAYOUT_H
 // Physical memory layout
 
-// 0x00200000 -- bios loads kernel here and jumps here
-// 0x10000000 -- 
-// 0x1c000000 -- reset address
-// 0x1fe00000 -- I/O interrupt base address
-// 0x1fe20000 -- uart16550 serial port
-// 0x90000000 -- RAM used by user pages
+// Physical memory layout
+
+// k210 peripherals
+// (0x0200_0000, 0x1000),      /* CLINT     */
+// // we only need claim/complete for target0 after initializing
+// (0x0C20_0000, 0x1000),      /* PLIC      */
+// (0x3800_0000, 0x1000),      /* UARTHS    */
+// (0x3800_1000, 0x1000),      /* GPIOHS    */
+// (0x5020_0000, 0x1000),      /* GPIO      */
+// (0x5024_0000, 0x1000),      /* SPI_SLAVE */
+// (0x502B_0000, 0x1000),      /* FPIOA     */
+// (0x502D_0000, 0x1000),      /* TIMER0    */
+// (0x502E_0000, 0x1000),      /* TIMER1    */
+// (0x502F_0000, 0x1000),      /* TIMER2    */
+// (0x5044_0000, 0x1000),      /* SYSCTL    */
+// (0x5200_0000, 0x1000),      /* SPI0      */
+// (0x5300_0000, 0x1000),      /* SPI1      */
+// (0x5400_0000, 0x1000),      /* SPI2      */
+// (0x8000_0000, 0x600000),    /* Memory    */
+
+// qemu -machine virt is set up like this,
+// based on qemu's hw/riscv/virt.c:
+//
+// 00001000 -- boot ROM, provided by qemu
+// 02000000 -- CLINT
+// 0C000000 -- PLIC
+// 10000000 -- uart0 
+// 10001000 -- virtio disk 
+// 80000000 -- boot ROM jumps here in machine mode
+//             -kernel loads the kernel here
+// unused RAM after 80000000.
+
 
 // 低48位掩码
 #define DMWIN_MASK 0x9000000000000000
@@ -34,8 +60,8 @@
 
 // the kernel expects there to be RAM
 // for use by user pages
-// from physical address 0x90000000 to PHYSTOP.
-#define RAMBASE (0x90000000UL | DMWIN_MASK)
+// from physical address 0x8000000 to PHYSTOP.
+#define RAMBASE (0x08000000UL | DMWIN_MASK)
 #define RAMSTOP (RAMBASE + 128*1024*1024)
 
 // map kernel stacks beneath the trampframe,

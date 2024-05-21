@@ -1,6 +1,8 @@
 #ifndef __SYSNUM_H
 #define __SYSNUM_H
 
+// llh : 修改系统调用号
+
 // System call numbers
 #define SYS_fork         300
 #define SYS_exit        93

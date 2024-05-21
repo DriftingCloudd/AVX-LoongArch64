@@ -45,7 +45,7 @@ struct proc *initproc;
 
 // extern thread threads[];
 extern char trampoline[];       // trampoline.S
-// extern char signalTrampoline[]; // signalTrampoline.S
+extern char signalTrampoline[]; // signalTrampoline.S
 
 // void reg_info(void) {
 //   printf("register info: {\n");
@@ -115,23 +115,23 @@ void procinit(void) {
     p->tmask = 0;
     p->ktime = 0;
     p->utime = 0;
-    // memset(p->sigaction, 0, sizeof(p->sigaction));
-    // memset(p->sig_set.__val, 0, sizeof(p->sig_set));
-    // memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
-    // p->sig_tf = NULL;
+    memset(p->sigaction, 0, sizeof(p->sigaction));
+    memset(p->sig_set.__val, 0, sizeof(p->sig_set));
+    memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
+    p->sig_tf = NULL;
     // Allocate a page for the process's kernel stack.
     // Map it high in memory, followed by an invalid
     // guard page.
-    // char *pa = kalloc();
-    // // printf("[procinit]kernel stack: %p\n", (uint64)pa);
-    // if(pa == 0)
-    //   panic("kalloc");
-    // uint64 va = KSTACK((int) (p - proc));
-    // // printf("[procinit]kvmmap va %p to pa %p\n", va, (uint64)pa);
-    // kvmmap(va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
-    // p->kstack = va;
+    char *pa = kalloc();
+    // printf("[procinit]kernel stack: %p\n", (uint64)pa);
+    if(pa == 0)
+      panic("kalloc");
+    uint64 va = KSTACK((int) (p - proc));
+    // printf("[procinit]kvmmap va %p to pa %p\n", va, (uint64)pa);
+    kvmmap(va, (uint64)pa, PGSIZE, ~PTE_NR & PTE_W);
+    p->kstack = va;
   }
-  // kvminithart();
+  kvminithart();
 
   memset(cpus, 0, sizeof(cpus));
 #ifdef DEBUG
@@ -179,21 +179,21 @@ int allocpid() {
   return pid;
 }
 // 新上下文
-// static void copycontext(context *t1, context *t2) {
-//   t1->ra = t2->ra;
-//   t1->sp = t2->sp;
-//   //---// 
-//   t1->s0 = t2->s0;
-//   t1->s1 = t2->s1;
-//   t1->s2 = t2->s2;
-//   t1->s3 = t2->s3;
-//   t1->s4 = t2->s4;
-//   t1->s5 = t2->s5;
-//   t1->s6 = t2->s6;
-//   t1->s7 = t2->s7;
-//   t1->s8 = t2->s8;
-//   t1->fp = t2->fp;
-// }
+static void copycontext(context *t1, context *t2) {
+  t1->ra = t2->ra;
+  t1->sp = t2->sp;
+  //---// 
+  t1->s0 = t2->s0;
+  t1->s1 = t2->s1;
+  t1->s2 = t2->s2;
+  t1->s3 = t2->s3;
+  t1->s4 = t2->s4;
+  t1->s5 = t2->s5;
+  t1->s6 = t2->s6;
+  t1->s7 = t2->s7;
+  t1->s8 = t2->s8;
+  t1->fp = t2->fp;
+}
 
 // todo trapframe
 // static void copytrapframe(struct trapframe *f1, struct trapframe *f2) {

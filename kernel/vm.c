@@ -94,6 +94,9 @@ void kvminithart() {
   // 修改uart的地址映射
   // uart
   // uart8250_change_base_addr(UART_V);
+  flush_TLB();
+  w_csr_pgdl((uint64)kernel_pagetable);
+  flush_TLB();
 // sfence_vma();
 
 #ifdef DEBUG

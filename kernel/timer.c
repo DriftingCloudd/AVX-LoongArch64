@@ -98,6 +98,9 @@ uint64 setitimer(int which, const struct itimerval *value,
       break;
     }
   }
+  if (timer == NULL)
+    panic("setitimer:timer not found");
+
   if (ovalue != NULL && timer != NULL) {
     copyout(myproc()->pagetable, (uint64)ovalue, (char *)&((timer->itimer)),
             sizeof(struct itimerval));

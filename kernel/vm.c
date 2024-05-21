@@ -505,7 +505,7 @@ int copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len) {
     pa0 = walkaddr(pagetable, va0);
     if (pa0 == NULL)
       return -1;
-    n = PGSIZE - (dstva - va0);
+    n = PGSIZE - (dstva - va0);   // n is the remain of the page
     if (n > len)
       n = len;
     memmove((void *)((pa0 + (dstva - va0)) | DMWIN_MASK), src, n);

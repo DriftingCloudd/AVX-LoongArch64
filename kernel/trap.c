@@ -24,7 +24,7 @@
 extern char trampoline[], uservec[], userret[]; 
 
 // in kernelvec.S, calls kerneltrap().
-extern void kernelvec();
+void kernelvec();
 // void uservec();
 void handle_tlbr();
 void handle_merr();

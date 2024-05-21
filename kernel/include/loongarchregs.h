@@ -60,6 +60,7 @@
 
 #define LOONGARCH_CSR_TLBEHI		0x11	/* TLB EntryHi */
 #define LOONGARCH_CSR_PGDL          0x19
+#define LOONGARCH_CSR_PGDH          0x1a
 #define LOONGARCH_CSR_PGD           0x1b
 #define LOONGARCH_CSR_TLBRENTRY		0x88	/* TLB refill exception entry */
 #define LOONGARCH_CSR_TLBRBADV		0x89	/* TLB refill badvaddr */

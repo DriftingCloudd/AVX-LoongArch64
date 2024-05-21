@@ -11,6 +11,10 @@
 #include "include/string.h"
 #include "include/types.h"
 
+#ifndef DEBUG
+#define DEBUG 1
+#endif
+
 void freerange(void *pa_start, void *pa_end);
 
 extern char kernel_end[]; // first address after kernel.
@@ -32,12 +36,19 @@ void kinit() {
   kmem.npage = 0;
   // RAMSTOP : 物理内存的上界
   // PHYSTOP->RAMSTOP, 内核使用物理内存的上界
+  #if DEBUG
+  printf("kernel_end: %p, RAMSTOP: %p\n", kernel_end, (void *)RAMSTOP);
+  #endif
   freerange(kernel_end, (void *)RAMSTOP);
   printf("kernel_end: %p, RAMSTOP: %p\n", kernel_end, (void *)RAMSTOP);
 //   debug_print("kinit\n");
 }
 
 void freerange(void *pa_start, void *pa_end) {
+
+  #if DEBUG
+  printf("freerange: pa_start: %p, pa_end: %p\n", pa_start, pa_end);
+  #endif
 
   char *p;
   p = (char *)PGROUNDUP((uint64)pa_start);
@@ -52,6 +63,11 @@ void freerange(void *pa_start, void *pa_end) {
 // see kinit above.)
 
 void kfree(void *pa) {
+
+  #if 0
+  printf("kfree: pa: %p\n", pa);
+  #endif
+
   struct run *r;
 
   if (((uint64)pa % PGSIZE) != 0 || (char *)pa < kernel_end ||

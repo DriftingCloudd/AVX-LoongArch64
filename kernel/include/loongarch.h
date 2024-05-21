@@ -327,6 +327,7 @@ flush_TLB()
 #define PTE_D (1L << 1) // dirty
 #define PTE_PLV (3L << 2) //privilege level
 #define PTE_MAT (1L << 4) //memory access type
+#define PTE_G (1L << 6) // global
 #define PTE_P (1L << 7) // physical page exists
 #define PTE_W (1L << 8) // writeable
 #define PTE_NX (1UL << 62) //non executable

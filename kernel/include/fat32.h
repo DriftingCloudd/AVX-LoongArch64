@@ -13,7 +13,11 @@
 #define ATTR_LONG_NAME      0x0F
 
 #define LAST_LONG_ENTRY     0x40
+
+#define FAT32_BAD           0x0ffffff7
 #define FAT32_EOC           0x0ffffff8
+#define FAT32_EOF           0x0fffffff
+
 #define EMPTY_ENTRY         0xe5
 #define END_OF_ENTRY        0x00
 #define CHAR_LONG_NAME      13

@@ -275,7 +275,7 @@ found:
   // p->thread_num = 0;
   // p->char_count = 0;
   // p->clear_child_tid = NULL;
-  信号量
+  // 信号量
   memset(p->sigaction, 0, sizeof(p->sigaction));
   memset(p->sig_set.__val, 0, sizeof(p->sig_set));
   memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
@@ -413,7 +413,7 @@ pagetable_t proc_pagetable(struct proc *p) {
   }
   // signal ：交互信号
   if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
-               PTE_R | PTE_X | PTE_U) < 0) {
+              PTE_PLV) < 0) {
     vmunmap(pagetable, TRAMPOLINE, 1, 0);
     vmunmap(pagetable, TRAPFRAME, 1, 0);
     uvmfree(pagetable, 0);

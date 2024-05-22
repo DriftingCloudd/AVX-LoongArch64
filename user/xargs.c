@@ -1,6 +1,6 @@
 #include "kernel/include/param.h"
 #include "kernel/include/types.h"
-#include "xv6-user/user.h"
+#include "user/user.h"
 
 /**
  * len:    include the 0 in the end.

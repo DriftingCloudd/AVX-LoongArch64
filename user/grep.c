@@ -2,7 +2,7 @@
 
 #include "kernel/include/stat.h"
 #include "kernel/include/types.h"
-#include "xv6-user/user.h"
+#include "user/user.h"
 
 char buf[1024];
 int match(char *, char *);

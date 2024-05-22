@@ -1,6 +1,6 @@
 #include "kernel/include/stat.h"
 #include "kernel/include/types.h"
-#include "xv6-user/user.h"
+#include "user/user.h"
 
 char *fmtname(char *name) {
   static char buf[STAT_MAX_NAME + 1];

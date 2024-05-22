@@ -5,7 +5,7 @@
 #include "kernel/include/stat.h"
 #include "kernel/include/syscall.h"
 #include "kernel/include/types.h"
-#include "xv6-user/user.h"
+#include "user/user.h"
 
 //
 // Tests xv6 system calls.  usertests without arguments runs them all

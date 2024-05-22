@@ -1,4 +1,4 @@
-#include "xv6-user/user.h"
+#include "user/user.h"
 typedef struct {
   int valid;
   char *name[20];

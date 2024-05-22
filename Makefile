@@ -45,7 +45,8 @@ OBJS += \
   $K/vma.o \
   $K/signal.o \
   $K/syssig.o \
-  $K/systime.o 
+  $K/systime.o \
+  $K/SignalTrampoline.o \
   # $K/fs.o \
   # $K/futex.o \
   
@@ -154,6 +155,7 @@ CFLAGS += -march=loongarch64 -mabi=lp64s
 CFLAGS += -ffreestanding -fno-common -nostdlib
 CFLAGS += -fno-pie -no-pie
 CFLAGS += -fno-stack-protector
+FLAGS += -I.
 CFLAGS += -Ikernel/include
 CFLAGS += -I.kernel -I.
 # CFLAGS += -Ikernel/lwip/include
@@ -192,17 +194,17 @@ LDFLAGS = -z max-page-size=4096
 # 	@cd kernel && make -f net.mk liblwip.a
 
 # Compile Kernel
-$T/kernel.bin: $T/kernel
-	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
+# $T/kernel.bin: $T/kernel
+# 	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
 
-$T/kernel: $(OBJS) $(linker) # $U/initcode
+$T/kernel: $(OBJS) $(linker) $U/initcode
 	if [ ! -d "./target" ]; then mkdir target; fi
 	$(LD) $(LDFLAGS) -T $(linker) -o $T/kernel $(OBJS)
 	$(OBJDUMP) -S $T/kernel > $T/kernel.asm
 	$(OBJDUMP) -t $T/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $T/kernel.sym
 
-%.o: %.S
-	$(CC) $(ASFLAGS) -c $< -o $@
+# %.o: %.S
+# 	$(CC) $(ASFLAGS) -c $< -o $@
 
 # kernel-qemu: $(OBJS) $(linker) $U/initcode $U/init_for_test
 # 	$(LD) $(LDFLAGS) -T $(linker) -so kernel-qemu $(OBJS) -L.
@@ -212,10 +214,13 @@ $T/kernel: $(OBJS) $(linker) # $U/initcode
 # build-grading: kernel-qemu
 # 	$(OBJCOPY) kernel-qemu --strip-all -O binary kernel-qemu.bin
 
-# build: userprogs $T/kernel
-# 	$(OBJCOPY) $T/kernel --strip-all -O binary $(image)
+build: userprogs $T/kernel
+	$(OBJCOPY) $T/kernel --strip-all -O binary $(image)
 
-# image = $T/kernel.bin
+image = $T/kernel.bin
+
+all:
+	@make build 
 
 # $K/bin.S:$U/initcode $U/init-for-test
 $K/bin.S:$U/initcode
@@ -237,22 +242,24 @@ _%: %.o $(ULIB)
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
 $U/usys.S : $U/usys.pl
-	@perl $U/usys.pl > $U/usys.S
+	perl $U/usys.pl > $U/usys.S
 
 $U/usys.o : $U/usys.S
 	$(CC) $(CFLAGS) -c -o $U/usys.o $U/usys.S
 
-# $U/_forktest: $U/forktest.o $(ULIB)
-# 	# forktest has less library code linked in - needs to be small
-# 	# in order to be able to max out the proc table.
-# 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $U/ulib.o $U/usys.o
-# 	$(OBJDUMP) -S $U/_forktest > $U/forktest.asm
+$U/_forktest: $U/forktest.o $(ULIB)
+	# forktest has less library code linked in - needs to be small
+	# in order to be able to max out the proc table.
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $U/ulib.o $U/usys.o
+	$(OBJDUMP) -S $U/_forktest > $U/forktest.asm
 
 # Prevent deletion of intermediate files, e.g. cat.o, after first build, so
 # that disk image changes after first build are persistent until clean.  More
 # details:
 # http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
-# .PRECIOUS: %.o
+
+
+.PRECIOUS: %.o
 
 UPROGS=\
 	$U/_init\
@@ -273,8 +280,8 @@ UPROGS=\
 	$U/_strace\
 	$U/_mv\
 	$U/_busybox_test\
-	# $U/_myDup3\
 
+	# $U/_myDup3\
 	# $U/_forktest\
 	# $U/_ln\
 	# $U/_stressfs\

@@ -64,18 +64,6 @@
 #define RAMBASE (0x08000000UL | DMWIN_MASK)
 #define RAMSTOP (RAMBASE + 128*1024*1024)
 
-// map kernel stacks beneath the trampframe,
-// each surrounded by invalid guard pages.
-
-#define KSTACK(p) (TRAPFRAME - ((p)+1)* 2*PGSIZE)
-// STACKSZIE by wty
-// 此处的VKSTACK 切换为MMIO地址
-// from AVX
-#define VKSTACK                 0x3EC0000000L //0x3E_C000_0000
-#define KSTACKSIZE              6 * PGSIZE
-#define EXTRASIZE               2 * PGSIZE
-#define PROCVKSTACK(paddrnum)        (VKSTACK - ((((paddrnum) + 1) % NPROC) * (KSTACKSIZE + EXTRASIZE)) + EXTRASIZE)
-
 // User memory layout.
 // Address zero first:
 //   text
@@ -91,6 +79,20 @@
 #define TRAMPOLINE (MAXVA - PGSIZE)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
 #define SIGTRAMPOLINE (TRAPFRAME - PGSIZE)
+
+// map kernel stacks beneath the trampframe,
+// each surrounded by invalid guard pages.
+
+#define KSTACK(p) (TRAPFRAME - ((p)+1)* 2*PGSIZE)
+// STACKSZIE by wty
+// 此处的VKSTACK 切换为MMIO地址
+// from AVX
+#define VKSTACK                 0x3EC0000000L //0x3E_C000_0000
+#define KSTACKSIZE              6 * PGSIZE
+#define EXTRASIZE               2 * PGSIZE
+#define PROCVKSTACK(paddrnum)        (VKSTACK - ((((paddrnum) + 1) % NPROC) * (KSTACKSIZE + EXTRASIZE)) + EXTRASIZE)
+
+
 
 // 1<< 32
 // added by wty

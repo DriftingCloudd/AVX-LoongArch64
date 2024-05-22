@@ -283,7 +283,7 @@ pagetable_t uvmcreate() {
 
 // Load the user initcode into address 0 of pagetable,
 // for the very first process.
-// sz must be less than a page.
+// sz can be more than a page.
 void uvminit(pagetable_t pagetable, pagetable_t kpagetable, uchar *src,
              uint sz) {
   char *mem;
@@ -293,13 +293,13 @@ void uvminit(pagetable_t pagetable, pagetable_t kpagetable, uchar *src,
     // printf("[uvminit]kalloc: %p\n", mem);
     memset(mem, 0, PGSIZE);
     mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV | PTE_W | PTE_MAT);
-    mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W | PTE_P | PTE_MAT);
+    mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W | PTE_P);
     memmove(mem, src + i, PGSIZE);
   }
   mem = kalloc();
   memset(mem, 0, PGSIZE);
   mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV | PTE_W | PTE_MAT);
-  mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_W | PTE_MAT);
+  mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_W);
   memmove(mem, src + i, sz % PGSIZE);
   printf("uvminit done sz:%d\n", sz);
   // for (int i = 0; i < sz; i ++) {
@@ -368,7 +368,7 @@ uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
       uvmdealloc(pagetable, kpagetable, a, oldsz);
       return 0;
     }
-    // 
+    // 内核
     if (mappages(kpagetable , a, PGSIZE, (uint64)mem, perm) != 0) {
       // vmunmap 的2种分配模式，根据特权集不同判断是否清空
       int npages = (a - oldsz) / PGSIZE;

@@ -44,6 +44,7 @@ void timerinit() {
 // }
 
 void countdown_timer_init(){
+  printf("countdown_timer_init\n");
   uint64 prcfg1_val;
   prcfg1_val = r_csr_tcfg();
   uint64 timerbits = FIELD_GET(prcfg1_val,PRCFG1_TIMERBITS_LEN,PRCFG1_TIMERBITS_SHIFT) + 1;

@@ -254,35 +254,35 @@ $U/usys.o : $U/usys.S
 # http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
 # .PRECIOUS: %.o
 
-# UPROGS=\
-# 	$U/_init\
-# 	$U/_sh\
-# 	$U/_cat\
-# 	$U/_echo\
-# 	$U/_grep\
-# 	$U/_ls\
-# 	$U/_kill\
-# 	$U/_mkdir\
-# 	$U/_xargs\
-# 	$U/_sleep\
-# 	$U/_find\
-# 	$U/_rm\
-# 	$U/_wc\
-# 	$U/_test\
-# 	$U/_usertests\
-# 	$U/_strace\
-# 	$U/_mv\
-# 	$U/_busybox_test\
-# 	# $U/_myDup3\
+UPROGS=\
+	$U/_init\
+	$U/_sh\
+	$U/_cat\
+	$U/_echo\
+	$U/_grep\
+	$U/_ls\
+	$U/_kill\
+	$U/_mkdir\
+	$U/_xargs\
+	$U/_sleep\
+	$U/_find\
+	$U/_rm\
+	$U/_wc\
+	$U/_test\
+	$U/_usertests\
+	$U/_strace\
+	$U/_mv\
+	$U/_busybox_test\
+	# $U/_myDup3\
 
-# 	# $U/_forktest\
-# 	# $U/_ln\
-# 	# $U/_stressfs\
-# 	# $U/_grind\
-# 	# $U/_zombie\
+	# $U/_forktest\
+	# $U/_ln\
+	# $U/_stressfs\
+	# $U/_grind\
+	# $U/_zombie\
 
-# userprogs: $(UPROGS)
-# 	@$(OBJCOPY) -S -O binary $U/_busybox_test $U/busybox_test.bin
+userprogs: $(UPROGS)
+	@$(OBJCOPY) -S -O binary $U/_busybox_test $U/busybox_test.bin
 
 # dst=/mnt
 

@@ -12,9 +12,11 @@
 #include "include/param.h"
 #include "include/printf.h"
 #include "include/proc.h"
+#include "include/apic.h"
+#include "include/extioi.h"
 // #include "include/sbi.h"
 // #include "include/socket.h"
-// #include "include/sysinfo.h"
+#include "include/sysinfo.h"
 // #include "include/thread.h"
 #include "include/timer.h"
 #include "include/trap.h"
@@ -58,12 +60,16 @@ void main() {
     trapinit(); // install kernel trap vector, including interrupt handler
     // threadInit();
     procinit();
+
+    apic_init();     // set up LS7A1000 interrupt controller
+//printf("apicinit\n");
+    extioi_init();   // extended I/O interrupt controller
     // plicinit();
     // plicinithart();
     // // sd_test();
-    // disk_init();
+    disk_init();
     // // init_socket();
-    // binit(); // buffer cache
+    binit(); // buffer cache
     // initlogbuffer();
     fileinit(); // file table
     userinit(); // first user process

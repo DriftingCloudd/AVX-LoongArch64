@@ -130,16 +130,16 @@ void procinit(void) {
     // Allocate a page for the process's kernel stack.
     // Map it high in memory, followed by an invalid
     // guard page.
-    char *pa = kalloc();
-    // printf("[procinit]kernel stack: %p\n", (uint64)pa);
-    if(pa == 0)
-      panic("kalloc");
-    uint64 va = KSTACK((int) (p - proc));
-    // printf("[procinit]kvmmap va %p to pa %p\n", va, (uint64)pa);
-    kvmmap(va, (uint64)pa, PGSIZE, PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D);
-    p->kstack = va;
+    // char *pa = kalloc();
+    // // printf("[procinit]kernel stack: %p\n", (uint64)pa);
+    // if(pa == 0)
+    //   panic("kalloc");
+    // uint64 va = KSTACK((int) (p - proc));
+    // // printf("[procinit]kvmmap va %p to pa %p\n", va, (uint64)pa);
+    // kvmmap(va, (uint64)pa, PGSIZE, PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D);
+    // p->kstack = va;
   }
-  kvminithart();
+  // kvminithart();
 
   memset(cpus, 0, sizeof(cpus));
 #ifdef DEBUG
@@ -275,10 +275,10 @@ found:
   // p->thread_num = 0;
   // p->char_count = 0;
   // p->clear_child_tid = NULL;
-  // 信号量
-  // memset(p->sigaction, 0, sizeof(p->sigaction));
-  // memset(p->sig_set.__val, 0, sizeof(p->sig_set));
-  // memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
+  信号量
+  memset(p->sigaction, 0, sizeof(p->sigaction));
+  memset(p->sig_set.__val, 0, sizeof(p->sig_set));
+  memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
   // Allocate a trapframe page.
   // trapframes :TODO
   if ((p->trapframe = (struct trapframe *)kalloc()) == NULL) {
@@ -412,13 +412,13 @@ pagetable_t proc_pagetable(struct proc *p) {
     return NULL;
   }
   // signal ：交互信号
-  // if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
-  //              PTE_R | PTE_X | PTE_U) < 0) {
-  //   vmunmap(pagetable, TRAMPOLINE, 1, 0);
-  //   vmunmap(pagetable, TRAPFRAME, 1, 0);
-  //   uvmfree(pagetable, 0);
-  //   return NULL;
-  // }
+  if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
+               PTE_R | PTE_X | PTE_U) < 0) {
+    vmunmap(pagetable, TRAMPOLINE, 1, 0);
+    vmunmap(pagetable, TRAPFRAME, 1, 0);
+    uvmfree(pagetable, 0);
+    return NULL;
+  }
 
   return pagetable;
 }
@@ -470,6 +470,7 @@ void userinit(void)
   p->cwd = ename("/"); 
   p->state = RUNNABLE;
   release(&p->lock);
+  printf("p name %s\n", p->name);
 }
 
 // // Grow or shrink user memory by n bytes.
@@ -775,14 +776,16 @@ void scheduler(void) {
         // futexClear(p->main_thread);
         // wty_todo
         // 更改页表权限和配置，在satp寄存器中
+        w_csr_pgdl((uint64)(p->kpagetable));
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
-        tlbinit();
+        flush_TLB();
         swtch(&c->context, &p->context);
         // copycontext(&p->main_thread->context, &p->context);
-        // w_satp(MAKE_SATP(kernel_pagetable));
+        w_csr_pgdl((uint64)(p->kpagetable));
+        // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
-        tlbinit();
+        flush_TLB();
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;

@@ -30,7 +30,7 @@ struct vma *vma_init(struct proc *p) {
   
   if (NULL == alloc_mmap_vma(p, 0, USER_MMAP_START, 0, 0, 0, 0)) {
     // free_vma_list(p);
-    kfree(vma);
+  kfree(vma);
     return NULL;
   }
 

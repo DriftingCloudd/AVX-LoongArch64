@@ -2,7 +2,7 @@
 #include "param.h"
 #include "memlayout.h"
 #include "loongarch.h"
-#include "defs.h"
+//#include "defs.h"
 
 void extioi_init(void);
 

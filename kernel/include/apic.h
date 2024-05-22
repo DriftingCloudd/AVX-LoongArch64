@@ -2,7 +2,7 @@
 #include "param.h"
 #include "memlayout.h"
 #include "loongarch.h"
-#include "defs.h"
+// #include "defs.h"
 
 //
 // the loongarch 7A1000 I/O Interrupt Controller Registers.

@@ -1,7 +1,7 @@
 #include "kernel/include/fcntl.h"
 #include "kernel/include/memlayout.h"
 #include "kernel/include/param.h"
-#include "kernel/include/riscv.h"
+#include "kernel/include/loongarch.h"
 #include "kernel/include/stat.h"
 #include "kernel/include/syscall.h"
 #include "kernel/include/types.h"
@@ -2011,7 +2011,7 @@ void kernmem(char *s) {
   char *a;
   int pid;
 
-  for (a = (char *)(KERNBASE); a < (char *)(KERNBASE + 2000000); a += 50000) {
+  for (a = (char *)(RAMBASE); a < (char *)(RAMBASE + 2000000); a += 50000) {
     pid = fork();
     if (pid < 0) {
       printf("%s: fork failed\n", s);

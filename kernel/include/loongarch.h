@@ -4,10 +4,36 @@
 #include <larchintrin.h>
 #include "types.h"
 
-#define  CSR_CRMD_IE_SHIFT		    2
-#define  CSR_CRMD_IE			        ( 0x1 << CSR_CRMD_IE_SHIFT )
+// calculate the mask for a field in a register.
+#define FILED_MASK(len, shift)      (((0x1UL << (len)) - 1) << (shift))
 
-#define  EXT_INT_EN_SHIFT         48
+#define FIELD_GET(reg, len, shift)  (((reg) >> (shift)) & ((0x1UL << (len)) - 1))
+#define FIELD_WRITE(val, len, shift) (((val) & ((0x1UL << (len)) - 1)) << (shift))
+
+#define CSR_CRMD_IE_SHIFT		        2
+#define CSR_CRMD_IE			            ( 0x1 << CSR_CRMD_IE_SHIFT )
+
+#define EXT_INT_EN_SHIFT            48
+
+// fileds in CSR_PRCFG1
+#define PRCFG1_TIMERBITS            FILED_MASK(PRCFG1_TIMERBITS_LEN, PRCFG1_TIMERBITS_SHIFT)       
+#define PRCFG1_TIMERBITS_SHIFT      0x4
+#define PRCFG1_TIMERBITS_LEN        0x8
+
+
+// field in CSR_TCFG
+#define TCFG_EN                     FILED_MASK(TCFG_EN_LEN, TCFG_EN_SHIFT)     
+#define TCFG_EN_SHIFT               0x0
+#define TCFG_EN_LEN                 0x1
+
+#define TCFG_PERIODIC               FILED_MASK(TCFG_PERIODIC_LEN, TCFG_PERIODIC_SHIFT)
+#define TCFG_RERIODIC_SHIFT         0x1
+#define TCFG_RERIODIC_LEN           0x1
+
+#define TCFG_INITVAL                FILED_MASK(TCFG_INITVAL_LEN, TCFG_INITVAL_SHIFT)
+#define TCFG_INITVAL_SHIFT          0x2
+#define TCFG_INITVAL_LEN(n)         n   
+
 
 #define LOONGARCH_IOCSR_EXTIOI_EN_BASE		    0x1600
 #define LOONGARCH_IOCSR_EXTIOI_ISR_BASE		    0x1800
@@ -39,6 +65,20 @@ r_fp()
   uint64 x;
   asm volatile("addi.d %0, $fp, 0" : "=r" (x) );
   return x;
+}
+
+static inline void 
+w_csr64(uint32 csrnum, uint64 val)
+{
+  asm volatile("csrwr %0, %1\n\t" : :"r" (val) ,"r" (csrnum));
+}
+
+static inline  uint64
+r_csr64(uint32 csrnum)
+{
+  uint64 val;
+  asm volatile("csrwr %0, %1\n\t" : "=r" (val):"r" (csrnum));
+  return val;
 }
 
 static inline uint32
@@ -193,6 +233,14 @@ static inline void
 w_csr_tcfg(uint64 x)
 {
   asm volatile("csrwr %0, 0x41" : : "r" (x) );
+}
+
+static inline uint64
+r_csr_tcfg()
+{
+  uint64 x;
+  asm volatile("csrrd %0, 0x41" : "=r" (x) );
+  return x;
 }
 
 static inline void

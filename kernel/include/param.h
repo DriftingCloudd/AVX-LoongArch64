@@ -26,4 +26,5 @@
 //#define INTERVAL     (390000000 / 200) // timer interrupt interval
 #define ticks_per_second 5
 #define INTERVAL     CLK_FREQ / ticks_per_second // timer interrupt interval
+
 #endif

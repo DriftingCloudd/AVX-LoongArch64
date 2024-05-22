@@ -45,6 +45,8 @@ trapinit(void)
   w_csr_tlbrentry((uint64)handle_tlbr);
   // 机器exception
   w_csr_merrentry((uint64)handle_merr);
+  // 倒计时定时器开始倒计时
+  countdown_timer_init();
   intr_on();
 }
 

@@ -59,8 +59,10 @@ static inline uint64 convert_from_timespec2(const struct timespec2 *ts)
 typedef struct timespec2 TimeSpec2;
 
 void timerinit();
+void countdown_timer_init();
 // void set_next_timeout();
-// void timer_tick();
+void timer_tick();
 uint64 setitimer(int which, const struct itimerval *value, struct itimerval *ovalue);
 struct timeval get_timeval();
+
 #endif

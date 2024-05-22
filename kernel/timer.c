@@ -9,6 +9,7 @@
 // #include "include/sbi.h"
 #include "include/spinlock.h"
 #include "include/loongarch.h"
+#include "loongarchregs.h"
 // #include "include/syscall.h"
 #include "include/types.h"
 
@@ -32,38 +33,50 @@ void timerinit() {
 #endif
 }
 
-void set_next_timeout() {
-  // There is a very strange bug,
-  // if comment the `printf` line below
-  // the timer will not work.
+// void set_next_timeout() {
+//   // There is a very strange bug,
+//   // if comment the `printf` line below
+//   // the timer will not work.
 
-  // this bug seems to disappear automatically
-  // printf("");
-  sbi_set_timer(r_time() + INTERVAL);
+//   // this bug seems to disappear automatically
+//   // printf("");
+//   sbi_set_timer(r_time() + INTERVAL);
+// }
+
+void countdown_timer_init(){
+  uint64 prcfg1_val;
+  prcfg1_val = r_csr_tcfg();
+  uint64 timerbits = FIELD_GET(prcfg1_val,PRCFG1_TIMERBITS_LEN,PRCFG1_TIMERBITS_SHIFT) + 1;
+  if (timerbits <= 0 || timerbits >=64)
+    panic("countdown_timer_init: timerbits is invalid");
+
+  uint64 tcfg_val = FIELD_WRITE(1,TCFG_EN_LEN,TCFG_EN_SHIFT) | FIELD_WRITE(1,TCFG_RERIODIC_LEN,TCFG_RERIODIC_SHIFT) | FIELD_WRITE(INTERVAL,TCFG_INITVAL_LEN(timerbits),TCFG_INITVAL_SHIFT);
+  // enable countdown_timer
+  w_csr_tcfg(tcfg_val);
 }
 
-// void timer_tick() {
-//   acquire(&tickslock);
-//   ticks++;
-//   wakeup(&ticks);
-//   release(&tickslock);
-//   set_next_timeout();
 
-//   // printf("ticks:%d\n",ticks);
-//   if (hastimer) {
-//     // printf("begin timer\n");
-//     for (int i = 0; i < NTIMERS; i++) {
-//       if (timers[i].pid == 0)
-//         continue;
-//       if (ticks - timers[i].ticks >= 80) {
-//         // printf("timer pid %d\n",timers[i].pid);
-//         kill(timers[i].pid, SIGALRM);
-//         timers[i].pid = 0;
-//         hastimer = 0;
-//       }
-//     }
-//   }
-// }
+void timer_tick() {
+  acquire(&tickslock);
+  ticks++;
+  wakeup(&ticks);
+  release(&tickslock);
+
+  // printf("ticks:%d\n",ticks);
+  if (hastimer) {
+    // printf("begin timer\n");
+    for (int i = 0; i < NTIMERS; i++) {
+      if (timers[i].pid == 0)
+        continue;
+      if (ticks - timers[i].ticks >= 80) {
+        // printf("timer pid %d\n",timers[i].pid);
+        kill(timers[i].pid, SIGALRM);
+        timers[i].pid = 0;
+        hastimer = 0;
+      }
+    }
+  }
+}
 
 // 进程的时间统计信息
 uint64 sys_times() {
@@ -100,7 +113,7 @@ uint64 setitimer(int which, const struct itimerval *value,
 
   if (ovalue != NULL && timer != NULL) {
     copyout(myproc()->pagetable, (uint64)ovalue, (char *)&((timer->itimer)),
-            sizeof(struct itimerval));
+            sizeof(struct itimerval));    //may be bug since are all in kernel space
   }
 
   if (value != NULL) {

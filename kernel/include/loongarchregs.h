@@ -52,7 +52,10 @@
 #define LOONGARCH_CSR_CPUID		    0x20	/* CPU core id */
 // 上下文保存寄存器
 
-#define LOONGARCH_CSR_PRCFG1		0x21	/* Privilege config 1 */		                
+#define LOONGARCH_CSR_PRCFG1		0x21	/* Privilege config 1 */		 
+
+#define LOONGARCH_CSR_PRCFG2		0x22	/* Config2 */
+#define LOONGARCH_CSR_PRCFG3		0x23	/* Config3 */               
 
 #define LOONGARCH_CSR_SAVE0		    0x30    /* Kscratch registers */
 

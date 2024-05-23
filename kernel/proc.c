@@ -474,7 +474,7 @@ void userinit(void)
   printf("p name %s\n", p->name);
   #ifdef DEBUG
     reg_info();
-  #endif;
+  #endif
 }
 
 // // Grow or shrink user memory by n bytes.
@@ -715,7 +715,7 @@ void scheduler(void) {
   struct proc *p;
   struct cpu *c = mycpu();
   // vm.c 
-  extern pagetable_t kernel_pagetable;
+  // extern pagetable_t kernel_pagetable;
 
   c->proc = 0;
   for (;;) {
@@ -781,6 +781,9 @@ void scheduler(void) {
         // wty_todo
         // 更改页表权限和配置，在satp寄存器中
         w_csr_pgdl((uint64)(p->kpagetable));
+        #ifdef DEBUG
+        printf("scheduler: p->kpagetable %x\n", p->kpagetable);
+        #endif
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
         // flush_TLB();

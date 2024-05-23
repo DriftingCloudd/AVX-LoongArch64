@@ -269,6 +269,15 @@ w_csr_pgdh(uint64 x)
   asm volatile("csrwr %0, 0x1a" : : "r" (x) );
 }
 
+static inline uint64
+r_csr_pgd()
+{
+  uint64 x;
+  asm volatile("csrrd %0, 0x1B" : "=r" (x) );
+  return x;
+}
+
+
 #define PTBASE  12U
 #define PTWIDTH  9U
 #define DIR1BASE  21U 
@@ -420,9 +429,9 @@ w_csr_prcfg3(uint64 x)
 #define PTE_G (1L << 6) // global
 #define PTE_P (1L << 7) // physical page exists
 #define PTE_W (1L << 8) // writeable
-#define PTE_NX (1UL << 62) //non executable
-#define PTE_NR (1L << 61) //non readable
-#define PTE_RPLV (1UL << 63) //restricted privilege level enable
+#define PTE_NX (1ULL << 62) //non executable
+#define PTE_NR (1ULL << 61) //non readable
+#define PTE_RPLV (0ULL << 63) //restricted privilege level enable
 
 #define PAMASK          0xFFFFFFFFFUL << PGSHIFT
 #define PTE2PA(pte) (pte & PAMASK)
@@ -437,7 +446,7 @@ w_csr_prcfg3(uint64 x)
 #define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
 // 最大虚拟地址
 
-#define MAXVA (1L << (9 + 9 + 9 + 9 + 12 - 1)) // 0x40_0000_0000
+#define MAXVA (1ULL << (9 + 9 + 9 + 9 + 12 - 1)) // 0x40_0000_0000
 
 
 typedef uint64 pte_t;//typde of pte

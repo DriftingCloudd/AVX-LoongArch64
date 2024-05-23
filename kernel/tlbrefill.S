@@ -1,4 +1,4 @@
-#include "include/loongarchregs.h"
+#include "include/loongarchregs.S"
 
 .section tlbrentry
 .globl handle_tlbr
@@ -9,11 +9,11 @@ handle_tlbr:
 	# lddir	$t0, $t0, 4
 	# addi.d  $t0, $t0, -1
 	lddir	$t0, $t0, 3
-	addi.d  $t0, $t0, -1
+# 	addi.d  $t0, $t0, -1
 	lddir	$t0, $t0, 2
-	addi.d  $t0, $t0, -1
+#	addi.d  $t0, $t0, -1
 	lddir   $t0, $t0, 1
-	addi.d  $t0, $t0, -1
+#	addi.d  $t0, $t0, -1
 	ldpte	$t0, 0
 	ldpte	$t0, 1
 	tlbfill

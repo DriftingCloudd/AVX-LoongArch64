@@ -44,7 +44,7 @@ void kvminit() {
 // 分配页表空间
   kernel_pagetable = (pagetable_t)kalloc();
 #ifdef DEBUG
-  printf("kernel_pagetable: %p\n", kernel_pagetable);
+  printf("kvminit:kernel_pagetable: %p\n", kernel_pagetable);
 #endif
   memset(kernel_pagetable, 0, PGSIZE);
 
@@ -69,11 +69,11 @@ void kvminit() {
 // #endif
 
   // map kernel text executable and read-only.
-  kvmmap(RAMBASE, RAMBASE, (uint64)etext - RAMBASE,
-        PTE_D |PTE_P| PTE_MAT);
+  // kvmmap(RAMBASE, RAMBASE, (uint64)etext - RAMBASE,
+  //       PTE_D |PTE_P| PTE_MAT);
   // map kernel data and the physical RAM we'll make use of.
-  kvmmap((uint64)etext, (uint64)etext, RAMSTOP - (uint64)etext,
-        PTE_NR | PTE_W | PTE_MAT |PTE_D |PTE_P);
+  // kvmmap((uint64)etext, (uint64)etext, RAMSTOP - (uint64)etext,
+  //      PTE_NR | PTE_W | PTE_MAT |PTE_D |PTE_P);
 
   // map the trampoline for trap entry/exit to
   // the highest virtual address in the kernel.
@@ -148,7 +148,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
           return 0;
         }
         memset(pagetable, 0, PGSIZE);
-        *pte = PA2PTE(pagetable) | PTE_V;
+        *pte = PA2PTE(pagetable) |PTE_MAT | PTE_PLV | PTE_RPLV ;
       }
     }
     return &pagetable[PX(0, va)];
@@ -561,7 +561,7 @@ int copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len) {
   if (dst < DMWIN_MASK)
     panic("copyin: dst < DMWIN_MASK");
 
-  if (srcva > MAXVA & (srcva & DMWIN_MASK)){
+  if (srcva > MAXVA && (srcva & DMWIN_MASK)){
     panic("copyin: srcva > MAXVA & srcva is not in 0x9000(x)");
 
   uint64 n, va0, pa0;
@@ -584,9 +584,11 @@ int copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len) {
   }
   return 0;
 }
+}
 
 // used by proc
-int copyin2(char *dst, uint64 srcva, uint64 len) {
+
+int copyin2(char *dst, uint64 srcva, uint64 len){
   uint64 sz = myproc()->sz;
   if (srcva + len > sz || srcva >= sz) {
     return -1;
@@ -774,6 +776,7 @@ void kvmfree(pagetable_t kpt, int stack_free, struct proc *p) {
 // }
 
 // 在给定的页表，为指定的虚拟地址设置权限
+
 uint64 experm(pagetable_t pagetable, uint64 va, uint64 perm) {
   pte_t *pte;
   uint64 pa;

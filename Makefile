@@ -202,6 +202,7 @@ $T/kernel: $(OBJS) $(linker) $U/initcode
 	$(LD) $(LDFLAGS) -T $(linker) -o $T/kernel $(OBJS)
 	$(OBJDUMP) -S $T/kernel > $T/kernel.asm
 	$(OBJDUMP) -t $T/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $T/kernel.sym
+	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
 
 # %.o: %.S
 # 	$(CC) $(ASFLAGS) -c $< -o $@

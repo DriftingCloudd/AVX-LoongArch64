@@ -69,10 +69,10 @@ void kvminit() {
 // #endif
 
   // map kernel text executable and read-only.
-  kvmmap(RAMBASE - DMWIN_MASK, RAMBASE, (uint64)etext - RAMBASE,
+  kvmmap(RAMBASE, RAMBASE, (uint64)etext - RAMBASE,
         PTE_D |PTE_P| PTE_MAT);
   // map kernel data and the physical RAM we'll make use of.
-  kvmmap((uint64)etext - DMWIN_MASK, (uint64)etext, RAMSTOP - (uint64)etext,
+  kvmmap((uint64)etext, (uint64)etext, RAMSTOP - (uint64)etext,
         PTE_NR | PTE_W | PTE_MAT |PTE_D |PTE_P);
 
   // map the trampoline for trap entry/exit to
@@ -98,6 +98,7 @@ void kvminithart() {
   w_csr_pgdl((uint64)kernel_pagetable);
   // flush the tlb(tlbinit)
   tlbinit();
+  
   w_csr_pwcl((PTEWIDTH << 30)|(DIR2WIDTH << 25)|(DIR2BASE << 20)|(DIR1WIDTH << 15)|(DIR1BASE << 10)|(PTWIDTH << 5)|(PTBASE << 0));
   w_csr_pwch((DIR4WIDTH << 18)|(DIR3WIDTH << 6)|(DIR3BASE << 0));
   // 修改uart的地址映射
@@ -126,24 +127,32 @@ void kvminithart() {
 //    0..11 -- 12 bits of byte offset within the page.
 // 
 pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
-  if (va >= MAXVA)
+  
+  // 判断va是否符合直接映射
+  if(va & DMWIN_MASK){
+    return (pte_t *)va;
+  }
+  // 页表映射
+  else{
+    if (va >= MAXVA)
     panic("walk");
 
-  for (int level = 3; level > 0; level--) {
-    pte_t *pte = &pagetable[PX(level, va)];
-    if (*pte & PTE_V) {
-      // 内核转换为物理地址
-      pagetable = (pagetable_t)(PTE2PA(*pte) | DMWIN_MASK);
-    } else {
-      if (!alloc || (pagetable = (pde_t *)kalloc()) == NULL) {
-        // printf("walk: not valid\n");
-        return 0;
+    for (int level = 3; level > 0; level--) {
+      pte_t *pte = &pagetable[PX(level, va)];
+      if (*pte & PTE_V) {
+        // 内核转换为物理地址
+        pagetable = (pagetable_t)(PTE2PA(*pte) | DMWIN_MASK);
+      } else {
+        if (!alloc || (pagetable = (pde_t *)kalloc()) == NULL) {
+          // printf("walk: not valid\n");
+          return 0;
+        }
+        memset(pagetable, 0, PGSIZE);
+        *pte = PA2PTE(pagetable) | PTE_V;
       }
-      memset(pagetable, 0, PGSIZE);
-      *pte = PA2PTE(pagetable) | PTE_V;
     }
+    return &pagetable[PX(0, va)];
   }
-  return &pagetable[PX(0, va)];
 }
 
 // Look up a virtual address, return the physical address,
@@ -153,28 +162,33 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
   pte_t *pte;
   uint64 pa;
 
-  if (va >= MAXVA) {
-    // debug_print --> printf
-    printf("walkaddr: va >= MAXVA\n");
-    return NULL;
+  if (va & DMWIN_MASK) {
+    return va;
   }
+  else{
+    if (va >= MAXVA) {
+      // debug_print --> printf
+      printf("walkaddr: va >= MAXVA\n");
+      return NULL;
+    }
 
-  pte = walk(pagetable, va, 0);
-  if (pte == 0) {
-    printf("walkaddr: pte == 0\n");
-    return NULL;
+    pte = walk(pagetable, va, 0);
+    if (pte == 0) {
+      printf("walkaddr: pte == 0\n");
+      return NULL;
+    }
+    if ((*pte & PTE_V) == 0) {
+      printf("va :%p walkaddr: *pte & PTE_V == 0\n", va);
+      return NULL;
+    }
+    if ((*pte & PTE_PLV) == 0) {
+      printf("walkaddr: *pte & PTE_U == 0\n");
+      return NULL;
+    }
+    // Used when in user_mode
+    pa = PTE2PA(*pte);
+    return pa;
   }
-  if ((*pte & PTE_V) == 0) {
-    printf("va :%p walkaddr: *pte & PTE_V == 0\n", va);
-    return NULL;
-  }
-  if ((*pte & PTE_PLV) == 0) {
-    printf("walkaddr: *pte & PTE_U == 0\n");
-    return NULL;
-  }
-  // Used when in user_mode
-  pa = PTE2PA(*pte);
-  return pa;
 }
 
 // add a mapping to the kernel page table.
@@ -547,8 +561,8 @@ int copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len) {
   if (dst < DMWIN_MASK)
     panic("copyin: dst < DMWIN_MASK");
 
-  if (srcva > MAXVA)
-    panic("copyin: srcva > MAXVA");
+  if (srcva > MAXVA & (srcva & DMWIN_MASK)){
+    panic("copyin: srcva > MAXVA & srcva is not in 0x9000(x)");
 
   uint64 n, va0, pa0;
 

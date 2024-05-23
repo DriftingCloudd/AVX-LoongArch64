@@ -34,6 +34,13 @@
 //             -kernel loads the kernel here
 // unused RAM after 80000000.
 
+// Virtual Memory Layout
+// 0 - 2^48-1
+// 9000(0） —— 9000(2^48-1）
+
+// Physical Memory Layout
+// 80000000 —— 2^48 -1
+
 
 // 低48位掩码
 #define DMWIN_MASK 0x9000000000000000

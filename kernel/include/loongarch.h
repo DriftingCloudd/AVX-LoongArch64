@@ -365,6 +365,48 @@ flush_TLB()
   asm volatile("invtlb 0x0,$zero,$zero");
 }
 
+static inline uint64
+r_csr_prcfg1()
+{
+  uint64 x;
+  asm volatile("csrrd %0, 0x21" : "=r" (x) );
+  return x;
+}
+
+static inline void
+w_csr_prcfg1(uint64 x)
+{
+  asm volatile("csrwr %0, 0x21" : : "r" (x) );
+}
+
+static inline uint64
+r_csr_prcfg2()
+{
+  uint64 x;
+  asm volatile("csrrd %0, 0x22" : "=r" (x) );
+  return x;
+}
+
+static inline void
+w_csr_prcfg2(uint64 x)
+{
+  asm volatile("csrwr %0, 0x22" : : "r" (x) );
+}
+
+static inline uint64
+r_csr_prcfg3()
+{
+  uint64 x;
+  asm volatile("csrrd %0, 0x23" : "=r" (x) );
+  return x;
+}
+
+static inline void
+w_csr_prcfg3(uint64 x)
+{
+  asm volatile("csrwr %0, 0x23" : : "r" (x) );
+}
+
 #define PGSIZE 4096 // bytes per page
 #define PGSHIFT 12  // bits of offset within a page
 

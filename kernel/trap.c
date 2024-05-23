@@ -203,6 +203,8 @@ clockintr()
   ticks++;
   wakeup(&ticks);
   release(&tickslock);
+
+  countdown_timer_init();
 }
 
 // check if it's an external interrupt or software interrupt,

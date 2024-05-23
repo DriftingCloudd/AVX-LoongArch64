@@ -47,6 +47,7 @@ OBJS += \
   $K/syssig.o \
   $K/systime.o \
   $K/SignalTrampoline.o \
+  $K/gdbdebug.o \
   # $K/fs.o \
   # $K/futex.o \
   

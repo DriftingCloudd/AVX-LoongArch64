@@ -414,7 +414,7 @@ pagetable_t proc_pagetable(struct proc *p) {
   }
   // signal ：交互信号
   if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
-              PTE_PLV) < 0) {
+              PTE_PLV3) < 0) {
     vmunmap(pagetable, TRAMPOLINE, 1, 0);
     vmunmap(pagetable, TRAPFRAME, 1, 0);
     uvmfree(pagetable, 0);

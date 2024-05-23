@@ -6,6 +6,7 @@
 #include "include/printf.h"
 #include "include/proc.h"
 #include "include/loongarch.h"
+#include "include/loongarchregs.h"
 #include "include/string.h"
 #include "include/types.h"
 // #include "include/uart8250.h"
@@ -25,6 +26,14 @@ extern char trampoline[]; // trampoline.S
 void tlbinit(void)
 {
   asm volatile("invtlb  0x0,$zero,$zero");
+  // #ifdef DEBUG
+  // uint64 pwcl_info = r_csr64(LOONGARCH_CSR_PWCL);
+  // uint64 pwch_info = r_csr64(LOONGARCH_CSR_PWCH);
+  // print ("tlbinit:  before, pwcl: %x, pwch: %x",pwcl_info,pwch_info);
+  // #endif
+ // w_csr64(LOONGARCH_CSR_PWCL,(uint64)(PWCL_PTBASE | PWCL_PTWIDTH | PWCL_D1BASE | PWCL_D1WIDTH | PWCL_D2BASE| PWCL_D2WIDTH | PWCL_PTEWIDTH));
+  // w_csr64(LOONGARCH_CSR_PWCH,(uint64)(PWCH_D3BASE | PWCH_D3WIDRH | PWCH_D4BASE | PWCH_D4WIDTH | PWCH_HPTW_EN));
+
   // 设置tlb页大小
   w_csr_stlbps(0xcU);
   // 设置asid 表项
@@ -100,7 +109,13 @@ void kvminithart() {
   tlbinit();
   
   w_csr_pwcl((PTEWIDTH << 30)|(DIR2WIDTH << 25)|(DIR2BASE << 20)|(DIR1WIDTH << 15)|(DIR1BASE << 10)|(PTWIDTH << 5)|(PTBASE << 0));
-  w_csr_pwch((DIR4WIDTH << 18)|(DIR3WIDTH << 6)|(DIR3BASE << 0));
+  w_csr_pwch((DIR4WIDTH << 18)|(DIR3WIDTH << 6)|(DIR3BASE << 0) |(PWCH_HPTW_EN << 24));
+
+  // #ifdef DEBUG
+  // uint64 pwcl_info2 = r_csr64(LOONGARCH_CSR_PWCL);
+  // uint64 pwch_info2 = r_csr64(LOONGARCH_CSR_PWCH);
+  //print ("tlbinit: after, pwcl: %x, pwch: %x",pwcl_info2,pwch_info2);
+  // #endif
   // 修改uart的地址映射
   // uart
   // uart8250_change_base_addr(UART_V);
@@ -148,7 +163,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
           return 0;
         }
         memset(pagetable, 0, PGSIZE);
-        *pte = PA2PTE(pagetable) |PTE_MAT | PTE_PLV | PTE_RPLV ;
+        *pte = PA2PTE(pagetable) | PTE_MAT |PTE_D |PTE_W| PTE_P| PTE_PLV3 | PTE_RPLV |PTE_V;
       }
     }
     return &pagetable[PX(0, va)];
@@ -181,7 +196,7 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
       printf("va :%p walkaddr: *pte & PTE_V == 0\n", va);
       return NULL;
     }
-    if ((*pte & PTE_PLV) == 0) {
+    if ((*pte & PTE_PLV3) == 0) {
       printf("walkaddr: *pte & PTE_U == 0\n");
       return NULL;
     }
@@ -249,7 +264,7 @@ int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa,
       panic("remap");
     }
 
-    *pte = PA2PTE(pa) | perm | PTE_V;
+    *pte = PA2PTE(pa) | perm | PTE_V |PTE_MAT ;
     if (a == last)
       break;
     a += PGSIZE;
@@ -306,14 +321,14 @@ void uvminit(pagetable_t pagetable, pagetable_t kpagetable, uchar *src,
     mem = kalloc();
     // printf("[uvminit]kalloc: %p\n", mem);
     memset(mem, 0, PGSIZE);
-    mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV | PTE_W | PTE_MAT);
-    mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W | PTE_P);
+    mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV3 | PTE_W | PTE_D |PTE_MAT);
+    mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W |PTE_D| PTE_P |PTE_MAT);
     memmove(mem, src + i, PGSIZE);
   }
   mem = kalloc();
   memset(mem, 0, PGSIZE);
-  mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV | PTE_W | PTE_MAT);
-  mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_W);
+  mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV3 | PTE_W |PTE_D| PTE_MAT);
+  mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_W | PTE_D | PTE_MAT);
   memmove(mem, src + i, sz % PGSIZE);
   printf("uvminit done sz:%d\n", sz);
   // for (int i = 0; i < sz; i ++) {
@@ -377,7 +392,7 @@ uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
     }
     memset(mem, 0, PGSIZE);
     // 非内核
-    if (mappages(pagetable, a, PGSIZE, (uint64)mem, perm | PTE_PLV) != 0) {
+    if (mappages(pagetable, a, PGSIZE, (uint64)mem, perm | PTE_PLV3) != 0) {
       kfree(mem);
       uvmdealloc(pagetable, kpagetable, a, oldsz);
       return 0;
@@ -471,7 +486,7 @@ int uvmcopy(pagetable_t old, pagetable_t new, pagetable_t knew, uint64 sz) {
     }
     i += PGSIZE;
     // 试图在用户进程清理内核页表
-    if (mappages(knew, ki, PGSIZE, (uint64)mem, flags & ~PTE_PLV) != 0) {
+    if (mappages(knew, ki, PGSIZE, (uint64)mem, flags & ~PTE_PLV3) != 0) {
       goto err;
     }
     ki += PGSIZE;
@@ -492,7 +507,7 @@ void uvmclear(pagetable_t pagetable, uint64 va) {
   pte = walk(pagetable, va, 0);
   if (pte == NULL)
     panic("uvmclear");
-  *pte &= ~PTE_PLV;
+  *pte &= ~PTE_PLV3;
 }
 
 // 向指定的用户地址输出长度为len的0值
@@ -789,7 +804,7 @@ uint64 experm(pagetable_t pagetable, uint64 va, uint64 perm) {
     return NULL;
   if ((*pte & PTE_V) == 0)
     return NULL;
-  if ((*pte & PTE_PLV) == 0)
+  if ((*pte & PTE_PLV3) == 0)
     return NULL;
   *pte |= perm;
   pa = PTE2PA(*pte);

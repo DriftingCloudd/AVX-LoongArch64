@@ -16,7 +16,7 @@ uint64 mmap(uint64 start, uint64 len, int prot, int flags, int fd,
   if (offset < 0) {
     return -1;
   }
-  int perm = PTE_PLV | PTE_MAT | PTE_D | PTE_NR | PTE_W | PTE_NX;
+  int perm = PTE_PLV3 | PTE_MAT | PTE_D | PTE_NR | PTE_W | PTE_NX;
 
   if (prot & PROT_READ)
     //LA64  架构下，0表示可读
@@ -79,7 +79,7 @@ uint64 mmap_with_newpt(pagetable_t pagetable, uint64 start, uint64 len,
   if (offset < 0) {
     return -1;
   }
-  int perm = PTE_PLV | PTE_MAT | PTE_D | PTE_NR | PTE_W | PTE_NX;
+  int perm = PTE_PLV3 | PTE_MAT | PTE_D | PTE_NR | PTE_W | PTE_NX;
 
   if (prot & PROT_READ)
     perm &= ~PTE_NR;

@@ -34,6 +34,21 @@
 #define TCFG_INITVAL_SHIFT          0x2
 #define TCFG_INITVAL_LEN(n)         n   
 
+// fields in CSR_PWCl
+#define PWCL_PTBASE                 12
+#define PWCL_PTWIDTH                9 << 5
+#define PWCL_D1BASE                 21 << 10
+#define PWCL_D1WIDTH                9 << 15
+#define PWCL_D2BASE                 30 << 20
+#define PWCL_D2WIDTH                9 << 25
+#define PWCL_PTEWIDTH               0 << 30
+
+// fields in CSR_PWCH
+#define PWCH_D3BASE                 39
+#define PWCH_D3WIDRH                9 << 6
+#define PWCH_D4BASE                 0 << 12
+#define PWCH_D4WIDTH                0 << 18
+#define PWCH_HPTW_EN                1 << 24     
 
 #define LOONGARCH_IOCSR_EXTIOI_EN_BASE		    0x1600
 #define LOONGARCH_IOCSR_EXTIOI_ISR_BASE		    0x1800
@@ -70,14 +85,14 @@ r_fp()
 static inline void 
 w_csr64(uint32 csrnum, uint64 val)
 {
-  asm volatile("csrwr %0, %1\n\t" : :"r" (val) ,"r" (csrnum));
+  asm volatile("csrwr %0, %1\n\t" : :"r" (val) ,"m" (csrnum));
 }
 
 static inline  uint64
 r_csr64(uint32 csrnum)
 {
   uint64 val;
-  asm volatile("csrwr %0, %1\n\t" : "=r" (val):"r" (csrnum));
+  asm volatile("csrwr %0, %1\n\t" : "=r" (val):"m" (csrnum));
   return val;
 }
 
@@ -277,7 +292,6 @@ r_csr_pgd()
   return x;
 }
 
-
 #define PTBASE  12U
 #define PTWIDTH  9U
 #define DIR1BASE  21U 
@@ -424,7 +438,8 @@ w_csr_prcfg3(uint64 x)
 
 #define PTE_V (1L << 0) // valid
 #define PTE_D (1L << 1) // dirty
-#define PTE_PLV (3L << 2) //privilege level
+#define PTE_PLV3 (3L << 2) //privilege level 3
+#define PTE_PLV0 (0L << 2)
 #define PTE_MAT (1L << 4) //memory access type
 #define PTE_G (1L << 6) // global
 #define PTE_P (1L << 7) // physical page exists

@@ -71,6 +71,9 @@
 #define LOONGARCH_CSR_PGDL          0x19
 #define LOONGARCH_CSR_PGDH          0x1a
 #define LOONGARCH_CSR_PGD           0x1b
+#define LOONGARCH_CSR_PWCL          0x1c
+#define LOONGARCH_CSR_PWCH          0x1d
+
 #define LOONGARCH_CSR_TLBRENTRY		0x88	/* TLB refill exception entry */
 #define LOONGARCH_CSR_TLBRBADV		0x89	/* TLB refill badvaddr */
 #define LOONGARCH_CSR_TLBRSAVE		0x8b	/* KScratch for TLB refill exception */

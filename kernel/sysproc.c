@@ -554,7 +554,7 @@ uint64 sys_mprotect() {
   if (argaddr(0, &addr) < 0 || argaddr(1, &len) < 0 || argint(2, &prot) < 0)
     return -1;
   struct proc *p = myproc();
-  int perm = PTE_PLV | PTE_MAT | PTE_D;
+  int perm = PTE_PLV3 | PTE_MAT | PTE_D;
 
   if (prot & PROT_READ)
     //LA64  架构下，0表示可读

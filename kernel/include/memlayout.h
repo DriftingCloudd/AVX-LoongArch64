@@ -97,11 +97,11 @@
 // 1<< 32
 // added by wty
 #define MAXUVA                  0x80000000L
-#define USER_STACK_BOTTOM (MAXUVA - (2*PGSIZE))
+// #define USER_STACK_BOTTOM (MAXUVA - (2*PGSIZE))
 // 用户栈的起始终止范围
-#define USER_MMAP_START (USER_STACK_BOTTOM - 0x10000000)
 //注意，上面的user_stack_bottom定义不管他，目前用下面这个
 #define USER_STACK_TOP MAXUVA - PGSIZE
 #define USER_STACK_DOWN USER_MMAP_START + PGSIZE
+#define USER_MMAP_START (USER_STACK_DOWN - 0x10000000)
 
 #endif

@@ -144,6 +144,7 @@ void procinit(void) {
   memset(cpus, 0, sizeof(cpus));
 #ifdef DEBUG
   printf("procinit\n");
+  reg_info();
 #endif
 }
 
@@ -471,6 +472,9 @@ void userinit(void)
   p->state = RUNNABLE;
   release(&p->lock);
   printf("p name %s\n", p->name);
+  #ifdef DEBUG
+    reg_info();
+  #endif;
 }
 
 // // Grow or shrink user memory by n bytes.
@@ -779,13 +783,13 @@ void scheduler(void) {
         w_csr_pgdl((uint64)(p->kpagetable));
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
-        flush_TLB();
+        // flush_TLB();
         swtch(&c->context, &p->context);
         // copycontext(&p->main_thread->context, &p->context);
         w_csr_pgdl((uint64)(p->kpagetable));
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
-        flush_TLB();
+        // flush_TLB();
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;

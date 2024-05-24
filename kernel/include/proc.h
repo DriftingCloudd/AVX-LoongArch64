@@ -80,7 +80,6 @@ struct proc {
   uint64 kstack;               // Virtual address of kernel stack
   uint64 sz;                   // Size of process memory (bytes)
   pagetable_t pagetable;       // User page table
-  pagetable_t kpagetable;      // Kernel page table
   struct trapframe *trapframe; // data page for trampoline.S
   struct context context;      // swtch() here to run process
   struct file *ofile[NOFILE];  // Open files
@@ -162,6 +161,7 @@ int             cpuid(void);
 void            exit(int);
 int             fork(void);
 int             growproc(int);
+void proc_mapstacks(pagetable_t kpgtbl);
 pagetable_t     proc_pagetable(struct proc *);
 void            proc_freepagetable(pagetable_t, uint64);
 int             kill(int, int);

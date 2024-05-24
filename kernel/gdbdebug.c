@@ -113,3 +113,7 @@ uint32 r_csr_estat1()
   asm volatile("csrrd %0, 0x5" : "=r" (x) );
   return x;
 }
+
+int test(){
+  return 1;
+}

@@ -92,7 +92,7 @@ static inline  uint64
 r_csr64(uint32 csrnum)
 {
   uint64 val;
-  asm volatile("csrwr %0, %1\n\t" : "=r" (val):"m" (csrnum));
+  asm volatile("csrrd %0, %1\n\t" : "=r" (val):"m" (csrnum));
   return val;
 }
 

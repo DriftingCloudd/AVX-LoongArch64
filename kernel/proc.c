@@ -110,10 +110,9 @@ void procinit(void) {
     p->killed = 0;
     p->xstate = 0;
     p->pid = 0;
-    p->kstack = 0;
+    p->kstack = PROCVKSTACK((int) (p - proc));
     p->sz = 0;
     p->pagetable = 0;
-    p->kpagetable = 0;
     p->trapframe = 0;
       for (int i = 0; i < NOFILE; i++)
         p->ofile[i] = 0;
@@ -204,6 +203,22 @@ static void copycontext(context *t1, context *t2) {
   t1->fp = t2->fp;
 }
 
+void
+proc_mapstacks(pagetable_t kpgtbl) {
+  struct proc *p;
+  
+  for(p = proc; p < &proc[NPROC]; p++) {
+    char *pa = kalloc();
+    if(pa == 0)
+      panic("kalloc");
+    memset(pa, 0, PGSIZE);
+    uint64 va = PROCVKSTACK((int) (p - proc));
+    if(mappages(kpgtbl, va, PGSIZE, (uint64)pa,  PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D) != 0)
+      panic("kvmmap");
+  }
+}
+
+
 // todo trapframe
 // static void copytrapframe(struct trapframe *f1, struct trapframe *f2) {
 //   f1->kernel_satp = f2->kernel_satp;
@@ -289,8 +304,7 @@ found:
 
   // An empty user page table.
   // And an identical kernel page table for this proc.
-  if ((p->pagetable = proc_pagetable(p)) == NULL ||
-      (p->kpagetable = proc_pagetable(p)) == NULL) {
+  if ((p->pagetable = proc_pagetable(p)) == NULL ) {
     freeproc(p);
     release(&p->lock);
     return NULL;
@@ -354,11 +368,6 @@ static void freeproc(struct proc *p) {
   //   t = tmp;
   // }
 
-  if (p->kpagetable) {
-    kvmfree(p->kpagetable, 1, p);
-  }
-
-  p->kpagetable = 0;
   if (p->pagetable) {
     free_vma_list(p);
     proc_freepagetable(p->pagetable, p->sz);
@@ -457,7 +466,7 @@ void userinit(void)
   // allocate one user page and copy init's instructions
   // and data into it.
   // uvminit(p->pagetable, p->kpagetable, initcode, sizeof(initcode));
-  uvminit(p->pagetable, p->kpagetable, initcode, initcodesize);
+  uvminit(p->pagetable, initcode, initcodesize);
   p->sz = initcodesize;
   p->sz = PGROUNDUP(p->sz);
 
@@ -485,12 +494,12 @@ int growproc(int n) {
 
   sz = p->sz;
   if (n > 0) {
-    if ((sz = uvmalloc(p->pagetable, p->kpagetable, sz, sz + n,
+    if ((sz = uvmalloc(p->pagetable, sz, sz + n,
                        PTE_P | PTE_W)) == 0) {
       return -1;
     }
   } else if (n < 0) {
-    sz = uvmdealloc(p->pagetable, p->kpagetable, sz, sz + n);
+    sz = uvmdealloc(p->pagetable,  sz, sz + n);
   }
   p->sz = sz;
   return 0;
@@ -509,7 +518,7 @@ int fork(void) {
   }
 
   // Copy user memory from parent to child.
-  if (uvmcopy(p->pagetable, np->pagetable, np->kpagetable, p->sz) < 0) {
+  if (uvmcopy(p->pagetable, np->pagetable,  p->sz) < 0) {
     // trapframe
     freeproc(np);
     release(&np->lock);
@@ -780,16 +789,16 @@ void scheduler(void) {
         // futexClear(p->main_thread);
         // wty_todo
         // 更改页表权限和配置，在satp寄存器中
-        w_csr_pgdl((uint64)(p->kpagetable));
+        w_csr_pgdl((uint64)(p->pagetable));
         #ifdef DEBUG
-        printf("scheduler: p->kpagetable %x\n", p->kpagetable);
+        printf("scheduler: p->pagetable %x\n", p->pagetable);
         #endif
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
         // flush_TLB();
         swtch(&c->context, &p->context);
         // copycontext(&p->main_thread->context, &p->context);
-        w_csr_pgdl((uint64)(p->kpagetable));
+        w_csr_pgdl((uint64)(p->pagetable));
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
         // flush_TLB();
@@ -1199,7 +1208,7 @@ uint64 clone(uint64 new_stack, uint64 new_fn) {
   }
 
   // Copy user memory from parent to child.
-  if (uvmcopy(p->pagetable, np->pagetable, np->kpagetable, p->sz) < 0) {
+  if (uvmcopy(p->pagetable, np->pagetable, p->sz) < 0) {
     freeproc(np);
     release(&np->lock);
     return -1;

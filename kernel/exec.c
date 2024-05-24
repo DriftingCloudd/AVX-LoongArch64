@@ -78,19 +78,6 @@ static int readelfhdr(struct dirent *ep, struct elfhdr *elf) {
   return 0;
 }
 
-pagetable_t create_kpagetable(struct proc *p) {
-  pagetable_t kpagetable;
-  // Make a copy of p->kpt without old user space,
-  // but with the same kstack we are using now, which can't be changed
-  if ((kpagetable = (pagetable_t)kalloc()) == NULL) {
-    return 0;
-  }
-  memmove(kpagetable, p->kpagetable, PGSIZE);
-  for (int i = 0; i < PX(2, MAXUVA); i++) {
-    kpagetable[i] = 0;
-  }
-  return kpagetable;
-}
 
 void stackdisplay(pagetable_t pagetable, uint64 sp, uint64 sz) {
   for (uint64 i = sp; i < sz; i += 8) {
@@ -104,7 +91,7 @@ void stackdisplay(pagetable_t pagetable, uint64 sp, uint64 sz) {
 
 // 加载elf文件，成功返回0，失败返回-1
 uint64 loadelf(struct elfhdr *elf, struct dirent *ep, struct proghdr *phdr,
-               pagetable_t pagetable, pagetable_t kpagetable, uint64 *sz,
+               pagetable_t pagetable, uint64 *sz,
                int *is_dynamic) {
   uint64 sz1;
   int i, off;
@@ -137,7 +124,7 @@ uint64 loadelf(struct elfhdr *elf, struct dirent *ep, struct proghdr *phdr,
         perm |= PTE_W;
       if (!ph.flags & ELF_PROG_FLAG_READ)
         perm |= PTE_NR;
-      if ((sz1 = uvmalloc(pagetable, kpagetable, *sz,
+      if ((sz1 = uvmalloc(pagetable,  *sz,
                           PGROUNDUP(ph.vaddr + ph.memsz), perm)) == 0) {
         printf("uvmalloc failed\n");
         return -1;
@@ -299,7 +286,6 @@ int exec(char *path, char **argv, char **env) {
   struct dirent *ep = NULL;
   struct proghdr ph;
   pagetable_t pagetable = 0, oldpagetable;
-  pagetable_t kpagetable = 0, oldkpagetable;
   struct dirent *interpreter = NULL;
   struct elfhdr interpreter_elf;
   uint64 interp_start_addr = 0;
@@ -310,13 +296,7 @@ int exec(char *path, char **argv, char **env) {
   vma_init(p);
 
   oldpagetable = p->pagetable;
-  oldkpagetable = p->kpagetable;
 
-  kpagetable = create_kpagetable(p);
-  if (kpagetable == 0) {
-    printf("[exec]create_kpagetable failed\n");
-    return -1;
-  }
   int is_shell_script = is_sh_script(path);
   if (is_shell_script) {
     goto bad;
@@ -342,7 +322,7 @@ int exec(char *path, char **argv, char **env) {
   p->pagetable = pagetable;
 
   // Load program into memory.
-  if (loadelf(&elf, ep, &ph, pagetable, kpagetable, &sz, &is_dynamic) < 0) {
+  if (loadelf(&elf, ep, &ph, pagetable,  &sz, &is_dynamic) < 0) {
     printf("loadelf failed\n");
     goto bad;
   }
@@ -507,7 +487,6 @@ int exec(char *path, char **argv, char **env) {
   // Commit to the user image.
 
   p->pagetable = pagetable;
-  p->kpagetable = kpagetable;
   p->sz = sz;
   p->trapframe->era = program_entry; // initial program counter = main
   p->trapframe->sp = sp;             // initial stack pointer
@@ -540,13 +519,11 @@ int exec(char *path, char **argv, char **env) {
 
   proc_freepagetable(oldpagetable, oldsz);
   
-  // w_satp(MAKE_SATP(p->kpagetable));
   //change to pwcl & pwch
   volatile uint64 pgdl = (uint64)(p->pagetable);
   w_csr_pgdl(pgdl);
   // sfence_vma();
   flush_TLB();
-  kvmfree(oldkpagetable, 0, myproc());
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
@@ -556,8 +533,6 @@ bad:
 #endif
   if (pagetable)
     proc_freepagetable(pagetable, sz);
-  if (kpagetable)
-    kvmfree(kpagetable, 0, myproc());
   if (interpreter) {
     eunlock(interpreter);
     eput(interpreter);

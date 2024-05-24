@@ -26,6 +26,7 @@ csr_rt csr_info = {1,1,1,1,1,1,1,1};
 
 csr_rt reg_gdb();
 csr_rt reg_gdb1();
+int test();
 uint32 r_csr_prmd1();
 uint32 r_csr_crmd1();
 uint32 r_csr_ecfg1();

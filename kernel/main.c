@@ -58,7 +58,7 @@ void main() {
     // 
     timerinit();    // init a lock for timer
     trapinit(); // install kernel trap vector, including interrupt handler
-    // threadInjit();
+    // threadInit();
     procinit();
 
     apic_init();     // set up LS7A1000 interrupt controller

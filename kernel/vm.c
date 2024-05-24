@@ -88,6 +88,7 @@ void kvminit() {
   // the highest virtual address in the kernel.
   // 暂时放在那里，Trampoline.S 没有更新
   kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_MAT |PTE_D |PTE_P);
+  proc_mapstacks(kernel_pagetable);
 
 #ifdef DEBUG
   printf("kvminit\n");
@@ -163,7 +164,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
           return 0;
         }
         memset(pagetable, 0, PGSIZE);
-        *pte = PA2PTE(pagetable) | PTE_MAT |PTE_D |PTE_W| PTE_P| PTE_PLV3 | PTE_RPLV |PTE_V;
+        *pte = PA2PTE(pagetable) |PTE_D | PTE_PLV3 | PTE_RPLV |PTE_V |DMWIN_MASK;
       }
     }
     return &pagetable[PX(0, va)];
@@ -313,7 +314,7 @@ pagetable_t uvmcreate() {
 // Load the user initcode into address 0 of pagetable,
 // for the very first process.
 // sz can be more than a page.
-void uvminit(pagetable_t pagetable, pagetable_t kpagetable, uchar *src,
+void uvminit(pagetable_t pagetable, uchar *src,
              uint sz) {
   char *mem;
   uint64 i;
@@ -322,13 +323,11 @@ void uvminit(pagetable_t pagetable, pagetable_t kpagetable, uchar *src,
     // printf("[uvminit]kalloc: %p\n", mem);
     memset(mem, 0, PGSIZE);
     mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV3 | PTE_W | PTE_D |PTE_MAT);
-    mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_W |PTE_D| PTE_P |PTE_MAT);
     memmove(mem, src + i, PGSIZE);
   }
   mem = kalloc();
   memset(mem, 0, PGSIZE);
   mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV3 | PTE_W |PTE_D| PTE_MAT);
-  mappages(kpagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_W | PTE_D | PTE_MAT);
   memmove(mem, src + i, sz % PGSIZE);
   printf("uvminit done sz:%d\n", sz);
   // for (int i = 0; i < sz; i ++) {
@@ -375,7 +374,7 @@ uint64 uvmdealloc1(pagetable_t pagetable, uint64 start, uint64 end) {
 // Allocate PTEs and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
 // 在函数输入时给特权？
-uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
+uint64 uvmalloc(pagetable_t pagetable, uint64 oldsz,
                 uint64 newsz, int perm) {
   char *mem;
   uint64 a;
@@ -387,23 +386,14 @@ uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
   for (a = oldsz; a < newsz; a += PGSIZE) {
     mem = kalloc();
     if (mem == NULL) {
-      uvmdealloc(pagetable, kpagetable, a, oldsz);
+      uvmdealloc(pagetable, a, oldsz);
       return 0;
     }
     memset(mem, 0, PGSIZE);
     // 非内核
     if (mappages(pagetable, a, PGSIZE, (uint64)mem, perm | PTE_PLV3) != 0) {
       kfree(mem);
-      uvmdealloc(pagetable, kpagetable, a, oldsz);
-      return 0;
-    }
-    // 内核
-    if (mappages(kpagetable , a, PGSIZE, (uint64)mem, perm) != 0) {
-      // vmunmap 的2种分配模式，根据特权集不同判断是否清空
-      int npages = (a - oldsz) / PGSIZE;
-      vmunmap(pagetable, oldsz, npages + 1,
-              1); // plus the page allocated above.
-      vmunmap(kpagetable, oldsz, npages, 0);
+      uvmdealloc(pagetable,  a, oldsz);
       return 0;
     }
   }
@@ -415,14 +405,13 @@ uint64 uvmalloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
 // need to be less than oldsz.  oldsz can be larger than the actual
 // process size.  Returns the new process size.
 // 释放虚拟空间大小
-uint64 uvmdealloc(pagetable_t pagetable, pagetable_t kpagetable, uint64 oldsz,
+uint64 uvmdealloc(pagetable_t pagetable, uint64 oldsz,
                   uint64 newsz) {
   if (newsz >= oldsz)
     return oldsz;
 
   if (PGROUNDUP(newsz) < PGROUNDUP(oldsz)) {
     int npages = (PGROUNDUP(oldsz) - PGROUNDUP(newsz)) / PGSIZE;
-    vmunmap(kpagetable, PGROUNDUP(newsz), npages, 0);
     vmunmap(pagetable, PGROUNDUP(newsz), npages, 1);
   }
 
@@ -464,7 +453,7 @@ void uvmfree(pagetable_t pagetable, uint64 sz) {
 // returns 0 on success, -1 on failure.
 // frees any allocated pages on failure.
 
-int uvmcopy(pagetable_t old, pagetable_t new, pagetable_t knew, uint64 sz) {
+int uvmcopy(pagetable_t old, pagetable_t new, uint64 sz) {
   pte_t *pte;
   uint64 pa, i = 0, ki = 0;
   uint flags;
@@ -486,15 +475,11 @@ int uvmcopy(pagetable_t old, pagetable_t new, pagetable_t knew, uint64 sz) {
     }
     i += PGSIZE;
     // 试图在用户进程清理内核页表
-    if (mappages(knew, ki, PGSIZE, (uint64)mem, flags & ~PTE_PLV3) != 0) {
-      goto err;
-    }
     ki += PGSIZE;
   }
   return 0;
 
 err:
-  vmunmap(knew, 0, ki / PGSIZE, 0);
   vmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }
@@ -677,46 +662,6 @@ int copyinstr2(char *dst, uint64 srcva, uint64 max) {
   }
 }
 
-// initialize kernel pagetable for each process.
-pagetable_t proc_kpagetable(struct proc *p) {
-  pagetable_t kpt = (pagetable_t)kalloc();
-  if (kpt == NULL)
-    return NULL;
-  // if (tcpip_pagetable != NULL) {
-  //   memmove(kpt, tcpip_pagetable, PGSIZE);
-  //   return kpt;
-  // } else {
-    memmove(kpt, kernel_pagetable, PGSIZE);
-  // }
-  
-  int procaddrnum = get_proc_addr_num(p);
-
-  char *mem;
-  uint64 a;
-  uint64 start = PROCVKSTACK(procaddrnum);
-  uint64 end = start + KSTACKSIZE;
-  for (a = start; a < end; a += PGSIZE) {
-    mem = kalloc();
-    if (mem == NULL) {
-      vmunmap(kpt, start, (a - start) / PGSIZE, 1);
-      printf("kpagetable kalloc failed\n");
-      goto fail;
-    }
-    memset(mem, 0, PGSIZE);
-    if (mappages(kpt, a, PGSIZE, (uint64)mem, PTE_P | PTE_W) != 0) {
-      kfree(mem);
-      vmunmap(kpt, start, (a - start) / PGSIZE, 1);
-      printf("[kpagetable]map page failed\n");
-      goto fail;
-    }
-  }
-
-  return kpt;
-
-fail:
-  kvmfree(kpt, 1, p);
-  return NULL;
-}
 
 // only free page table, not physical pages
 void kfreewalk(pagetable_t kpt) {

@@ -19,20 +19,20 @@ SECTIONS
         _keentry = .;
         *(k_eentry)
         . = ALIGN(0x1000);
-        _trampoline = .;
-        *(trampsec)
-        . = ALIGN(0x1000);
         _tlbrentry = .;
         *(tlbrentry)
         . = ALIGN(0x1000);
         _merrentry = .;
         *(merrentry)
         . = ALIGN(0x1000);
-        /* ASSERT(. - _trampoline == 0x1000, "error: trampoline larger than one page"); */
+        _trampoline = .;
+        *(trampsec)
+        . = ALIGN(0x1000);
+        ASSERT(. - _trampoline == 0x1000, "error: trampoline larger than one page");
         _signalTrampoline = .; 
         *(.signalTrampoline)
         . = ALIGN(0x1000);
-        /* ASSERT(. - _signalTrampoline == 4096, "error: signal trampoline not one page"); */
+        ASSERT(. - _signalTrampoline == 4096, "error: signal trampoline not one page");
         PROVIDE(etext = .);
     }
 

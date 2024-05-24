@@ -789,6 +789,7 @@ void scheduler(void) {
         // p->main_thread->state = t_RUNNING;
         // p->main_thread->awakeTime = 0;
         p->state = RUNNING;
+        c->proc = p;
         // futexClear(p->main_thread);
         // wty_todo
         // 更改页表权限和配置，在satp寄存器中

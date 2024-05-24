@@ -164,7 +164,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
           return 0;
         }
         memset(pagetable, 0, PGSIZE);
-        *pte = PA2PTE(pagetable) |PTE_D | PTE_PLV3 | PTE_RPLV |PTE_V |DMWIN_MASK;
+        *pte = PA2PTE(pagetable) | DMWIN_MASK | PTE_V;
       }
     }
     return &pagetable[PX(0, va)];

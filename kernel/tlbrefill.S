@@ -11,15 +11,23 @@ handle_tlbr:
 	csrrd   $t0, LOONGARCH_CSR_BADV 
 	csrrd   $t0, LOONGARCH_CSR_BADI
 
+	csrrd   $t0, LOONGARCH_CSR_STLBPS
+	csrrd   $t0, LOONGARCH_CSR_PRCFG1
+	csrrd	$t0, LOONGARCH_CSR_PRCFG2
+	csrrd	$t0, LOONGARCH_CSR_PRCFG3
+
+	csrrd   $t0, LOONGARCH_CSR_TLBRBADV
+	csrrd   $t0, LOONGARCH_CSR_TLBRERA
+
 	csrrd	$t0, LOONGARCH_CSR_PGD
 	# lddir	$t0, $t0, 4
 	# addi.d  $t0, $t0, -1
 	lddir	$t0, $t0, 3
-# 	addi.d  $t0, $t0, -1
-#	lddir	$t0, $t0, 2
-#	addi.d  $t0, $t0, -1
+ 	addi.d  $t0, $t0, -1
+	lddir	$t0, $t0, 2
+	addi.d  $t0, $t0, -1
 	lddir   $t0, $t0, 1
-#	addi.d  $t0, $t0, -1
+	addi.d  $t0, $t0, -1
 	ldpte	$t0, 0
 	ldpte	$t0, 1
 	tlbfill

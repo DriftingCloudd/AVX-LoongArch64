@@ -45,10 +45,11 @@
 #define LOONGARCH_CSR_BADI          0x8	    # Bad instruction 错误指令 
 #define LOONGARCH_CSR_EENTRY        0x9	    # Exception entry address 例外入口地址 
 
+#define LOONGARCH_CSR_STLBPS        0x1e    # STLB page size
+
 #define LOONGARCH_CSR_CPUID		    0x20	# CPU core id 
 
-#define LOONGARCH_CSR_PRCFG1		0x21	# Privilege config 1 		 
-
+#define LOONGARCH_CSR_PRCFG1		0x21	# Privilege config 1
 #define LOONGARCH_CSR_PRCFG2		0x22	# Config2 
 #define LOONGARCH_CSR_PRCFG3		0x23	# Config3                
 
@@ -68,9 +69,11 @@
 #define LOONGARCH_CSR_PGD           0x1b
 #define LOONGARCH_CSR_TLBRENTRY		0x88	# TLB refill exception entry 
 #define LOONGARCH_CSR_TLBRBADV		0x89	# TLB refill badvaddr 
+#define LOONGARCH_CSR_TLBRERA		0x8a	# TLB return address
 #define LOONGARCH_CSR_TLBRSAVE		0x8b	# KScratch for TLB refill exception 
 #define LOONGARCH_CSR_TLBRELO0      0x8d    
 #define LOONGARCH_CSR_TLBRELO1      0x8c    
 #define LOONGARCH_CSR_TLBREHI       0x8e    # TLB refill entryhi
+
 
 

@@ -461,7 +461,7 @@ w_csr_prcfg3(uint64 x)
 #define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
 // 最大虚拟地址
 
-#define MAXVA (1ULL << (9 + 9 + 9 + 9 + 12 - 1)) // 0x40_0000_0000
+#define MAXVA (1ULL << (9 + 9 + 9 + 9 + 12 - 2)) // 0x4000 0000 0000
 
 
 typedef uint64 pte_t;//typde of pte

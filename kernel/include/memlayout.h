@@ -83,9 +83,9 @@
 //   TRAPFRAME (p->trapframe, used by the uservec)
 //   如果要trampoline的情况，应该是在trapframe上面一页的大小（xv6）
 
-#define TRAMPOLINE (MAXVA - PGSIZE)
-#define TRAPFRAME (TRAMPOLINE - PGSIZE)
-#define SIGTRAMPOLINE (TRAPFRAME - PGSIZE)
+#define TRAMPOLINE (MAXVA - PGSIZE)     // 3FFF FFFF F000 
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)   // 3FFF FFFF E000
+#define SIGTRAMPOLINE (TRAPFRAME - PGSIZE)      // 3FFF FFFF D000
 
 // map kernel stacks beneath the trampframe,
 // each surrounded by invalid guard pages.
@@ -93,10 +93,10 @@
 // STACKSZIE by wty
 // 此处的VKSTACK 切换为MMIO地址
 // from AVX
-#define VKSTACK                 SIGTRAMPOLINE -PGSIZE//0x3E_C000_0000
+#define VKSTACK                 SIGTRAMPOLINE -PGSIZE// 3FFF FFFF C000
 #define KSTACKSIZE              6 * PGSIZE
 #define EXTRASIZE               2 * PGSIZE
-#define PROCVKSTACK(paddrnum)        (VKSTACK - ((((paddrnum) + 1) % NPROC) * (KSTACKSIZE + EXTRASIZE)) + EXTRASIZE)
+#define PROCVKSTACK(paddrnum)        (VKSTACK - ((((paddrnum) + 1) % (NPROC + 1)) * (KSTACKSIZE + EXTRASIZE)) + EXTRASIZE)
 
 
 

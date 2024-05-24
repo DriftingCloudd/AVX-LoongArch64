@@ -208,13 +208,16 @@ proc_mapstacks(pagetable_t kpgtbl) {
   struct proc *p;
   
   for(p = proc; p < &proc[NPROC]; p++) {
-    char *pa = kalloc();
-    if(pa == 0)
-      panic("kalloc");
-    memset(pa, 0, PGSIZE);
     uint64 va = PROCVKSTACK((int) (p - proc));
-    if(mappages(kpgtbl, va, PGSIZE, (uint64)pa,  PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D) != 0)
-      panic("kvmmap");
+
+    for (int i = 0; i < KSTACKSIZE /PGSIZE ;i++){
+      char *pa = kalloc();
+      if(pa == 0)
+        panic("kalloc");
+      memset(pa, 0, PGSIZE);
+      if(mappages(kpgtbl, va + i * PGSIZE, PGSIZE, (uint64)pa,  PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D) != 0)
+        panic("kvmmap");
+    }
   }
 }
 
@@ -789,7 +792,7 @@ void scheduler(void) {
         // futexClear(p->main_thread);
         // wty_todo
         // 更改页表权限和配置，在satp寄存器中
-        w_csr_pgdl((uint64)(p->pagetable));
+        // w_csr_pgdl((uint64)(p->pagetable));
         #ifdef DEBUG
         printf("scheduler: p->pagetable %x\n", p->pagetable);
         #endif
@@ -798,7 +801,7 @@ void scheduler(void) {
         // flush_TLB();
         swtch(&c->context, &p->context);
         // copycontext(&p->main_thread->context, &p->context);
-        w_csr_pgdl((uint64)(p->pagetable));
+        // w_csr_pgdl((uint64)(p->pagetable));
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
         // flush_TLB();

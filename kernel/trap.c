@@ -131,7 +131,7 @@ usertrapret(void)
   // set up trapframe values that uservec will need when
   // the process next re-enters the kernel.
   p->trapframe->kernel_pgdl = r_csr_pgdl();         // kernel page table
-  p->trapframe->kernel_sp = p->kstack + PGSIZE; // process's kernel stack
+  p->trapframe->kernel_sp = p->kstack + KSTACKSIZE; // process's kernel stack
   p->trapframe->kernel_trap = (uint64)usertrap;
   p->trapframe->kernel_hartid = r_tp();         // hartid for cpuid()
 
@@ -203,8 +203,6 @@ clockintr()
   ticks++;
   wakeup(&ticks);
   release(&tickslock);
-
-  countdown_timer_init();
 }
 
 // check if it's an external interrupt or software interrupt,

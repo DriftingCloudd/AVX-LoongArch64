@@ -22,6 +22,7 @@ pagetable_t tcpip_pagetable;
 
 extern char etext[];      // kernel.ld sets this to end of kernel code.
 extern char trampoline[]; // trampoline.S
+extern char signalTrampoline[]; // signalTrampoline.S
 
 void tlbinit(void)
 {
@@ -88,6 +89,7 @@ void kvminit() {
   // the highest virtual address in the kernel.
   // 暂时放在那里，Trampoline.S 没有更新
   kvmmap(TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_MAT |PTE_D |PTE_P);
+  kvmmap(SIGTRAMPOLINE, (uint64)signalTrampoline, PGSIZE, PTE_MAT |PTE_D |PTE_P);
   proc_mapstacks(kernel_pagetable);
 
 #ifdef DEBUG
@@ -164,7 +166,7 @@ pte_t *walk(pagetable_t pagetable, uint64 va, int alloc) {
           return 0;
         }
         memset(pagetable, 0, PGSIZE);
-        *pte = PA2PTE(pagetable) | DMWIN_MASK | PTE_V;
+        *pte = PA2PTE(pagetable) | PTE_V |DMWIN_MASK ;
       }
     }
     return &pagetable[PX(0, va)];
@@ -265,7 +267,7 @@ int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa,
       panic("remap");
     }
 
-    *pte = PA2PTE(pa) | perm | PTE_V |PTE_MAT ;
+    *pte = PA2PTE(pa) | perm | PTE_V | PTE_MAT ;
     if (a == last)
       break;
     a += PGSIZE;
@@ -558,10 +560,10 @@ int copyout2(uint64 dstva, char *src, uint64 len) {
 // Copy len bytes to dst from virtual address srcva in a given page table.
 // Return 0 on success, -1 on error.
 int copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len) {
-  if (dst < DMWIN_MASK)
-    panic("copyin: dst < DMWIN_MASK");
+  // if (dst < DMWIN_MASK)
+  //   panic("copyin: dst < DMWIN_MASK"); dts mybe in kernel stack
 
-  if (srcva > MAXVA && (srcva & DMWIN_MASK)){
+  if (srcva > MAXVA && (srcva & DMWIN_MASK))
     panic("copyin: srcva > MAXVA & srcva is not in 0x9000(x)");
 
   uint64 n, va0, pa0;
@@ -582,8 +584,8 @@ int copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len) {
     dst += n;
     srcva = va0 + PGSIZE;
   }
+  
   return 0;
-}
 }
 
 // used by proc

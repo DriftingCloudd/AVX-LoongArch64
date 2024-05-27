@@ -19,6 +19,7 @@ int pipealloc(struct file **f0, struct file **f1) {
     goto bad;
   if ((pi = (struct pipe *)kalloc()) == NULL)
     goto bad;
+  memset(pi, 0, sizeof(*pi));
   pi->readopen = 1;
   pi->writeopen = 1;
   pi->nwrite = 0;

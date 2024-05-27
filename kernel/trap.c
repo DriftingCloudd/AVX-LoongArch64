@@ -21,7 +21,8 @@
 // struct spinlock tickslock;
 // uint ticks;
 
-extern char trampoline[], uservec[], userret[]; 
+extern char trampoline[], uservec[]; 
+void userret(uint64, uint64);
 
 // in kernelvec.S, calls kerneltrap().
 void kernelvec();
@@ -70,10 +71,30 @@ usertrap(void)
   
   // save user program counter.
   p->trapframe->era = r_csr_era();
+
+  #ifdef DEBUG
+  printf("usertrap():handling exception\n");
+  uint32 info = r_csr_crmd();
+  printf ("usertrap(): crmd=%x\n", info);
+  info = r_csr_prmd();
+  printf ("usertrap(): prmd=%x\n", info);
+  info = r_csr_estat();
+  printf ("usertrap(): estat=%x\n", info);
+  info = r_csr_era();
+  printf ("usertrap(): era=%x\n", info);
+  info = r_csr_ecfg();
+  printf ("usertrap(): ecfg=%x\n", info);
+  info = r_csr_badi();
+  printf ("usertrap(): badi=%x\n", info);
+  info = r_csr_badv();
+  printf ("usertrap(): badv=%x\n\n", info);
+  #endif
   
   if( ((r_csr_estat() & CSR_ESTAT_ECODE) >> 16) == 0xb){
     // 系统调用例外
-
+    #ifdef DEBUG
+    printf("usertrap():handling syscall\n");
+    #endif
     if(p->killed)
       exit(-1);
 
@@ -89,7 +110,7 @@ usertrap(void)
   }else if((r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x1 || (r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x2  ){
     // load page fault or store page fault
     // check if the page fault is caused by stack growth
-    printf("handle stack page fault\n");
+    printf("usertrap():handle stack page fault\n");
   } 
   else if((which_dev = devintr()) != 0){
     // ok
@@ -118,6 +139,9 @@ usertrap(void)
 void
 usertrapret(void)
 {
+  #ifdef DEBUG
+  printf("usertrapret(): user trap returning.\n\n");
+  #endif
   struct proc *p = myproc();
 
   // we're about to switch the destination of traps from
@@ -126,7 +150,7 @@ usertrapret(void)
   intr_off();
 
   // send syscalls, interrupts, and exceptions to uservec.S
-  w_csr_eentry(TRAMPOLINE + (uservec - trampoline));  //maybe todo
+  w_csr_eentry((uint64)uservec);  //maybe todo
 
   // set up trapframe values that uservec will need when
   // the process next re-enters the kernel.
@@ -153,9 +177,9 @@ usertrapret(void)
   // jump to uservec.S at the top of memory, which 
   // switches to the user page table, restores user registers,
   // and switches to user mode with ertn.
-  uint64 fn = TRAMPOLINE + (userret - trampoline);
-  ((void (*)(uint64, uint64))fn)(TRAPFRAME, pgdl);
-  // userret(TRAPFRAME, pgdl);
+  // uint64 fn = TRAMPOLINE + (userret - trampoline);
+  // ((void (*)(uint64, uint64))fn)(TRAPFRAME, pgdl);
+  userret(TRAPFRAME, pgdl);
 }
 
 // interrupts and exceptions from kernel code go here via kernelvec,
@@ -163,6 +187,24 @@ usertrapret(void)
 void 
 kerneltrap()
 {
+  #ifdef DEBUG
+  printf("kerneltrap():handling exception\n");
+  uint32 info = r_csr_crmd();
+  printf ("kerneltrap(): crmd=%x\n", info);
+  info = r_csr_prmd();
+  printf ("kerneltrap(): prmd=%x\n", info);
+  info = r_csr_estat();
+  printf ("kerneltrap(): estat=%x\n", info);
+  info = r_csr_era();
+  printf ("kerneltrap(): era=%x\n", info);
+  info = r_csr_ecfg();
+  printf ("kerneltrap(): ecfg=%x\n", info);
+  info = r_csr_badi();
+  printf ("kerneltrap(): badi=%x\n", info);
+  info = r_csr_badv();
+  printf ("kerneltrap(): badv=%x\n\n", info);
+  #endif
+
   int which_dev = 0;
   // ERA寄存器：异常程序计数器，记录异常发生时的指令地址。
   uint64 era = r_csr_era();

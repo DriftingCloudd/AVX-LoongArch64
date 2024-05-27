@@ -1,0 +1,4 @@
+loongarch64-linux-gnu-gcc -march=loongarch64 -mabi=lp64s -c kernel/entry.S -o kernel/entry.o
+loongarch64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -g -MD -march=loongarch64 -mabi=lp64s -ffreestanding -fno-common -nostdlib -fno-pie -no-pie -fno-stack-protector -Ikernel/include -I.kernel -I. -DDEBUG    -c -o kernel/printf.o kernel/printf.c
+loongarch64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -g -MD -march=loongarch64 -mabi=lp64s -ffreestanding -fno-common -nostdlib -fno-pie -no-pie -fno-stack-protector -Ikernel/include -I.kernel -I. -DDEBUG    -c -o kernel/extioi.o kernel/extioi.c
+loongarch64-linux-gnu-gcc -Wall -Werror -O -fno-omit-frame-pointer -ggdb -g -MD -march=loongarch64 -mabi=lp64s -ffreestanding -fno-common -nostdlib -fno-pie -no-pie -fno-stack-protector -Ikernel/include -I.kernel -I. -DDEBUG    -c -o kernel/uart.o kernel/uart.c

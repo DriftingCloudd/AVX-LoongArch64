@@ -22,6 +22,7 @@ struct vma *vma_init(struct proc *p) {
     printf("vma kalloc failed\n");
     return NULL;
   }
+  memset(vma, 0, PGSIZE);
 
   vma->type = NONE;
   // next 结构
@@ -61,6 +62,8 @@ struct vma *alloc_vma(struct proc *p, enum segtype type, uint64 addr, uint64 sz,
     printf("vma kalloc failed\n");
     return NULL;
   }
+
+  memset(vma, 0, PGSIZE);
   if (0 != sz) {
     if (alloc) {
       if (0 != uvmalloc1(p->pagetable, start, end, perm)) {

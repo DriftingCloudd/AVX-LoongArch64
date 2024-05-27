@@ -3,6 +3,7 @@
 
 #include <larchintrin.h>
 #include "types.h"
+#include "memlayout.h"
 
 // calculate the mask for a field in a register.
 #define FILED_MASK(len, shift)      (((0x1UL << (len)) - 1) << (shift))
@@ -154,7 +155,7 @@ r_csr_estat()
 
 #define CSR_ECFG_VS_SHIFT  16 
 #define CSR_ECFG_LIE_TI_SHIFT  11
-#define HWI_VEC  0x3fcU
+#define HWI_VEC  0x3fcU // 0x1111111100
 #define TI_VEC  (0x1 << CSR_ECFG_LIE_TI_SHIFT)
 
 static inline uint32
@@ -316,6 +317,14 @@ w_csr_pwch(uint32 x)
 }
 
 static inline uint32
+r_csr_badv()
+{
+  uint32 x;
+  asm volatile("csrrd %0, 0x7" : "=r" (x) );
+  return x;
+}
+
+static inline uint32
 r_csr_badi()
 {
   uint32 x;
@@ -449,7 +458,7 @@ w_csr_prcfg3(uint64 x)
 #define PTE_RPLV (0ULL << 63) //restricted privilege level enable
 
 #define PAMASK          0xFFFFFFFFFUL << PGSHIFT
-#define PTE2PA(pte) (pte & PAMASK)
+#define PTE2PA(pte) (pte & PAMASK | DMWIN_MASK)
 // shift a physical address to the right place for a PTE.
 #define PA2PTE(pa) (((uint64)pa) & PAMASK)
 // 查看页权限

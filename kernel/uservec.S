@@ -3,13 +3,14 @@
 	# kernel.ld causes this to be aligned
         # to a page boundary.
         #
-#include "include/loongarchregs.h"
+#include "include/loongarchregs.S"
 
 .section trampsec
 .globl trampoline
 trampoline:
-.align 4
 .globl uservec
+.align 4
+
 uservec:    
 	#
         # trap.c sets eentry to point here, so
@@ -24,7 +25,6 @@ uservec:
 	# swap a0 and SAVE
         # so that a0 is TRAPFRAME
         csrwr  $a0, LOONGARCH_CSR_SAVE0
-
         # save the user registers in TRAPFRAME
         st.d   $ra, $a0, 0
         st.d   $tp, $a0, 8
@@ -73,8 +73,15 @@ uservec:
         # restore kernel page table from p->trapframe->kernel_pgdl
         ld.d   $t1, $a0, 280
         csrwr  $t1, LOONGARCH_CSR_PGDL
-        invtlb 0x0,$zero,$zero
+        # invtlb 0x0,$zero,$zero
 
+        csrrd  $t3, 0x0
+        csrrd  $t3, 0x1
+        csrrd  $t3, 0x4
+        csrrd  $t3, 0x5
+        csrrd  $t3, 0x6
+        csrrd  $t3, 0x7
+        csrrd  $t3, 0x8
         # jump to usertrap(), which does not return
         jirl   $zero ,$t0, 0
 
@@ -88,7 +95,7 @@ userret:
 
         # switch to the user page table.
         csrwr  $a1, LOONGARCH_CSR_PGDL
-        invtlb 0x0,$zero,$zero
+        # invtlb 0x0,$zero,$zero
 
         # put the saved user a0 in SAVE0, so we
         # can swap it with our a0 (TRAPFRAME) in the last step.

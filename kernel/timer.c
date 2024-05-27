@@ -62,6 +62,9 @@ void countdown_timer_init(){
 void timer_tick() {
   acquire(&tickslock);
   ticks++;
+  #ifdef  DEBUG
+  printf("timer_tick():tick++, now tick is %d",ticks);
+  #endif
   wakeup(&ticks);
   release(&tickslock);
 

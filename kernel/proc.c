@@ -215,7 +215,7 @@ proc_mapstacks(pagetable_t kpgtbl) {
       if(pa == 0)
         panic("kalloc");
       memset(pa, 0, PGSIZE);
-      if(mappages(kpgtbl, va + i * PGSIZE, PGSIZE, (uint64)pa,  PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D) != 0)
+      if(mappages(kpgtbl, va + i * PGSIZE, PGSIZE, (uint64)pa,  PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D | PTE_PLV3) != 0)
         panic("kvmmap");
     }
   }
@@ -304,6 +304,7 @@ found:
     release(&p->lock);
     return NULL;
   }
+  memset(p->trapframe, 0, PGSIZE);
 
   // An empty user page table.
   // And an identical kernel page table for this proc.
@@ -412,21 +413,21 @@ pagetable_t proc_pagetable(struct proc *p) {
   // only the supervisor uses it, on the way
   // to/from user space, so not PTE_U.
   if (mappages(pagetable, TRAMPOLINE, PGSIZE, (uint64)trampoline,
-               PTE_P | PTE_MAT) < 0) {
+               PTE_P | PTE_MAT | PTE_D) < 0) {
     uvmfree(pagetable, 0);
     return NULL;
   }
 
   // map the trapframe just below TRAMPOLINE, for trampoline.S.
   if (mappages(pagetable, TRAPFRAME, PGSIZE, (uint64)(p->trapframe),
-               PTE_P | PTE_W) < 0) {
+                PTE_NX | PTE_P | PTE_W | PTE_MAT | PTE_D) < 0) {
     vmunmap(pagetable, TRAMPOLINE, 1, 0);
     uvmfree(pagetable, 0);
     return NULL;
   }
   // signal ：交互信号
   if (mappages(pagetable, SIGTRAMPOLINE, PGSIZE, (uint64)signalTrampoline,
-              PTE_PLV3) < 0) {
+              PTE_P | PTE_MAT | PTE_D) < 0) {
     vmunmap(pagetable, TRAMPOLINE, 1, 0);
     vmunmap(pagetable, TRAPFRAME, 1, 0);
     uvmfree(pagetable, 0);
@@ -795,7 +796,7 @@ void scheduler(void) {
         // 更改页表权限和配置，在satp寄存器中
         // w_csr_pgdl((uint64)(p->pagetable));
         #ifdef DEBUG
-        printf("scheduler: p->pagetable %x\n", p->pagetable);
+        printf("scheduler(): p->pagetable %x\n", p->pagetable);
         #endif
         // w_satp(MAKE_SATP(p->kpagetable));
         // sfence_vma();
@@ -858,7 +859,7 @@ void sched(void) {
 void yield(void) {
   struct proc *p = myproc();
   acquire(&p->lock);
-  printf("pid %d yield\n, era: %p", p->pid, p->trapframe->era);
+  printf("pid %d yield, era: %p\n", p->pid, p->trapframe->era);
   p->state = RUNNABLE;
   // todo：线程部分
   // p->main_thread->state = t_RUNNABLE;

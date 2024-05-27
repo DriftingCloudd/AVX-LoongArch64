@@ -280,6 +280,9 @@ int is_sh_script(char *path) {
 }
 
 int exec(char *path, char **argv, char **env) {
+  #ifdef DEBUG
+  printf("exec(): enter exec/n/n");
+  #endif
   char *s, *last;
   uint64 argc, sz = 0, sp, ustack[MAXARG + 1], stackbase;
   struct elfhdr elf;

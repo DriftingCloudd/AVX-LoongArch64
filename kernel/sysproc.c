@@ -85,6 +85,9 @@ uint64 sys_wait4() {
 }
 
 uint64 sys_exec(void) {
+  #ifdef DEBUG
+  printf ("sys_exec(): enter sys_exec\n\n");
+  #endif
   char path[FAT32_MAX_PATH], *argv[MAXARG];
   int i;
   uint64 uargv, uarg;
@@ -112,6 +115,7 @@ uint64 sys_exec(void) {
       printf("[sys_exec] kalloc error\n");
       goto bad;
     }
+    memset(argv[i], 0, PGSIZE);
     if (fetchstr(uarg, argv[i], PGSIZE) < 0) {
       printf("[sys_exec] fetchstr error\n");
       goto bad;
@@ -160,6 +164,7 @@ uint64 sys_execve(void) {
     argv[i] = kalloc();
     if (argv[i] == 0)
       goto bad;
+    memset(argv[i], 0, PGSIZE);
     if (fetchstr(uarg, argv[i], PGSIZE) < 0)
       goto bad;
   }

@@ -525,8 +525,8 @@ int copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len) {
   if (dstva > MAXVA)
     panic("copyout: dstva > MAXVA");
 
-  if (src < DMWIN_MASK)
-    panic("copyout: src < DMWIN_MASK");
+  if (src < PROCVKSTACK(NPROC - 1))
+    panic("copyout: src < KSTACK");
 
   uint64 n, va0, pa0;
 

@@ -187,7 +187,7 @@ usertrapret(void)
 void 
 kerneltrap()
 {
-  #ifdef DEBUG
+  #ifdef NDEBUG
   printf("kerneltrap():handling exception\n");
   uint32 info = r_csr_crmd();
   printf ("kerneltrap(): crmd=%x\n", info);

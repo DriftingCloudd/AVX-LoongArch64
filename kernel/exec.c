@@ -526,7 +526,7 @@ int exec(char *path, char **argv, char **env) {
   volatile uint64 pgdl = (uint64)(p->pagetable);
   w_csr_pgdl(pgdl);
   // sfence_vma();
-  flush_TLB();
+  // flush_TLB();
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 

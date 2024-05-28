@@ -213,11 +213,13 @@ int fileread(struct file *f, uint64 addr, int n) {
   if (f->readable == 0)
     return -1;
   struct proc *p = myproc();
+  // printf("f->type:%d\n", f->type);
   switch (f->type) {
   case FD_PIPE:
     r = piperead(f->pipe, 1, addr, n);
     break;
   case FD_DEVICE:
+    // printf("fileread: major:%d\n", f->major);
     if (f->major < 0 || f->major >= NDEV || !devsw[f->major].read)
       return -1;
     r = devsw[f->major].read(1, addr, n);
@@ -257,7 +259,9 @@ int fileread(struct file *f, uint64 addr, int n) {
   default:
     panic("fileread");
   }
-
+  #ifdef DEBUG
+  printf("fileread ret:%d\n", r);
+  #endif
   return r;
 }
 
@@ -302,7 +306,9 @@ int filewrite(struct file *f, uint64 addr, int n) {
   } else {
     panic("filewrite");
   }
-
+  #ifdef DEBUG
+  printf("filewrite ret:%d\n", ret);
+  #endif
   return ret;
 }
 

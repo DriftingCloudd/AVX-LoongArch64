@@ -299,6 +299,7 @@ int exec(char *path, char **argv, char **env) {
   vma_init(p);
 
   oldpagetable = p->pagetable;
+  printf("oldpagetable:%p\n", oldpagetable);
 
   int is_shell_script = is_sh_script(path);
   if (is_shell_script) {
@@ -332,6 +333,8 @@ int exec(char *path, char **argv, char **env) {
   /* -------------------动态链接-------------------------------------------*/
   // 动态链接目前默认处理/libc.so
 
+  printf("is_dynamic is %d\n",is_dynamic);
+
   if (is_dynamic) {
 
     if ((interpreter = ename("/libc.so")) == NULL) {
@@ -348,14 +351,14 @@ int exec(char *path, char **argv, char **env) {
     interp_start_addr =
         load_elf_interp(pagetable, &interpreter_elf, interpreter);
     program_entry = interp_start_addr + interpreter_elf.entry;
-    printf("interp_start_addr:%p program_entry:%p\n", interp_start_addr,
-                program_entry);
+    printf("interp_start_addr:%p program_entry:%p\n", interp_start_addr,program_entry);
 
     eunlock(interpreter);
     eput(interpreter);
     interpreter = NULL;
   } else {
     program_entry = elf.entry;
+    printf("elf.entry %p\n", elf.entry);
   }
 
   /*--------------------动态链接结束---------------------------------------*/
@@ -490,19 +493,29 @@ int exec(char *path, char **argv, char **env) {
   // Commit to the user image.
 
   p->pagetable = pagetable;
+  printf("page table:%p\n", pagetable);
   p->sz = sz;
+  printf("program_entry:%p\n", program_entry);
+
   p->trapframe->era = program_entry; // initial program counter = main
   p->trapframe->sp = sp;             // initial stack pointer
   // printf("program entry:%p\n", program_entry);
   // maybe it's wrong
   for (int fd = 0; fd < NOFILEMAX(p); fd++) {
     struct file *f = p->ofile[fd];
+#if DEBUG
+    printf("fd:%d, f is %p\n", fd, f);
+#endif
     if (f && p->exec_close[fd]) {
       fileclose(f);
       p->ofile[fd] = 0;
       p->exec_close[fd] = 0;
     }
   }
+#if DEBUG
+  printf("p->ofile[1] is %p\n", p->ofile[1]);
+  printf("redirection is %d\n", redirection);
+#endif
   // 处理重定向
   if (redirection != -1) {
     fileclose(p->ofile[1]);
@@ -523,10 +536,15 @@ int exec(char *path, char **argv, char **env) {
   proc_freepagetable(oldpagetable, oldsz);
   
   //change to pwcl & pwch
-  volatile uint64 pgdl = (uint64)(p->pagetable);
-  w_csr_pgdl(pgdl);
+  // volatile uint64 pgdl = (uint64)(p->pagetable);
+  // printf("pgdl %p\n", pgdl);
+  // w_csr_pgdl(pgdl);
   // sfence_vma();
   // flush_TLB();
+
+  printf("p->trapframe->era:%p\n", p->trapframe->era);
+
+  printf("p->ofile[1] is %p\n", p->ofile[1]);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 

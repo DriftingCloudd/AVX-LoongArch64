@@ -436,13 +436,14 @@ void syscall(void) {
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+  // printf("pid %d: %s\n", p->pid, sysnames[num]);
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    if (num != 64 && num != 63 && num != SYS_writev &&
+    if (num != SYS_read && num != SYS_write && num != SYS_writev &&
         num != SYS_clock_gettime && num != SYS_sendto && num != SYS_recvfrom)
       printf("pid %d call %d: %s\n", p->pid, num, sysnames[num]);
     p->trapframe->a0 = syscalls[num]();
     if (num == SYS_openat && p->trapframe->a0 == -1) {
-      printf("");
+      printf("pid %d: openat failed\n", p->pid);
     }
     // trace
     if (num != SYS_read && num != SYS_write && num != SYS_writev &&

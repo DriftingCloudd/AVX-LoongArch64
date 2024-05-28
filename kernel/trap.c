@@ -92,9 +92,7 @@ usertrap(void)
   
   if( ((r_csr_estat() & CSR_ESTAT_ECODE) >> 16) == 0xb){
     // 系统调用例外
-    #ifdef DEBUG
-    printf("usertrap():handling syscall\n");
-    #endif
+    
     if(p->killed)
       exit(-1);
 
@@ -105,7 +103,9 @@ usertrap(void)
     // an interrupt will change crmd & prmd registers,
     // so don't enable until done with those registers.
     intr_on();
-
+    #ifdef DEBUG
+    printf("usertrap():handling syscall\n");
+    #endif
     syscall();
   }else if((r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x1 || (r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x2  ){
     // load page fault or store page fault
@@ -169,10 +169,18 @@ usertrapret(void)
   w_csr_prmd(x);
 
   // set S Exception Program Counter to the saved user pc.
+  
+  #ifdef DEBUG
+  printf("usertrapret(): era=%p\n", p->trapframe->era);
+  #endif
   w_csr_era(p->trapframe->era);
 
   // tell uservec.S the user page table to switch to.
   volatile uint64 pgdl = (uint64)(p->pagetable);
+  #ifdef DEBUG
+  printf("usertrapret(): pgdl=%p\n", pgdl);
+  #endif
+  
 
   // jump to uservec.S at the top of memory, which 
   // switches to the user page table, restores user registers,
@@ -285,6 +293,7 @@ devintr()
 
     if(cpuid() == 0){
       clockintr();
+      // timer_tick();
     }
     
     // acknowledge the timer interrupt by clearing

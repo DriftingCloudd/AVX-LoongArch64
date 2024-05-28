@@ -52,6 +52,9 @@ static int argfd(int n, int *pfd, struct file **pf) {
     *pfd = fd;
     return -1;
   }
+#ifdef DEBUG
+  printf("argfd: fd: %d\n", fd);
+#endif
 
   if (fd < 0 || fd >= NOFILE || (f = myproc()->ofile[fd]) == NULL) {
     printf("fd: %d argfd: fd error\n", fd);
@@ -639,7 +642,7 @@ uint64 sys_getcwd(void) {
   if (copyout2(addr, s, strlen(s) + 1) < 0)
     return -1;
   */
-
+  printf("getcwd: %s\n", s);
   return addr;
 }
 

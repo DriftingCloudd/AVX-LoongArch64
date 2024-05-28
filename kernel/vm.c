@@ -267,7 +267,7 @@ int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa,
       panic("remap");
     }
 
-    *pte = PA2PTE(pa) | perm | PTE_V | PTE_MAT ;
+    *pte = PA2PTE(pa) | perm | PTE_V | PTE_MAT | PTE_D ;
     if (a == last)
       break;
     a += PGSIZE;

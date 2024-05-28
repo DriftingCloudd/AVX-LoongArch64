@@ -268,7 +268,7 @@ uint64 alloc_vma_stack(struct proc *p) {
     return -1;
   }
 
-  if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV3) != 0) {
+  if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV3|PTE_D) != 0) {
     // 判断读权限
     printf("user stack vma alloc failed\n");
     kfree(vma);
@@ -314,7 +314,7 @@ uint64 handle_stack_page_fault(struct proc *p, uint64 va) {
   }
   uint64 end = vma->addr;
 
-  if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV3) != 0) {
+  if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV3|PTE_D) != 0) {
     printf("user stack vma alloc failed\n");
     return -1;
   }

@@ -95,7 +95,7 @@ userret:
 
         # switch to the user page table.
         csrwr  $a1, LOONGARCH_CSR_PGDL
-        # invtlb 0x0,$zero,$zero
+        invtlb 0x0,$zero,$zero
 
         # put the saved user a0 in SAVE0, so we
         # can swap it with our a0 (TRAPFRAME) in the last step.

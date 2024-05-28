@@ -84,14 +84,14 @@ void main() {
     // other hart
     while (started == 0)
       ;
-    // __sync_synchronize();
+    __sync_synchronize();
     // kvminithart();
-    // trapinithart();
+    // trapinit();
     // plicinithart(); // ask PLIC for device interrupts
     // debug_print("hart 1 init done\n");
-    // printf("hart 2\n");
+    // printf("cpu 2\n");
     // while (1) {
-    //   int c = uart8250_getc();
+    //   int c = uartgetc();
     //   if (-1 != c) {
     //     // uart8250_putc(c);
     //     consoleintr(c);

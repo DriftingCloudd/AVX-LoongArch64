@@ -1,0 +1,173 @@
+{
+  "main": {
+    "id": "3cb61ffebab0079f",
+    "type": "split",
+    "children": [
+      {
+        "id": "4cf203a9200b017c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6a290fc95741e312",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "doc/内核介绍/chap1：内存管理.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "97ea8a380545bdd0",
+    "type": "split",
+    "children": [
+      {
+        "id": "6832aa9fabee9f98",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5036605fcbe02dcd",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "c87a55c11a1f66a7",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "b4b0a75418d651d8",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "4cb7a4ee8c297326",
+    "type": "split",
+    "children": [
+      {
+        "id": "f612c677e7c42f0f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6ffb3e276077eeab",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "doc/内核介绍/chap1：内存管理.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "a6df6f5fa0c5e712",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "doc/内核介绍/chap1：内存管理.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "724be495c65f8cee",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "a8d7e88642e995e6",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "doc/内核介绍/chap1：内存管理.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "6a290fc95741e312",
+  "lastOpenFiles": [
+    "doc/内核介绍/picture",
+    "doc/内核介绍/chap4：系统调用.md",
+    "doc/内核介绍/chap3：进程管理.md",
+    "doc/内核介绍/chap2：文件系统.md",
+    "doc/内核介绍/chap1：内存管理.md",
+    "doc/内核介绍/README.md",
+    "doc/README.md",
+    "doc/内核介绍",
+    "doc/基于LA的OS的特点分析/NPUcore+LA.md",
+    "doc/系统设计与实现.md",
+    "doc/基于LA的OS的特点分析/StarryOS-LoongArch.md",
+    "doc/picture/pic_3.drawio.png",
+    "doc/picture/pic_2.drawio.png",
+    "doc/picture/Pasted image 20240521183010.png",
+    "doc/picture/pic_1.jpg",
+    "doc/picture/进程关系.png",
+    "doc/picture/Pasted image 20240520184848.png",
+    "doc/picture",
+    "doc/异常 & 系统调用开发.md",
+    "进程管理模式.md"
+  ]
+}

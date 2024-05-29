@@ -316,9 +316,9 @@ found:
   
   p->kstack = PROCVKSTACK(get_proc_addr_num(p));
 
-  // p->exec_close = kalloc();
-  // for (int fd = 0; fd < NOFILE; fd++)
-  //   p->exec_close[fd] = 0;
+  p->exec_close = kalloc();
+  for (int fd = 0; fd < NOFILE; fd++)
+     p->exec_close[fd] = 0;
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
@@ -351,7 +351,7 @@ static void freeproc(struct proc *p) {
   if (p->trapframe)
     kfree((void *)p->trapframe);
 
-  // kfree((void *)p->exec_close);
+  kfree((void *)p->exec_close);
   p->trapframe = 0;
 
   // thread *t = p->thread_queue;

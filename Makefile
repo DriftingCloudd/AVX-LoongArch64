@@ -6,7 +6,9 @@ mode := debug
 K=kernel
 U=user
 T=target
-linker = ./kernel.ld
+linker = ld/kernel.ld
+initcode-ld = ld/initcode.ld
+
 
 OBJS += \
   $K/entry.o \
@@ -230,7 +232,7 @@ $K/bin.S:$U/initcode
 
 $U/initcode: $U/initcode.S
 	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
-	$(LD) $(LDFLAGS) -N -e start -Ttext-segment 0 -o $U/initcode.out $U/initcode.o
+	$(LD) $(LDFLAGS) -N -e start -Ttext-segment 0 -T$(initcode-ld) -o $U/initcode.out $U/initcode.o
 	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
 	$(OBJDUMP) -S $U/initcode.o > $U/initcode.asm
 

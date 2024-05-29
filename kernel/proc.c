@@ -813,6 +813,7 @@ void scheduler(void) {
 
         found = 1;
       }
+      // printf("estat is %p\n", r_csr_estat());
       release(&p->lock);
     }
     if (found == 0) {

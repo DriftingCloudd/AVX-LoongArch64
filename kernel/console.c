@@ -177,6 +177,8 @@ void consoleinit(void) {
   initlock(&cons.lock, "cons");
 // #ifdef QEMU
   uartinit();
+  // uart_intr_init();
+
 // #endif
 // #ifdef visionfive
 //   uart8250_init(UART, 24000000, 115200, 2, 4, 0);

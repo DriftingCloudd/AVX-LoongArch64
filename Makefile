@@ -178,7 +178,8 @@ endif
 # CFLAGS += -D k210
 # else ifeq ($(platform), visionfive)
 # CFLAGS += -D visionfive
-OBJS += $K/sddata.o $K/ramdisk.o
+OBJS += $K/ramdisk.o
+# OBJS += $K/sddata.o 
 # endif
 
 LDFLAGS = -z max-page-size=4096 
@@ -229,7 +230,7 @@ $K/bin.S:$U/initcode
 
 $U/initcode: $U/initcode.S
 	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
-	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o $U/initcode.out $U/initcode.o
+	$(LD) $(LDFLAGS) -N -e start -Ttext-segment 0 -o $U/initcode.out $U/initcode.o
 	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
 	$(OBJDUMP) -S $U/initcode.o > $U/initcode.asm
 

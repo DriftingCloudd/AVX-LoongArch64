@@ -4,6 +4,7 @@
 
 #include "include/uart.h"
 #include "include/console.h"
+#include "include/memlayout.h"
 
 // #include "defs.h"
 
@@ -41,7 +42,20 @@ uartinit(void)
   // enable transmit and receive interrupts.
   WriteReg(IER, IER_TX_ENABLE | IER_RX_ENABLE);
 
+
   initlock(&uart_tx_lock, "uart");
+}
+
+void uart_intr_init(void)
+{
+  // enable uart0 interrupt on 2k1000 irqc
+  *(volatile unsigned int*)INTENSET0 = 1;
+
+  // 2k1000 irq0 route to core0 int0, which is related to bit2 of ECFG/ESTAT
+  *(volatile unsigned int*)ENTRY0 = 0x10;
+
+  
+
 }
 
 // add a character to the output buffer and tell the

@@ -3,17 +3,18 @@
 #include "include/spinlock.h"
 #include "include/string.h"
 #include "include/types.h"
+#include "include/new_sdcard.h"
 
-#define NRAMDISKPAGES (sddata_size * BSIZE / PGSIZE)
+#define NRAMDISKPAGES (new_sdcard_len * BSIZE / PGSIZE)
 
 struct spinlock ramdisklock;
-extern uchar sddata_start[];
-extern uchar sddata_end[];
+extern uchar new_sdcard[];
+extern uint32 new_sdcard_len;
 char *ramdisk;
 
 void ramdisk_init(void) {
   initlock(&ramdisklock, "ramdisk lock");
-  ramdisk = (char *)sddata_start;
+  ramdisk = (char *)new_sdcard;
   printf("ramdiskinit ram start:%p\n", ramdisk);
 }
 

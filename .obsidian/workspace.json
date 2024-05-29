@@ -1,19 +1,19 @@
 {
   "main": {
-    "id": "3cb61ffebab0079f",
+    "id": "aa564eecc5222b37",
     "type": "split",
     "children": [
       {
-        "id": "4cf203a9200b017c",
+        "id": "07cfb86d221ac2d8",
         "type": "tabs",
         "children": [
           {
-            "id": "6a290fc95741e312",
+            "id": "a0aca158f748742c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "doc/内核介绍/chap1：内存管理.md",
+                "file": "doc/内核介绍/chap3：进程管理.md",
                 "mode": "source",
                 "source": false
               }
@@ -25,15 +25,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "97ea8a380545bdd0",
+    "id": "de3923057017a6c6",
     "type": "split",
     "children": [
       {
-        "id": "6832aa9fabee9f98",
+        "id": "72a4b4b818a1222c",
         "type": "tabs",
         "children": [
           {
-            "id": "5036605fcbe02dcd",
+            "id": "ab7b60b5148e8b35",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -43,7 +43,7 @@
             }
           },
           {
-            "id": "c87a55c11a1f66a7",
+            "id": "5b968af7649b60c8",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -58,7 +58,7 @@
             }
           },
           {
-            "id": "b4b0a75418d651d8",
+            "id": "4b580ab90c07e217",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -72,20 +72,20 @@
     "width": 300
   },
   "right": {
-    "id": "4cb7a4ee8c297326",
+    "id": "f1b714f1302e0d6d",
     "type": "split",
     "children": [
       {
-        "id": "f612c677e7c42f0f",
+        "id": "921227f7cf6f683b",
         "type": "tabs",
         "children": [
           {
-            "id": "6ffb3e276077eeab",
+            "id": "7c8ccffd3411661f",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "doc/内核介绍/chap1：内存管理.md",
+                "file": "doc/内核介绍/chap3：进程管理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,19 +97,19 @@
             }
           },
           {
-            "id": "a6df6f5fa0c5e712",
+            "id": "fd21eac32e83c948",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "doc/内核介绍/chap1：内存管理.md",
+                "file": "doc/内核介绍/chap3：进程管理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
             }
           },
           {
-            "id": "724be495c65f8cee",
+            "id": "9cf62d1d00ada62f",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -120,21 +120,21 @@
             }
           },
           {
-            "id": "a8d7e88642e995e6",
+            "id": "3c3b5284247830d9",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "doc/内核介绍/chap1：内存管理.md"
+                "file": "doc/内核介绍/chap3：进程管理.md"
               }
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -146,27 +146,47 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "6a290fc95741e312",
+  "active": "ab7b60b5148e8b35",
   "lastOpenFiles": [
-    "doc/内核介绍/picture",
-    "doc/内核介绍/chap4：系统调用.md",
+    "doc/内核介绍/系统设计与实现.md",
     "doc/内核介绍/chap3：进程管理.md",
-    "doc/内核介绍/chap2：文件系统.md",
+    "doc/内核介绍/chap4：系统调用.md",
     "doc/内核介绍/chap1：内存管理.md",
-    "doc/内核介绍/README.md",
     "doc/README.md",
-    "doc/内核介绍",
-    "doc/基于LA的OS的特点分析/NPUcore+LA.md",
+    "doc/内核介绍/picture/pic_3.drawio.png",
+    "doc/内核介绍/picture/pic_2.drawio.png",
+    "doc/内核介绍/picture/pic_1.jpg",
+    "doc/内核介绍/picture/Pasted image 20240521183010.png",
+    "doc/内核介绍/picture/Pasted image 20240520184848.png",
     "doc/系统设计与实现.md",
-    "doc/基于LA的OS的特点分析/StarryOS-LoongArch.md",
-    "doc/picture/pic_3.drawio.png",
-    "doc/picture/pic_2.drawio.png",
-    "doc/picture/Pasted image 20240521183010.png",
-    "doc/picture/pic_1.jpg",
-    "doc/picture/进程关系.png",
-    "doc/picture/Pasted image 20240520184848.png",
-    "doc/picture",
+    "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
+    "doc/内核介绍/chap2：文件系统.md",
+    "doc/内核介绍/README.md",
+    "doc/Loongarch介绍/picture/exception.csv",
+    "doc/Loongarch介绍/picture/Pasted image 20240509103251.png",
+    "doc/Loongarch介绍/picture/Pasted image 20240509103054.png",
+    "doc/Loongarch介绍/picture/Pasted image 20240508185805.png",
+    "doc/Loongarch介绍/picture/Pasted image 20240508185358.png",
+    "doc/Loongarch介绍/picture/Pasted image 20240508182241.png",
+    "doc/Loongarch介绍/loongarch架构详细介绍.md",
+    "doc/Loongarch介绍/la和rv架构比较.md",
+    "doc/Loongarch介绍/Loongarch架构简要介绍.md",
+    "系统设计与实现.md",
+    "picture",
+    "user/zombie.c",
+    "user/wc.c",
+    "user/usys.pl",
+    "user/usertests.c",
+    "user/user.h",
+    "user/user copy.h",
+    "user/umalloc.c",
+    "user/ulib.c",
     "doc/异常 & 系统调用开发.md",
-    "进程管理模式.md"
+    "doc/基于LA的OS的特点分析/StarryOS-LoongArch.md",
+    "doc/Loongarch介绍/loongarch架构.md",
+    "doc/Loongarch介绍/loongarch与risc-v比较.md",
+    "doc/AVX-LA开发记录/basic-kernel-v1.2.md",
+    "doc/AVX-LA开发记录/basic-kernel-1.3.md",
+    "README.md"
   ]
 }

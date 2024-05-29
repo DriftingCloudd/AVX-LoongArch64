@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "doc/内核介绍/chap3：进程管理.md",
+                "file": "doc/内核介绍/README.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "doc/内核介绍/chap3：进程管理.md",
+                "file": "doc/内核介绍/README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "doc/内核介绍/chap3：进程管理.md",
+                "file": "doc/内核介绍/README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "doc/内核介绍/chap3：进程管理.md"
+                "file": "doc/内核介绍/README.md"
               }
             }
           }
@@ -146,10 +146,10 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "ab7b60b5148e8b35",
+  "active": "a0aca158f748742c",
   "lastOpenFiles": [
-    "doc/内核介绍/系统设计与实现.md",
     "doc/内核介绍/chap3：进程管理.md",
+    "doc/内核介绍/系统设计与实现.md",
     "doc/内核介绍/chap4：系统调用.md",
     "doc/内核介绍/chap1：内存管理.md",
     "doc/README.md",

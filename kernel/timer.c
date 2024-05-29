@@ -63,7 +63,7 @@ void timer_tick() {
   acquire(&tickslock);
   ticks++;
   #ifdef  DEBUG
-  printf("timer_tick():tick++, now tick is %d",ticks);
+  printf("timer_tick():tick++, now tick is %d\n\n",ticks);
   #endif
   wakeup(&ticks);
   release(&tickslock);

@@ -442,6 +442,7 @@ void syscall(void) {
         num != SYS_clock_gettime && num != SYS_sendto && num != SYS_recvfrom)
       printf("pid %d call %d: %s\n", p->pid, num, sysnames[num]);
     p->trapframe->a0 = syscalls[num]();
+    
     if (num == SYS_openat && p->trapframe->a0 == -1) {
       printf("pid %d: openat failed\n", p->pid);
     }

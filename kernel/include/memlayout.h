@@ -53,6 +53,8 @@
 // 2k1000 puts UART registers here in virtual memory.
 #define UART0 (0x1fe20000UL | DMWIN_MASK)
 #define UART0_IRQ 2
+#define KEYBOARD_IRQ 3
+#define MOUSE_IRQ 4
 
 // 7段寄存器
 /* ============== LS7A registers =============== */

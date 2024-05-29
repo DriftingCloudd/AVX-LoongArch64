@@ -50,5 +50,6 @@ void uartputc_sync(int c);
 void uartstart();
 int uartgetc(void);
 void uartintr(void);
+void uart_intr_init(void);
 
 #endif

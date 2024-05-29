@@ -44,6 +44,7 @@
 
 // 低48位掩码
 #define DMWIN_MASK 0x9000000000000000
+#define DMWIN1_MASK 0x8000000000000000
 // #define DMWIN_MASK 0x9 << 0x60
 // by llh
 // #define DMWIN_MASK ((__uint128_t)0x9 << 0x60)
@@ -51,8 +52,16 @@
 #define MAKE_DMWIN(pagetable) (DMWIN | (((uint64)pagetable) >> 12))
 
 // 2k1000 puts UART registers here in virtual memory.
-#define UART0 (0x1fe20000UL | DMWIN_MASK)
+#define UART0 (0x1fe20000UL | DMWIN1_MASK)
 #define UART0_IRQ 2
+#define KEYBOARD_IRQ 3
+#define MOUSE_IRQ 4
+
+#define INTISR0 0x800000001fe01420
+#define INTEN0  0x800000001fe01424
+#define INTENSET0 0x800000001fe01428
+#define INTENCLR0 0x800000001fe0142c
+#define ENTRY0 0x800000001fe01400
 
 // 7段寄存器
 /* ============== LS7A registers =============== */

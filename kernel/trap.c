@@ -37,6 +37,11 @@ void
 trapinit(void)
 {
   initlock(&tickslock, "time");
+
+  printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
+  // uart_intr_init();
+  printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
+
   uint32 ecfg = ( 0U << CSR_ECFG_VS_SHIFT ) | HWI_VEC | TI_VEC;
   // uint64 tcfg = 0x1000000UL | CSR_TCFG_EN | CSR_TCFG_PER;
   w_csr_ecfg(ecfg);
@@ -49,6 +54,7 @@ trapinit(void)
   // 倒计时定时器开始倒计时
   countdown_timer_init();
   intr_on();
+  printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
 }
 
 //
@@ -111,6 +117,7 @@ usertrap(void)
     // load page fault or store page fault
     // check if the page fault is caused by stack growth
     printf("usertrap():handle stack page fault\n");
+    panic("usertrap():handle stack page fault\n");
   } 
   else if((which_dev = devintr()) != 0){
     // ok
@@ -127,8 +134,12 @@ usertrap(void)
     exit(-1);
 
   // give up the CPU if this is a timer interrupt.
-  if(which_dev == 2)
+  if(which_dev == 2){
     yield();
+    // uartintr();
+    p->utime++;
+  }
+    
 
   usertrapret();
 }
@@ -229,7 +240,11 @@ kerneltrap()
     printf("era=%p eentry=%p\n", r_csr_era(), r_csr_eentry());
     panic("kerneltrap");
   }
+  // printf ("which_dev=%d\n", which_dev);
 
+  if (which_dev == 2 && myproc() != 0) {
+    myproc()->ktime++;
+  }
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
     yield();
@@ -266,33 +281,35 @@ devintr()
   uint32 estat = r_csr_estat();
   uint32 ecfg = r_csr_ecfg();
 
+  // printf("devintr():estat=%x, ecfg=%x\n", estat, ecfg);
+
   
   //CSR.ESTAT.IS & CSR.ECFG.LIE -> int_vec(13bits stand for irq type)
   if(estat & ecfg & HWI_VEC) {
     // this is a hardware interrupt, via IOCR.
 
-    // irq indicates which device interrupted.
-    uint64 irq = extioi_claim();
-    if(irq & (1UL << UART0_IRQ)){
+    if(estat & ecfg & (1UL << UART0_IRQ)){
       uartintr();
 
     // tell the apic the device is
     // now allowed to interrupt again.
 
-      extioi_complete(1UL << UART0_IRQ);
-    } else if(irq){
-       printf("unexpected interrupt irq=%d\n", irq);
 
-      apic_complete(irq); 
-      extioi_complete(irq);        
+      // extioi_complete(1UL << UART0_IRQ);
+    } else if(ecfg & estat){
+       printf("unexpected interrupt estate %x, ecfg %x \n", estat, ecfg);   
+    
+      // apic_complete(irq); 
+      // extioi_complete(irq);  
     }
-
+    
     return 1;
   } else if(estat & ecfg & TI_VEC){
     //timer interrupt,
 
     if(cpuid() == 0){
       clockintr();
+      uartintr();
       // timer_tick();
     }
     

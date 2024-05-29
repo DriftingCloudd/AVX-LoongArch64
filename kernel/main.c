@@ -61,9 +61,9 @@ void main() {
     // threadInit();
     procinit();
 
-    apic_init();     // set up LS7A1000 interrupt controller
-//printf("apicinit\n");
-    extioi_init();   // extended I/O interrupt controller
+    // apic_init();     // set up LS7A1000 interrupt controller
+    // printf("apicinit\n");
+    // extioi_init();   // extended I/O interrupt controller
     // plicinit();
     // plicinithart();
     // // sd_test();

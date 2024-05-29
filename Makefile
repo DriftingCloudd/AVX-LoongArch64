@@ -1,6 +1,6 @@
 # platform	:= visionfive
 # platform	:= qemu
-mode := debug
+# mode := debug
 # mode := release
 
 K=kernel

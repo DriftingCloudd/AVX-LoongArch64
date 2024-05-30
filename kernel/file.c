@@ -222,6 +222,10 @@ int fileread(struct file *f, uint64 addr, int n) {
     // printf("fileread: major:%d\n", f->major);
     if (f->major < 0 || f->major >= NDEV || !devsw[f->major].read)
       return -1;
+
+    // check the intr is on or off
+    // intr_on();
+    // printf("estat is %p\n", r_csr_estat());
     r = devsw[f->major].read(1, addr, n);
     break;
   case FD_ENTRY:

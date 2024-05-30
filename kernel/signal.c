@@ -5,6 +5,7 @@
 #include "include/printf.h"
 #include "include/proc.h"
 #include "include/types.h"
+#include "include/string.h"
 
 int set_sigaction(int signum, sigaction const *act, sigaction *oldact) {
 

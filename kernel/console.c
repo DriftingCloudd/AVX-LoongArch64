@@ -16,7 +16,6 @@
 #include "include/param.h"
 #include "include/proc.h"
 #include "include/loongarch.h"
-// #include "include/sbi.h"
 #include "include/sleeplock.h"
 #include "include/spinlock.h"
 #include "include/types.h"
@@ -78,7 +77,6 @@ int consoleread(int user_dst, uint64 dst, int n) {
   uint target;
   int c;
   char cbuf;
-  // printf("consoleread\n");
 
   target = n;
   acquire(&cons.lock);
@@ -117,8 +115,6 @@ int consoleread(int user_dst, uint64 dst, int n) {
       // the user-level read().
       break;
     }
-    
-
   }
   release(&cons.lock);
 
@@ -175,13 +171,8 @@ void consoleintr(int c) {
 
 void consoleinit(void) {
   initlock(&cons.lock, "cons");
-// #ifdef QEMU
   uartinit();
-// #endif
-// #ifdef visionfive
-//   uart8250_init(UART, 24000000, 115200, 2, 4, 0);
-// #endif
-  // cons.e = cons.w = cons.r = 0;
+
 
   // connect read and write system calls
   // to consoleread and consolewrite.

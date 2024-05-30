@@ -70,7 +70,7 @@ static void printptr(uint64 x) {
 
 
 void serious_print(char *fmt, ...) {
-// #ifndef EXAM
+#ifndef EXAM
   va_list ap;
   int i, c;
   int locking;
@@ -122,7 +122,7 @@ void serious_print(char *fmt, ...) {
   }
   if (locking)
     release(&pr.lock);
-// #endif
+#endif
 }
 
 // Print to the console. only understands %d, %x, %p, %s.
@@ -210,12 +210,12 @@ void printf(char *fmt, ...) {
 
 void panic(char *s) {
   if (strncmp(s, "No futex Resource!", 18) == 0) {
-    // exit(0);
+    exit(0);
   }
-  printf("%p\n", s);  // 这个地方原本使用的是serious_print
-  printf("panic: ");
-  printf(s);
-  printf("\n");
+  serious_print("%p\n", s);
+  serious_print("panic: ");
+  serious_print(s);
+  serious_print("\n");
   backtrace();
   panicked = 1; // freeze uart output from other CPUs
   for (;;)
@@ -225,10 +225,10 @@ void panic(char *s) {
 void backtrace() {
   uint64 *fp = (uint64 *)r_fp();
   uint64 *bottom = (uint64 *)PGROUNDUP((uint64)fp);
-  printf("backtrace:\n");   //这个地方原本使用的是serious_print()
+  serious_print("backtrace:\n");
   while (fp < bottom) {
     uint64 ra = *(fp - 1);
-    printf("%p\n", ra - 4);     //同上
+    serious_print("%p\n", ra - 4);
     fp = (uint64 *)*(fp - 2);
   }
 }
@@ -236,10 +236,6 @@ void backtrace() {
 void printfinit(void) {
   initlock(&pr.lock, "pr");
   pr.locking = 1; // changed, used to be 1
-  
-  #ifdef DEBUG
-  printf("DEBUG:printf initialzie.\n");
-  #endif
 }
 
 // #ifdef QEMU

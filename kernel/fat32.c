@@ -99,7 +99,7 @@ int fat32_init() {
   b = bread(0, 0);
 // #endif
   if (strncmp((char const *)(b->data + 82), "FAT32", 5))
-    panic("not FAT32 volume\n");
+    panic("not FAT32 volume");
   // fat.bpb.byts_per_sec = *(uint16 *)(b->data + 11);
   memmove(&fat.bpb.byts_per_sec, b->data + 11,
           2); // avoid misaligned load on k210
@@ -130,7 +130,7 @@ int fat32_init() {
 
   // make sure that byts_per_sec has the same value with BSIZE
   if (BSIZE != fat.bpb.byts_per_sec)
-    panic("byts_per_sec != BSIZE\n");
+    panic("byts_per_sec != BSIZE");
   initlock(&ecache.lock, "ecache");
   memset(&root, 0, sizeof(root));
   initsleeplock(&root.lock, "entry");
@@ -173,7 +173,7 @@ static inline uint32 first_sec_of_clus(uint32 cluster) {
  */
 static inline uint32 fat_sec_of_clus(uint32 cluster, uint8 fat_num) {
   if (cluster < 2 || cluster > fat.data_clus_cnt + 1)   // 当cluster不在合法范围内，panic
-    panic("cluster number error\n");
+    panic("cluster number error");
   if (fat_num > fat.bpb.fat_cnt)
     panic("FAT number error");
   return fat.bpb.rsvd_sec_cnt + (cluster << 2) / fat.bpb.byts_per_sec +
@@ -187,7 +187,7 @@ static inline uint32 fat_sec_of_clus(uint32 cluster, uint8 fat_num) {
  */
 static inline uint32 fat_offset_of_clus(uint32 cluster) {
   if(cluster < 2 || cluster > fat.data_clus_cnt + 1)
-    panic("cluster number error\n");
+    panic("cluster number error");
   return (cluster << 2) % fat.bpb.byts_per_sec;
 }
 
@@ -198,7 +198,7 @@ static inline uint32 fat_offset_of_clus(uint32 cluster) {
  */
 static uint32 read_fat(uint32 cluster) {
   if (cluster < 2)
-    panic("cluster number error when read FAT \n");
+    panic("cluster number error when read FAT ");
 
   if (cluster >= FAT32_EOC) {   //cluster >= FAT32_EOC 时返回当前clutser
     return cluster;
@@ -222,7 +222,7 @@ static uint32 read_fat(uint32 cluster) {
  * FAT end of chain flag
  */
 static int write_fat(uint32 cluster, uint32 content) {
-  if (cluster < 2 || cluster > fat.data_clus_cnt + 1) {
+  if (cluster < 2) {
     panic("cluster number error when write in FAT\n");
   }
   uint32 fat_sec = fat_sec_of_clus(cluster, 1);
@@ -254,7 +254,7 @@ static uint32 alloc_clus(uint8 dev) {
   struct buf *b;
   uint32 sec = fat.bpb.rsvd_sec_cnt;
   uint32 const ent_per_sec = fat.bpb.byts_per_sec / sizeof(uint32);
-  for (uint32 i = 0; i < fat.bpb.fat_sz; i++, sec++) {  // 
+  for (uint32 i = 0; i < fat.bpb.fat_sz; i++, sec++) {   
     b = bread(dev, sec);
     for (uint32 j = 0; j < ent_per_sec; j++) {
       if (((uint32 *)(b->data))[j] == 0) {
@@ -283,7 +283,7 @@ static void free_clus(uint32 cluster) { write_fat(cluster, 0); }
  * @param   n           the number of bytes to read/write
  * @return              the offset from the new cur_clus
  */
-static uint rw_clus(uint32 cluster, int write, int user, uint64 data_add, uint off,
+static uint rw_clus(uint32 cluster, int write, int user, uint64 data, uint off,
                     uint n) {
   if (off + n > fat.byts_per_clus)
     panic("offset out of range");
@@ -294,19 +294,19 @@ static uint rw_clus(uint32 cluster, int write, int user, uint64 data_add, uint o
   off = off % fat.bpb.byts_per_sec;
 
   int bad = 0;
-  for (tot = 0; tot < n; tot += m, off += m, data_add += m, sec++) {    // read or write m bytes data a time
+  for (tot = 0; tot < n; tot += m, off += m, data += m, sec++) {    // read or write m bytes data a time
     bp = bread(0, sec);     // dev =0 ,maybe need to change when more drivers are included
     m = BSIZE - off % BSIZE;    // m is the size of remaining area in current sector 
     if (n - tot < m) {     // if m is enough
       m = n - tot;
     }
     if (write) {
-      if ((bad = either_copyin(bp->data + (off % BSIZE), user, data_add, m)) !=
+      if ((bad = either_copyin(bp->data + (off % BSIZE), user, data, m)) !=
           -1) {
         bwrite(bp);
       }
     } else {
-      bad = either_copyout(user, data_add, bp->data + (off % BSIZE), m);
+      bad = either_copyout(user, data, bp->data + (off % BSIZE), m);
     }
     brelse(bp);
     if (bad == -1) {

@@ -6,7 +6,7 @@
 #include "types.h"
 #include "spinlock.h"
 #include "file.h"
-// #include "fat32.h"
+#include "fat32.h"
 // #include "thread.h"
 #include "trap.h"
 #include "vma.h"
@@ -51,7 +51,6 @@ struct cpu {
 
 extern struct cpu cpus[NCPU];
 
-// enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
 // DEFINED IN XV6_PROC
@@ -156,7 +155,8 @@ typedef struct rlimit {
 // #define THREAD_TOTAL_NUMBER (1 << LOG_PROCESS_NUM)
 // #define PROCESS_OFFSET(processId) ((processId) & (THREAD_TOTAL_NUMBER - 1))
 
- void            cpuinit(void);
+void            cpuinit(void);
+void            reg_info(void);
 int             cpuid(void);
 void            exit(int);
 int             fork(void);
@@ -188,5 +188,4 @@ uint64          clone(uint64 new_stack, uint64 new_fn);
 // uint64          thread_clone(uint64 stackVa,uint64 ptid,uint64 tls,uint64 ctid);
 // struct proc*    threadalloc(void (*fn)(void *), void *arg);
 int             get_proc_addr_num(struct proc *p);
-void            reg_info(void);
 #endif

@@ -1,5 +1,4 @@
 .vscode/*
 .obsidian/*
-kernel/2kfs.img
-kernel/sdcard-loongarch.img/*
-kernel/new_sdcard.img
+kernel/sdcard_loongarch/new_sdcard.img
+

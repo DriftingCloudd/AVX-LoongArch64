@@ -11,38 +11,38 @@
 #endif
 
 void disk_init(void) {
-// #ifdef QEMU
-//   virtio_disk_init();
-// #else
+#ifdef QEMU
+   virtio_disk_init();
+#else
   // sdcard_init();
   ramdisk_init();
-// #endif
+#endif
 }
 
 void disk_read(struct buf *b) {
-// #ifdef QEMU
-//   virtio_disk_rw(b, 0);
-// #else
+#ifdef QEMU
+  virtio_disk_rw(b, 0);
+#else
   // sdcard_read_sector(b->data, b->sectorno);
   // sd_read((uint32*)b->data, 128, b->sectorno);
   ramdisk_read(b);
-// #endif
+#endif
 }
 
 void disk_write(struct buf *b) {
-// #ifdef QEMU
-//   virtio_disk_rw(b, 1);
-// #else
+#ifdef QEMU
+  virtio_disk_rw(b, 1);
+#else
   // sdcard_write_sector(b->data, b->sectorno);
   ramdisk_write(b);
-// #endif
+#endif
 }
 
 void disk_intr(void) {
-// #ifdef QEMU
-//   virtio_disk_intr();
-// #else
+#ifdef QEMU
+  virtio_disk_intr();
+#else
   printf("should not have disk intr");
 // dmac_intr(DMAC_CHANNEL0);
-// #endif
+#endif
 }

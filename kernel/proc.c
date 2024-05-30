@@ -1,5 +1,5 @@
 #include "include/proc.h"
-// #include "include/fat32.h"
+#include "include/fat32.h"
 #include "include/file.h"
 // #include "include/futex.h"
 #include "include/intr.h"
@@ -13,7 +13,6 @@
 #include "include/trap.h"
 #include "include/types.h"
 #include "include/vm.h"
-
 #include "include/vma.h"
 
 // bin.S
@@ -21,53 +20,36 @@
 extern uchar initcode[];
 extern int initcodesize;
 // extern thread *free_thread;
-// to delete
 extern char trampoline[];
 struct cpu cpus[NCPU];
-// 设置进程池
+
 struct proc proc[NPROC];
+
 struct proc *initproc;
 
 int nextpid = 1;
 struct spinlock pid_lock;
-struct spinlock wait_lock;
 
 extern void forkret(void);
 extern int magic_count;
-
-// swtch.S
 extern void swtch(struct context *, struct context *);
-// used for wait();
 static void wakeup1(struct proc *chan);
 static void freeproc(struct proc *p);
 
-struct proc *initproc;
 
-// extern thread threads[];
 extern char trampoline[];       // trampoline.S
 extern char signalTrampoline[]; // signalTrampoline.S
 
 void reg_info(void) {
   printf("register info: {\n");
-//   printf("sstatus: %p\n", r_sstatus());
-printf("prmd: %p\n", r_csr_prmd());
-//   printf("sip: %p\n", r_sip());
-//todo
-//   printf("sie: %p\n", r_sie());
-printf("ecfg: %p\n", r_csr_ecfg());
-//   printf("sepc: %p\n", r_sepc());
-printf("era: %p\n", r_csr_era());
-//   printf("stvec: %p\n", r_stvec());
-printf("eentry: %p\n", r_csr_eentry());
-//   printf("satp: %p\n", r_satp());
-printf("pgdl: %p\n", r_csr_pgdl());
-//   printf("scause: %p\n", r_scause());
-printf("estatus: %p\n", r_csr_estat());
-//   printf("stval: %p\n", r_stval());
-
+  printf("prmd: %p\n", r_csr_prmd());
+  printf("ecfg: %p\n", r_csr_ecfg());
+  printf("era: %p\n", r_csr_era());
+  printf("eentry: %p\n", r_csr_eentry());
+  printf("pgdl: %p\n", r_csr_pgdl());
+  printf("estatus: %p\n", r_csr_estat());
   printf("sp: %p\n", r_sp());
   printf("tp: %p\n", r_tp());
-  // printf("ra: %p\n", r_ra());
   printf("}\n");
 }
 
@@ -81,22 +63,6 @@ void cpuinit(void) {
 }
 
 // initialize the proc table at boot time.
-// void procinit(void)
-// {
-//   struct proc *p;
-  
-//   initlock(&pid_lock, "nextpid");
-//   initlock(&wait_lock, "wait_lock");
-//   for(p = proc; p < &proc[NPROC]; p++) {
-//       initlock(&p->lock, "proc");
-//       p->state = UNUSED;
-//       p->pid = 0;//boot_time
-//       for (int i = 0; i < NOFILE; i++)
-//         p->ofile[i] = 0;
-//       p->kstack = KSTACK((int) (p - proc)); 
-//   }
-// }
-
 void procinit(void) {
   struct proc *p;
   magic_count = 0;
@@ -114,8 +80,8 @@ void procinit(void) {
     p->sz = 0;
     p->pagetable = 0;
     p->trapframe = 0;
-      for (int i = 0; i < NOFILE; i++)
-        p->ofile[i] = 0;
+    for (int i = 0; i < NOFILE; i++)
+      p->ofile[i] = 0;
     p->cwd = 0;
     p->name[0] = 0;
     p->vma = 0;
@@ -143,14 +109,12 @@ void procinit(void) {
   memset(cpus, 0, sizeof(cpus));
 #ifdef DEBUG
   printf("procinit\n");
-  reg_info();
 #endif
 }
 
 // Must be called with interrupts disabled,
 // to prevent race with process being moved
 // to a different CPU.
-
 int cpuid() {
   int id = r_tp();
   return id;
@@ -159,7 +123,6 @@ int cpuid() {
 // Return this CPU's cpu struct.
 // Interrupts must be disabled.
 struct cpu *mycpu(void) {
-  // get CPU_ID
   int id = cpuid();
   struct cpu *c = &cpus[id];
 
@@ -178,7 +141,6 @@ struct proc *myproc(void) {
 // 分配进程id
 int allocpid() {
   int pid;
-  // atomic
   acquire(&pid_lock);
   pid = nextpid;
   nextpid = nextpid + 1;
@@ -190,7 +152,6 @@ int allocpid() {
 static void copycontext(context *t1, context *t2) {
   t1->ra = t2->ra;
   t1->sp = t2->sp;
-  //---// 
   t1->s0 = t2->s0;
   t1->s1 = t2->s1;
   t1->s2 = t2->s2;
@@ -299,7 +260,6 @@ found:
   memset(p->sig_set.__val, 0, sizeof(p->sig_set));
   memset(p->sig_pending.__val, 0, sizeof(p->sig_pending));
   // Allocate a trapframe page.
-  // trapframes :TODO
   if ((p->trapframe = (struct trapframe *)kalloc()) == NULL) {
     release(&p->lock);
     return NULL;
@@ -316,9 +276,9 @@ found:
   
   p->kstack = PROCVKSTACK(get_proc_addr_num(p));
 
-  // p->exec_close = kalloc();
-  // for (int fd = 0; fd < NOFILE; fd++)
-  //   p->exec_close[fd] = 0;
+  p->exec_close = kalloc();
+  for (int fd = 0; fd < NOFILE; fd++)
+    p->exec_close[fd] = 0;
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
@@ -351,7 +311,7 @@ static void freeproc(struct proc *p) {
   if (p->trapframe)
     kfree((void *)p->trapframe);
 
-  // kfree((void *)p->exec_close);
+  kfree((void *)p->exec_close);
   p->trapframe = 0;
 
   // thread *t = p->thread_queue;
@@ -444,49 +404,36 @@ void proc_freepagetable(pagetable_t pagetable, uint64 sz) {
   vmunmap(pagetable, TRAPFRAME, 1, 0);
   uvmfree(pagetable, sz);
 }
-// // xv6 mode-> no initcode.S file
-// a user program that calls exec("/init")
-// od -t xC initcode
-// uchar initcode[] = {
-//   0x04, 0x00, 0x00, 0x1c, 0x84, 0x00, 0xc1, 0x28,
-//   0x05, 0x00, 0x00, 0x1c, 0xa5, 0x00, 0xc1, 0x28,
-//   0x0b, 0x1c, 0x80, 0x03, 0x00, 0x00, 0x2b, 0x00, 
-//   0x0b, 0x08, 0x80, 0x03, 0x00, 0x00, 0x2b, 0x00,
-//   0xff, 0xfb, 0xff, 0x57, 0x2f, 0x69, 0x6e, 0x69,
-//   0x74, 0x00, 0x00, 0x00, 0x24, 0x00, 0x00, 0x00,
-//   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-//   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//   0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-//   0x2c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-// };
 
 // Set up first user process.
-void userinit(void)
-{
+void userinit(void) {
   struct proc *p;
+
   p = allocproc();
   initproc = p;
-  
+
   // allocate one user page and copy init's instructions
   // and data into it.
-  // uvminit(p->pagetable, p->kpagetable, initcode, sizeof(initcode));
   uvminit(p->pagetable, initcode, initcodesize);
   p->sz = initcodesize;
   p->sz = PGROUNDUP(p->sz);
 
   // prepare for the very first "return" from kernel to user.
-  p->trapframe->era = 0x0;      // user program counter
   alloc_vma_stack(p);
   p->trapframe->sp = get_proc_sp(p); // user stack pointer
-  // p->trapframe->sp = PGSIZE;  // user stack pointer 
+  
+   p->trapframe->era = 0x0;      // user program counter
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
-  p->cwd = ename("/"); 
+  // p->cwd = ename("/"); 
   p->state = RUNNABLE;
+  p->tmask = 0;
+
+
   release(&p->lock);
-  printf("p name %s\n", p->name);
+
   #ifdef DEBUG
-    reg_info();
+    printf("userinit\n");
   #endif
 }
 
@@ -523,7 +470,6 @@ int fork(void) {
 
   // Copy user memory from parent to child.
   if (uvmcopy(p->pagetable, np->pagetable,  p->sz) < 0) {
-    // trapframe
     freeproc(np);
     release(&np->lock);
     return -1;
@@ -553,8 +499,6 @@ int fork(void) {
   np->trapframe->a0 = 0;
   // copytrapframe(np->main_thread->trapframe, np->trapframe);
   // increment reference counts on open file descriptors.
-  // 分配新的进程号
-
   for (i = 0; i < NOFILE; i++)
     if (p->ofile[i])
       np->ofile[i] = filedup(p->ofile[i]);
@@ -615,7 +559,7 @@ void exit(int status) {
       p->ofile[fd] = 0;
     }
   }
-  // file_system
+
   eput(p->cwd);
   p->cwd = 0;
   // checkup1(p);
@@ -727,8 +671,7 @@ int wait(uint64 addr) {
 void scheduler(void) {
   struct proc *p;
   struct cpu *c = mycpu();
-  // vm.c 
-  // extern pagetable_t kernel_pagetable;
+
 
   c->proc = 0;
   for (;;) {
@@ -799,20 +742,18 @@ void scheduler(void) {
         printf("scheduler(): p->pagetable %x\n", p->pagetable);
         #endif
         // w_satp(MAKE_SATP(p->kpagetable));
-        // sfence_vma();
-        // flush_TLB();
         swtch(&c->context, &p->context);
         // copycontext(&p->main_thread->context, &p->context);
         // w_csr_pgdl((uint64)(p->pagetable));
         // w_satp(MAKE_SATP(p->kpagetable));
-        // sfence_vma();
-        // flush_TLB();
+
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
 
         found = 1;
       }
+      // printf("estat is %p\n", r_csr_estat());
       release(&p->lock);
     }
     if (found == 0) {
@@ -963,7 +904,7 @@ int kill(int pid, int sig) {
   for (p = proc; p < &proc[NPROC]; p++) {
     acquire(&p->lock);
     if (p->pid == pid) {
-      // p->sig_pending.__val[0] |= (1 << (sig))
+      p->sig_pending.__val[0] |= (1 << (sig));
       if (p->killed == 0 || p->killed > sig) {
         p->killed = sig;
       }

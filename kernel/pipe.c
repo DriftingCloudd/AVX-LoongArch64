@@ -9,6 +9,7 @@
 #include "include/spinlock.h"
 #include "include/types.h"
 #include "include/vm.h"
+#include "include/string.h"
 
 int pipealloc(struct file **f0, struct file **f1) {
   struct pipe *pi;

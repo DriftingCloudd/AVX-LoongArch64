@@ -1,12 +1,21 @@
 # platform	:= visionfive
-# platform	:= qemu
-mode := debug
-# mode := release
+platform	:= ramdisk
+mode 		:= 
+# mode 		:= release
 
 K=kernel
 U=user
 T=target
-linker = ./kernel.ld
+I=include
+IMG=sdcard_loongarch
+linker = ld/kernel.ld
+initcode-ld = ld/initcode.ld
+
+imgname = new_sdcard2.img
+headername = sdcard.h
+sdcard_img = $(K)/$(IMG)/$(imgname)
+sdcard_h = $(K)/$(I)/$(headername)
+
 
 OBJS += \
   $K/entry.o \
@@ -65,9 +74,9 @@ OBJS += \
 #   $K/time.o \
 
 
-# ifeq ($(platform), qemu)
-# OBJS += \
-#   $K/virtio_disk.o \
+ifeq ($(platform), qemu)
+OBJS += \
+  $K/virtio_disk.o \
 #   #$K/uart.o \
 
 # else
@@ -82,7 +91,7 @@ OBJS += \
 #   $K/sysctl.o 
   
 
-# endif
+endif
 
 # LWIP_INCLUDES := \
 # 	-Ikernel/lwip/include \
@@ -172,14 +181,15 @@ endif
 # CFLAGS += -DEXAM 
 # endif 
 
-# ifeq ($(platform), qemu)
-# CFLAGS += -D QEMU
-# else ifeq ($(platform), k210)
+ifeq ($(platform), qemu)
+CFLAGS += -D QEMU
+else ifeq ($(platform), ramdisk)
 # CFLAGS += -D k210
 # else ifeq ($(platform), visionfive)
 # CFLAGS += -D visionfive
-OBJS += $K/sddata.o $K/ramdisk.o
-# endif
+OBJS += $K/ramdisk.o
+# OBJS += $K/sddata.o 
+endif
 
 LDFLAGS = -z max-page-size=4096 
 
@@ -203,7 +213,7 @@ $T/kernel: $(OBJS) $(linker) $U/initcode
 	$(LD) $(LDFLAGS) -T $(linker) -o $T/kernel $(OBJS)
 	$(OBJDUMP) -S $T/kernel > $T/kernel.asm
 	$(OBJDUMP) -t $T/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $T/kernel.sym
-	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
+	$(OBJCOPY) -O binary $T/kernel kernel.bin
 
 # %.o: %.S
 # 	$(CC) $(ASFLAGS) -c $< -o $@
@@ -216,7 +226,7 @@ $T/kernel: $(OBJS) $(linker) $U/initcode
 # build-grading: kernel-qemu
 # 	$(OBJCOPY) kernel-qemu --strip-all -O binary kernel-qemu.bin
 
-build: userprogs $T/kernel
+build: sdcard-ram userprogs $T/kernel 
 	$(OBJCOPY) $T/kernel --strip-all -O binary $(image)
 
 image = $T/kernel.bin
@@ -229,7 +239,7 @@ $K/bin.S:$U/initcode
 
 $U/initcode: $U/initcode.S
 	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
-	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o $U/initcode.out $U/initcode.o
+	$(LD) $(LDFLAGS) -N -e start -Ttext-segment 0 -T$(initcode-ld) -o $U/initcode.out $U/initcode.o
 	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
 	$(OBJDUMP) -S $U/initcode.o > $U/initcode.asm
 
@@ -321,6 +331,12 @@ userprogs: $(UPROGS)
 # 	@sudo cp $U/_sh $(dst)/sh
 # 	@sudo cp README $(dst)/README
 
+sdcard-ram: 
+	if [ -f $(sdcard_h) ]; then rm $(sdcard_h); fi
+	xxd -i $(sdcard_img) > $(sdcard_h);
+	sed -i 's/$(K)_$(IMG)_$(imgname)/sdcard/g' $(sdcard_h);
+	sed -i 's/$(K)_$(IMG)_$(imgname)_len/sdcard_len/g' $(sdcard_h);
+
 clean: 
 	rm -f *.tex *.dvi *.idx *.aux *.log *.ind *.ilg \
 	*/*.o */*.d */*.asm */*.sym kernel-qemu kernel-qemu.asm kernel-qemu.bin kernel-qemu.sym \
@@ -340,4 +356,5 @@ clean:
 	$K/lwip/*/*/*.o \
 	$K/lwip/*/*/*.d \
 	$K/*.a \
+	$(sdcard_h)\
 

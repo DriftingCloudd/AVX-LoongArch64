@@ -1,5 +1,5 @@
 #include "include/vm.h"
-// #include "include/elf.h"
+#include "include/elf.h"
 #include "include/kalloc.h"
 #include "include/memlayout.h"
 #include "include/param.h"

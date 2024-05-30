@@ -4,11 +4,14 @@
 #include "include/string.h"
 #include "include/types.h"
 #include "include/sdcard.h"
+
 #define NRAMDISKPAGES (sdcard_len * BSIZE / PGSIZE)
 
 struct spinlock ramdisklock;
+#ifdef RAMDISK_INCBIN
 extern uchar sdcard[];
 extern uint32 sdcard_len;
+#endif
 char *ramdisk;
 
 void ramdisk_init(void) {

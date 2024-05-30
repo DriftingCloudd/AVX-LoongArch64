@@ -1,719 +1,719 @@
 # Initial process that execs all.
 # This code runs in user space.
 
-#include "include/sysnum.h"
+#include "include/sysnum.S"
 
 # exec(init, argv)
 .globl start
 start:
-        li a0, 2    //O_RDWR
-        la a1, 1    //console
-        li a2, 0
-        li a7, SYS_dev
-        ecall	# dev(O_RDWR, CONSOLE, 0);
+        li.d $a0, 2    //O_RDWR
+        li.d   $a1, 1    //console
+        li.d $a2, 0
+        li.d $a7, SYS_dev
+        syscall 0	# dev(O_RDWR, CONSOLE, 0);
         
-        li a0, 0
-        li a7, SYS_dup
-        ecall	# dup(0);  // stdout
+        li.d $a0, 0
+        li.d $a7, SYS_dup
+        syscall 0	# dup(0);  // stdout
 
-        li a0, 0
-        li a7, SYS_dup
-        ecall	# dup(0);  // stderr
+        li.d $a0, 0
+        li.d $a7, SYS_dup
+        syscall 0	# dup(0);  // stderr
 //运行time_test
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_time_test
-	la a0, time_test
-	la a1, argv_time_test
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_time_test
+	la $a0, time_test
+	la $a1, argv_time_test
+	li.d $a7, SYS_exec
+	syscall 0
 after_time_test:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
 //输出echo "run busybox_testcode.sh"
 //echo_run_busybox_testcode
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_echo_run_busybox_testcode
-	la a0, busybox
-	la a1, argv_echo_run_busybox_testcode
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_echo_run_busybox_testcode
+	la $a0, busybox
+	la $a1, argv_echo_run_busybox_testcode
+	li.d $a7, SYS_exec
+	syscall 0
 after_echo_run_busybox_testcode:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_0
-	la a0, busybox
-	la a1, argv_busybox_0
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_0
+	la $a0, busybox
+	la $a1, argv_busybox_0
+	li.d $a7, SYS_exec
+	syscall 0
 after_0:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_1
-	la a0, busybox
-	la a1, argv_busybox_1
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_1
+	la $a0, busybox
+	la $a1, argv_busybox_1
+	li.d $a7, SYS_exec
+	syscall 0
 after_1:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_2
-	la a0, busybox
-	la a1, argv_busybox_2
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_2
+	la $a0, busybox
+	la $a1, argv_busybox_2
+	li.d $a7, SYS_exec
+	syscall 0
 after_2:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_3
-	la a0, busybox
-	la a1, argv_busybox_3
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_3
+	la $a0, busybox
+	la $a1, argv_busybox_3
+	li.d $a7, SYS_exec
+	syscall 0
 after_3:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_4
-	la a0, busybox
-	la a1, argv_busybox_4
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_4
+	la $a0, busybox
+	la $a1, argv_busybox_4
+	li.d $a7, SYS_exec
+	syscall 0
 after_4:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_5
-	la a0, busybox
-	la a1, argv_busybox_5
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_5
+	la $a0, busybox
+	la $a1, argv_busybox_5
+	li.d $a7, SYS_exec
+	syscall 0
 after_5:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_6
-	la a0, busybox
-	la a1, argv_busybox_6
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_6
+	la $a0, busybox
+	la $a1, argv_busybox_6
+	li.d $a7, SYS_exec
+	syscall 0
 after_6:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_7
-	la a0, busybox
-	la a1, argv_busybox_7
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_7
+	la $a0, busybox
+	la $a1, argv_busybox_7
+	li.d $a7, SYS_exec
+	syscall 0
 after_7:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_8
-	la a0, busybox
-	la a1, argv_busybox_8
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_8
+	la $a0, busybox
+	la $a1, argv_busybox_8
+	li.d $a7, SYS_exec
+	syscall 0
 after_8:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_9
-	la a0, busybox
-	la a1, argv_busybox_9
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_9
+	la $a0, busybox
+	la $a1, argv_busybox_9
+	li.d $a7, SYS_exec
+	syscall 0
 after_9:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_10
-	la a0, busybox
-	la a1, argv_busybox_10
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_10
+	la $a0, busybox
+	la $a1, argv_busybox_10
+	li.d $a7, SYS_exec
+	syscall 0
 after_10:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_11
-	la a0, busybox
-	la a1, argv_busybox_11
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_11
+	la $a0, busybox
+	la $a1, argv_busybox_11
+	li.d $a7, SYS_exec
+	syscall 0
 after_11:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_12
-	la a0, busybox
-	la a1, argv_busybox_12
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_12
+	la $a0, busybox
+	la $a1, argv_busybox_12
+	li.d $a7, SYS_exec
+	syscall 0
 after_12:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_13
-	la a0, busybox
-	la a1, argv_busybox_13
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_13
+	la $a0, busybox
+	la $a1, argv_busybox_13
+	li.d $a7, SYS_exec
+	syscall 0
 after_13:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_14
-	la a0, busybox
-	la a1, argv_busybox_14
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_14
+	la $a0, busybox
+	la $a1, argv_busybox_14
+	li.d $a7, SYS_exec
+	syscall 0
 after_14:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_15
-	la a0, busybox
-	la a1, argv_busybox_15
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_15
+	la $a0, busybox
+	la $a1, argv_busybox_15
+	li.d $a7, SYS_exec
+	syscall 0
 after_15:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_16
-	la a0, busybox
-	la a1, argv_busybox_16
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_16
+	la $a0, busybox
+	la $a1, argv_busybox_16
+	li.d $a7, SYS_exec
+	syscall 0
 after_16:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_17
-	la a0, busybox
-	la a1, argv_busybox_17
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_17
+	la $a0, busybox
+	la $a1, argv_busybox_17
+	li.d $a7, SYS_exec
+	syscall 0
 after_17:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_18
-	la a0, busybox
-	la a1, argv_busybox_18
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_18
+	la $a0, busybox
+	la $a1, argv_busybox_18
+	li.d $a7, SYS_exec
+	syscall 0
 after_18:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_19
-	la a0, busybox
-	la a1, argv_busybox_19
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_19
+	la $a0, busybox
+	la $a1, argv_busybox_19
+	li.d $a7, SYS_exec
+	syscall 0
 after_19:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_20
-	la a0, busybox
-	la a1, argv_busybox_20
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_20
+	la $a0, busybox
+	la $a1, argv_busybox_20
+	li.d $a7, SYS_exec
+	syscall 0
 after_20:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_21
-	la a0, busybox
-	la a1, argv_busybox_21
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_21
+	la $a0, busybox
+	la $a1, argv_busybox_21
+	li.d $a7, SYS_exec
+	syscall 0
 after_21:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_22
-	la a0, busybox
-	la a1, argv_busybox_22
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_22
+	la $a0, busybox
+	la $a1, argv_busybox_22
+	li.d $a7, SYS_exec
+	syscall 0
 after_22:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_23
-	la a0, busybox
-	la a1, argv_busybox_23
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_23
+	la $a0, busybox
+	la $a1, argv_busybox_23
+	li.d $a7, SYS_exec
+	syscall 0
 after_23:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_24
-	la a0, busybox
-	la a1, argv_busybox_24
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_24
+	la $a0, busybox
+	la $a1, argv_busybox_24
+	li.d $a7, SYS_exec
+	syscall 0
 after_24:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_25
-	la a0, busybox
-	la a1, argv_busybox_25
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_25
+	la $a0, busybox
+	la $a1, argv_busybox_25
+	li.d $a7, SYS_exec
+	syscall 0
 after_25:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_26
-	la a0, busybox
-	la a1, argv_busybox_26
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_26
+	la $a0, busybox
+	la $a1, argv_busybox_26
+	li.d $a7, SYS_exec
+	syscall 0
 after_26:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_27
-	la a0, busybox
-	la a1, argv_busybox_27
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_27
+	la $a0, busybox
+	la $a1, argv_busybox_27
+	li.d $a7, SYS_exec
+	syscall 0
 after_27:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_28
-	la a0, busybox
-	la a1, argv_busybox_28
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_28
+	la $a0, busybox
+	la $a1, argv_busybox_28
+	li.d $a7, SYS_exec
+	syscall 0
 after_28:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_29
-	la a0, busybox
-	la a1, argv_busybox_29
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_29
+	la $a0, busybox
+	la $a1, argv_busybox_29
+	li.d $a7, SYS_exec
+	syscall 0
 after_29:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_30
-	la a0, busybox
-	la a1, argv_busybox_30
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_30
+	la $a0, busybox
+	la $a1, argv_busybox_30
+	li.d $a7, SYS_exec
+	syscall 0
 after_30:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_31
-	la a0, busybox
-	la a1, argv_busybox_31
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_31
+	la $a0, busybox
+	la $a1, argv_busybox_31
+	li.d $a7, SYS_exec
+	syscall 0
 after_31:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_32
-	la a0, busybox
-	la a1, argv_busybox_32
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_32
+	la $a0, busybox
+	la $a1, argv_busybox_32
+	li.d $a7, SYS_exec
+	syscall 0
 after_32:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_33
-	la a0, busybox
-	la a1, argv_busybox_33
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_33
+	la $a0, busybox
+	la $a1, argv_busybox_33
+	li.d $a7, SYS_exec
+	syscall 0
 after_33:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_34
-	la a0, busybox
-	la a1, argv_busybox_34
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_34
+	la $a0, busybox
+	la $a1, argv_busybox_34
+	li.d $a7, SYS_exec
+	syscall 0
 after_34:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_35
-	la a0, busybox
-	la a1, argv_busybox_35
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_35
+	la $a0, busybox
+	la $a1, argv_busybox_35
+	li.d $a7, SYS_exec
+	syscall 0
 after_35:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_36
-	la a0, busybox
-	la a1, argv_busybox_36
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_36
+	la $a0, busybox
+	la $a1, argv_busybox_36
+	li.d $a7, SYS_exec
+	syscall 0
 after_36:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_37
-	la a0, busybox
-	la a1, argv_busybox_37
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_37
+	la $a0, busybox
+	la $a1, argv_busybox_37
+	li.d $a7, SYS_exec
+	syscall 0
 after_37:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_38
-	la a0, busybox
-	la a1, argv_busybox_38
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_38
+	la $a0, busybox
+	la $a1, argv_busybox_38
+	li.d $a7, SYS_exec
+	syscall 0
 after_38:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_39
-	la a0, busybox
-	la a1, argv_busybox_39
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_39
+	la $a0, busybox
+	la $a1, argv_busybox_39
+	li.d $a7, SYS_exec
+	syscall 0
 after_39:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_40
-	la a0, busybox
-	la a1, argv_busybox_40
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_40
+	la $a0, busybox
+	la $a1, argv_busybox_40
+	li.d $a7, SYS_exec
+	syscall 0
 after_40:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_41
-	la a0, busybox
-	la a1, argv_busybox_41
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_41
+	la $a0, busybox
+	la $a1, argv_busybox_41
+	li.d $a7, SYS_exec
+	syscall 0
 after_41:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_42
-	la a0, busybox
-	la a1, argv_busybox_42
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_42
+	la $a0, busybox
+	la $a1, argv_busybox_42
+	li.d $a7, SYS_exec
+	syscall 0
 after_42:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_43
-	la a0, busybox
-	la a1, argv_busybox_43
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_43
+	la $a0, busybox
+	la $a1, argv_busybox_43
+	li.d $a7, SYS_exec
+	syscall 0
 after_43:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_44
-	la a0, busybox
-	la a1, argv_busybox_44
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_44
+	la $a0, busybox
+	la $a1, argv_busybox_44
+	li.d $a7, SYS_exec
+	syscall 0
 after_44:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_45
-	la a0, busybox
-	la a1, argv_busybox_45
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_45
+	la $a0, busybox
+	la $a1, argv_busybox_45
+	li.d $a7, SYS_exec
+	syscall 0
 after_45:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_46
-	la a0, busybox
-	la a1, argv_busybox_46
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_46
+	la $a0, busybox
+	la $a1, argv_busybox_46
+	li.d $a7, SYS_exec
+	syscall 0
 after_46:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_47
-	la a0, busybox
-	la a1, argv_busybox_47
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_47
+	la $a0, busybox
+	la $a1, argv_busybox_47
+	li.d $a7, SYS_exec
+	syscall 0
 after_47:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_48
-	la a0, busybox
-	la a1, argv_busybox_48
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_48
+	la $a0, busybox
+	la $a1, argv_busybox_48
+	li.d $a7, SYS_exec
+	syscall 0
 after_48:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_49
-	la a0, busybox
-	la a1, argv_busybox_49
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_49
+	la $a0, busybox
+	la $a1, argv_busybox_49
+	li.d $a7, SYS_exec
+	syscall 0
 after_49:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_50
-	la a0, busybox
-	la a1, argv_busybox_50
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_50
+	la $a0, busybox
+	la $a1, argv_busybox_50
+	li.d $a7, SYS_exec
+	syscall 0
 after_50:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_51
-	la a0, busybox
-	la a1, argv_busybox_51
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_51
+	la $a0, busybox
+	la $a1, argv_busybox_51
+	li.d $a7, SYS_exec
+	syscall 0
 after_51:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_52
-	la a0, busybox
-	la a1, argv_busybox_52
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_52
+	la $a0, busybox
+	la $a1, argv_busybox_52
+	li.d $a7, SYS_exec
+	syscall 0
 after_52:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_53
-	la a0, busybox
-	la a1, argv_busybox_53
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_53
+	la $a0, busybox
+	la $a1, argv_busybox_53
+	li.d $a7, SYS_exec
+	syscall 0
 after_53:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
-	li a7, SYS_fork
-	ecall
-	bne a0, zero, after_54
-	la a0, busybox
-	la a1, argv_busybox_54
-	li a7, SYS_exec
-	ecall
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_54
+	la $a0, busybox
+	la $a1, argv_busybox_54
+	li.d $a7, SYS_exec
+	syscall 0
 after_54:
-	li a0, 0
-	li a7, SYS_wait
-	ecall
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
 loop:
-        jal loop
+        bl loop
 
 # for(;;) exit();
 program_exit:
-        li a7, SYS_exit
-        ecall
-        jal program_exit
+        li.d $a7, SYS_exit
+        syscall 0
+        bl program_exit
 
 time_test:
 	.string "/time-test\0"

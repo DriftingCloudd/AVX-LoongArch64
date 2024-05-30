@@ -1,11 +1,11 @@
     .align 4
     .section .data
     .section .data.sddata
-    .global sddata_start
-    .global sddata_end
-sddata_start:
+    .global sdcard
+    .global sdcard_end
+sdcard:
     # .incbin "./sdcard.img"
-    .incbin "./kernel/new_sdcard.img"
-sddata_end:
-sddata_size:
-    .long sddata_end - sddata_start
+    .incbin "./kernel/sdcard_loongarch/new_sdcard2.img"
+sdcard_end:
+sdcard_len:
+    .long sdcard_end - sdcard

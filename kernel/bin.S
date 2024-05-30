@@ -6,7 +6,7 @@ initcode:
 
     # .incbin "./user/initcode"
     .incbin "./user/initcode"
-    #.incbin "./xv6-user/init-for-test"
+    # .incbin "./user/init-for-test"
     #.incbin "./xv6-user/busybox_test.bin"
 codeend:
 

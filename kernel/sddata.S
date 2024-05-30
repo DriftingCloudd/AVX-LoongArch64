@@ -4,8 +4,8 @@
     .global sddata_start
     .global sddata_end
 sddata_start:
-    # .incbin "./sdcard.img"
-    .incbin "./kernel/new_sdcard.img"
+    .incbin "./sdcard.img"
+    # .incbin "./kernel/dcard.img"
 sddata_end:
 sddata_size:
     .long sddata_end - sddata_start

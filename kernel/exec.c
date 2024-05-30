@@ -299,7 +299,7 @@ int exec(char *path, char **argv, char **env) {
   vma_init(p);
 
   oldpagetable = p->pagetable;
-  printf("oldpagetable:%p\n", oldpagetable);
+  // printf("oldpagetable:%p\n", oldpagetable);
 
   int is_shell_script = is_sh_script(path);
   if (is_shell_script) {
@@ -503,7 +503,7 @@ int exec(char *path, char **argv, char **env) {
   // maybe it's wrong
   for (int fd = 0; fd < NOFILEMAX(p); fd++) {
     struct file *f = p->ofile[fd];
-#if DEBUG
+#ifdef DEBUG
     printf("fd:%d, f is %p\n", fd, f);
 #endif
     if (f && p->exec_close[fd]) {
@@ -512,7 +512,7 @@ int exec(char *path, char **argv, char **env) {
       p->exec_close[fd] = 0;
     }
   }
-#if DEBUG
+#ifdef DEBUG
   printf("p->ofile[1] is %p\n", p->ofile[1]);
   printf("redirection is %d\n", redirection);
 #endif
@@ -542,9 +542,9 @@ int exec(char *path, char **argv, char **env) {
   // sfence_vma();
   // flush_TLB();
 
-  printf("p->trapframe->era:%p\n", p->trapframe->era);
+  // printf("p->trapframe->era:%p\n", p->trapframe->era);
 
-  printf("p->ofile[1] is %p\n", p->ofile[1]);
+  // printf("p->ofile[1] is %p\n", p->ofile[1]);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 

@@ -117,7 +117,7 @@ usertrap(void)
     // load page fault or store page fault
     // check if the page fault is caused by stack growth
     printf("usertrap():handle stack page fault\n");
-    panic("usertrap():handle stack page fault\n");
+    // panic("usertrap():handle stack page fault\n");
   } 
   else if((which_dev = devintr()) != 0){
     // ok

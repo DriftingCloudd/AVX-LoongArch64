@@ -1,6 +1,6 @@
 # platform	:= visionfive
 # platform	:= qemu
-mode := debug
+# mode := debug
 # mode := release
 
 K=kernel
@@ -227,14 +227,21 @@ image = $T/kernel.bin
 all:
 	@make build 
 
-# $K/bin.S:$U/initcode $U/init-for-test
-$K/bin.S:$U/initcode
+$K/bin.S:$U/initcode $U/init-for-test
+# $K/bin.S:$U/initcode
 
 $U/initcode: $U/initcode.S
 	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
 	$(LD) $(LDFLAGS) -N -e start -Ttext-segment 0 -T$(initcode-ld) -o $U/initcode.out $U/initcode.o
 	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
 	$(OBJDUMP) -S $U/initcode.o > $U/initcode.asm
+
+$U/init-for-test: $U/init-for-test.S
+	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/init-for-test.S -o $U/init-for-test.o
+	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o $U/init-for-test.out $U/init-for-test.o
+	$(OBJCOPY) -S -O binary $U/init-for-test.out $U/init-for-test
+	$(OBJDUMP) -S $U/init-for-test.o > $U/init-for-test.asm
+
 
 tags: $(OBJS) _init
 	etags *.S *.c

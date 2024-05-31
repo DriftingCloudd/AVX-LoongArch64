@@ -34,7 +34,9 @@ uint64 sys_clock_getres(void) {
   uint64 addr;
   if (argaddr(1, &addr) < 0)
     return -1;
-  printf("addr: %p\n", addr);
+  #ifdef DEBUG
+printf("addr: %p\n", addr);
+#endif
   struct timespec2 t;
   t.tv_sec = 0;
   t.tv_nsec = 1;
@@ -51,13 +53,19 @@ uint64 sys_clock_gettime(void) {
 
   uint64 ticks = r_time();
 
-  //   printf("ticks: %p\n", ticks);
+//   //   #ifdef DEBUG
+// printf("ticks: %p\n", ticks);
+// #endif
   struct timespec2 t;
   if (tid == 0) {
     t.tv_sec = ticks / CLK_FREQ;
     t.tv_nsec = (ticks % CLK_FREQ) * 1000000000 / CLK_FREQ;
-    // printf("t.tv_sec: %p\n", t.tv_sec);
-    // printf("t.tv_nsec: %p\n", t.tv_nsec);
+//     // #ifdef DEBUG
+// printf("t.tv_sec: %p\n", t.tv_sec);
+// #endif
+//     // #ifdef DEBUG
+// printf("t.tv_nsec: %p\n", t.tv_nsec);
+// #endif
   }
   if (either_copyout(1, addr, (char *)&t, sizeof(struct timespec2)) < 0)
     return -1;
@@ -73,7 +81,9 @@ uint64 sys_gettimeofday(void) {
   TimeSpec ts;
   ts.second = t / CLK_FREQ;
   ts.microSecond = (t % CLK_FREQ) * 1000000 / CLK_FREQ;
-  // printf("second: %d, microSecond: %d\n", ts.second, ts.microSecond);
+//   // #ifdef DEBUG
+// printf("second: %d, microSecond: %d\n", ts.second, ts.microSecond);
+// #endif
   return copyout(myproc()->pagetable, tt, (char *)&ts, sizeof(TimeSpec));
 }
 
@@ -191,11 +201,13 @@ uint64 sys_setitimer() {
     return -1;
   }
 
-  printf("sys_setitimer: %d\n", which);
+  #ifdef DEBUG
+printf("sys_setitimer: %d\n", which);
   printf("sys_setitimer: %p it value: %p, %p, start:%p %p\n", value,
               value.it_interval.tv_sec, value.it_interval.tv_usec,
               value.it_value.tv_sec, value.it_value.tv_usec);
-  printf("sys_setitimer: %p\n", ovalue);
+printf("sys_setitimer: %p\n", ovalue);
+#endif
   setitimer(which, &value, &ovalue);
   return 0;
 }

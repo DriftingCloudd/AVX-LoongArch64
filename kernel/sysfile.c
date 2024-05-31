@@ -40,7 +40,9 @@ static int argfd(int n, int *pfd, struct file **pf) {
   struct file *f;
 
   if (argint(n, &fd) < 0) {
+    #ifdef DEBUG
     printf("argfd: argint error\n");
+    # endif
     return -1;
   }
   // mmap映射匿名区域的时候会需要fd为-1
@@ -57,7 +59,9 @@ static int argfd(int n, int *pfd, struct file **pf) {
 #endif
 
   if (fd < 0 || fd >= NOFILE || (f = myproc()->ofile[fd]) == NULL) {
+    # ifdef DEBUG
     printf("fd: %d argfd: fd error\n", fd);
+    # endif
     return -1;
   }
 
@@ -510,14 +514,18 @@ uint64 sys_pipe(void) {
     return -1;
   if (pipealloc(&rf, &wf) < 0)
     return -1;
+    # ifdef DEBUG
   printf("pip get arg success\n");
+  # endif
   fd0 = -1;
   if ((fd0 = fdalloc(rf)) < 0 || (fd1 = fdalloc(wf)) < 0) {
     if (fd0 >= 0)
       p->ofile[fd0] = 0;
     fileclose(rf);
     fileclose(wf);
+    # ifdef DEBUG
     printf("pip fdalloc fail\n");
+    # endif
     return -1;
   }
   if (copyout(p->pagetable, fdarray, (char *)&fd0, sizeof(fd0)) < 0 ||
@@ -642,7 +650,9 @@ uint64 sys_getcwd(void) {
   if (copyout2(addr, s, strlen(s) + 1) < 0)
     return -1;
   */
+ # ifdef DEBUG
   printf("getcwd: %s\n", s);
+  # endif
   return addr;
 }
 
@@ -955,7 +965,9 @@ uint64 sys_openat() {
       dp = NULL;
     }
   }
+  # ifdef DEBUG
   printf("%s\n", path);
+  # endif
   if (NULL == (ep = new_ename(dp, path))) {
     // 如果文件不存在
     if ((flags & O_CREATE) || strncmp(path, "/proc/loadavg", 13) == 0 ||
@@ -986,8 +998,9 @@ uint64 sys_openat() {
       (!(flags & O_WRONLY) && !(flags & O_RDWR))) {
     eunlock(ep);
     eput(ep);
+    # ifdef DEBUG
     printf("directory only can be read\n");
-
+# endif
     return -1;
   }
 
@@ -1068,30 +1081,42 @@ uint64 sys_mmap() {
   int prot, flags, fd, off;
   uint64 len;
   if (argaddr(0, &start) < 0) {
+    # ifdef DEBUG
     printf("argaddr start error\n");
+    # endif
     return -1;
   }
   if (argaddr(1, &len) < 0) {
+    # ifdef DEBUG
     printf("argint len error\n");
+    # endif
     return -1;
   }
   if (argint(2, &prot) < 0) {
+    # ifdef DEBUG
     printf("argint prot error\n");
+    # endif
     return -1;
   }
   if (argint(3, &flags) < 0) {
+    # ifdef DEBUG
     printf("argint flags error\n");
+    # endif
     return -1;
   }
   int ret = argfd(4, &fd, NULL);
   if (ret == -2 && (flags & MAP_ANONYMOUS)) {
     fd = -1;
   } else if (ret < 0) {
+    # ifdef DEBUG
     printf("argfd fd error\n");
+    # endif
     return -1;
   }
   if (argint(5, &off) < 0) {
+    # ifdef DEBUG
     printf("argint off error\n");
+    # endif
     return -1;
   }
   // printf("mmap start:%p len:%d prot:%d flags:%d fd:%d
@@ -1320,10 +1345,14 @@ uint64 sys_sendfile(void) {
   if (argaddr(3, &count) < 0) {
     return -1;
   }
+  # ifdef DEBUG
   printf("pid: %d out_type:%d in_type:%d\n", myproc()->pid, fout->type,
               fin->type);
+  # endif
   if (fin->type == FD_ENTRY) {
+    # ifdef DEBUG
     printf("in name : %s\n", fin->ep->filename);
+    # endif
   }
   return file_send(fin, fout, offset, count);
 }
@@ -1359,7 +1388,9 @@ uint64 sys_readlinkat(void) {
   struct file *df;
   struct dirent *dp = NULL;
   struct proc *p = myproc();
+  # ifdef DEBUG
   printf("arrive a\n");
+  # endif
   if (argfd(0, &dirfd, &df) < 0) {
     if (dirfd != AT_FDCWD && path[0] != '/') {
       return -1;
@@ -1369,20 +1400,26 @@ uint64 sys_readlinkat(void) {
   else {
     dp = df->ep;
   }
+  # ifdef DEBUG
   printf("arrive b\n");
+  # endif
   if (argstr(1, path, FAT32_MAX_PATH) < 0 || argaddr(2, &addr2) < 0 ||
       argint(3, &bufsiz) < 0) {
     return -1;
   }
+  # ifdef DEBUG
   printf("arrive c\n");
+  # endif
   int copy_size;
   if (bufsiz < strlen(path)) {
     copy_size = bufsiz;
   } else {
     copy_size = strlen(path);
   }
+  # ifdef DEBUG
   printf("readlinkat fd:%d path: %s proc name :%s\n", dirfd, path,
               myproc()->name);
+  # endif
   if (strncmp(path, "/proc/self/exe", 14) == 0) {
     either_copyout(1, addr2, "/", 1);
     either_copyout(1, addr2 + 1, myproc()->name, copy_size - 1);
@@ -1415,7 +1452,9 @@ static uint64 creat_file() {
       dp = NULL;
     }
   }
+  # ifdef DEBUG
   printf("%s\n", path);
+  # endif
   if (NULL == (ep = new_ename(dp, path))) {
     // 如果文件不存在
     if ((flags & O_CREATE) || strncmp(path, "/proc/loadavg", 13) == 0 ||
@@ -1445,7 +1484,9 @@ static uint64 creat_file() {
       (!(flags & O_WRONLY) && !(flags & O_RDWR))) {
     eunlock(ep);
     eput(ep);
+    # ifdef DEBUG
     printf("directory only can be read\n");
+    # endif
 
     return -1;
   }
@@ -1486,8 +1527,9 @@ uint64 sys_copy_file_range(void) {
   uint64 off_in;
   uint64 off_out = NULL;
   uint64 len;
-
+# ifdef DEBUG
   printf("enter here!\n");
+  # endif
   if (argfd(0, &fd_in, &fp_in) < 0 || argaddr(1, &off_in) < 0 ||
       argfd(2, &fd_out, &fp_out) < 0 || argaddr(3, &off_in) < 0 ||
       argint(4, &len) < 0) {
@@ -1502,8 +1544,9 @@ uint64 sys_copy_file_range(void) {
   } else {
     pagenum = len / PGSIZE + 1;
   }
-
+# ifdef DEBUG
   printf("pagenum:%d\n", pagenum);
+  # endif
   char **pbuf;
   uint64 lastlen = len - PGSIZE * (pagenum - 1);
   pbuf = kalloc();
@@ -1512,9 +1555,13 @@ uint64 sys_copy_file_range(void) {
     pbuf[i] = kalloc();
     memset(pbuf[i], 0, PGSIZE);
   }
+  # ifdef DEBUG
   printf("len %d\n", len);
+  # endif
   char *buf;
+  # ifdef DEBUG
   printf("eread off %d\n", fp_in->off);
+  # endif
   if (off_in == 0) {
     for (int i = 0; i < pagenum - 1; i++) {
       eread(fp_in->ep, 0, (uint64)pbuf[i], fp_in->off + i * PGSIZE, PGSIZE);
@@ -1529,7 +1576,9 @@ uint64 sys_copy_file_range(void) {
   //   printf("%d ",buf[i]);
   // }
   if (off_out == NULL) {
+    # ifdef DEBUG
     printf("off_out == null\n");
+    # endif
     if (fp_out->off > fp_out->ep->file_size) {
       char *buf = kalloc();
       memset(buf, 0, PGSIZE);
@@ -1543,12 +1592,18 @@ uint64 sys_copy_file_range(void) {
                PGSIZE);
       }
       for (int i = 0; i < PGSIZE; i++) {
+        # ifdef DEBUG
         printf("%d ", pbuf[pagenum - 1][i]);
+        # endif
       }
+      # ifdef DEBUG
       printf("ewrite lastlen %d\n", lastlen);
+      # endif
       ewrite(fp_out->ep, 0, (uint64)pbuf[pagenum - 1],
              fp_out->off + (pagenum - 1) * PGSIZE, lastlen);
+             # ifdef DEBUG
       printf("file?_size:%d\n", fp_out->ep->file_size);
+      # endif
     }
     fp_out->off += len;
   }

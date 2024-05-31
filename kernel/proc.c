@@ -243,7 +243,9 @@ static struct proc *allocproc(void) {
 found:
   p->pid = allocpid();
   freemem_amount();
+  # ifdef DEBUG
   printf("alloc proc:%d freemem_mount:%p\n", p->pid, freemem_amount());
+  # endif
   p->vma = NULL;
   p->filelimit = NOFILE;
   p->ktime = 1;
@@ -338,7 +340,9 @@ static void freeproc(struct proc *p) {
   }
   // TODO: free threads
   freemem_amount();
+  # ifdef DEBUG
   printf("free proc : %d freemem_mount:%p\n",p->pid, freemem_amount());
+  # endif
   p->pagetable = 0;
   p->vma = NULL;
   p->sz = 0;
@@ -480,7 +484,9 @@ int fork(void) {
     nvma = nvma->next;
     while (nvma != np->vma) {
       if (vma_map(p->pagetable, np->pagetable, nvma) < 0) {
+        # ifdef DEBUG
         printf("clone: vma deep mapping failed\n");
+        # endif
         return -1;
       }
       nvma = nvma->next;
@@ -800,7 +806,9 @@ void sched(void) {
 void yield(void) {
   struct proc *p = myproc();
   acquire(&p->lock);
+  # ifdef DEBUG
   printf("pid %d yield, era: %p\n", p->pid, p->trapframe->era);
+  # endif
   p->state = RUNNABLE;
   // todo：线程部分
   // p->main_thread->state = t_RUNNABLE;
@@ -936,7 +944,9 @@ int kill(int pid, int sig) {
 int tgkill(int tid, int pid, int sig) {
   // if(!cmp_parent(pid,tid)) {printf("pid:%d, tid:%d\n");return -1;}
   // else return kill(tid,sig);
+  # ifdef DEBUG
   printf("tgkill:%d %d %d\n", tid, pid, sig);
+  # endif
   return kill(tid, sig);
 }
 
@@ -979,8 +989,9 @@ void procdump(void) {
                            [ZOMBIE] "zombie"};
   struct proc *p;
   char *state;
-
+# ifdef DEBUG
   printf("\nPID\tSTATE\tNAME\tMEM\n");
+  # endif
   for (p = proc; p < &proc[NPROC]; p++) {
     if (p->state == UNUSED)
       continue;
@@ -988,8 +999,10 @@ void procdump(void) {
       state = states[p->state];
     else
       state = "???";
+    # ifdef DEBUG
     printf("%d\t%s\t%s\t%d", p->pid, state, p->name, p->sz);
     printf("\n");
+    # endif
   }
 }
 
@@ -1013,7 +1026,9 @@ struct proc *findchild(struct proc *p, int pid, struct proc **child) {
     if ((pid == -1 || np->pid == pid) && np->parent == p) {
       acquire(&np->lock);
       *child = np;
+      # ifdef DEBUG
       printf("state : %d\n", np->state);
+      # endif
       if (np->state == ZOMBIE) {
         return np;
       }
@@ -1165,7 +1180,9 @@ uint64 clone(uint64 new_stack, uint64 new_fn) {
     nvma = nvma->next;
     while (nvma != np->vma) {
       if (vma_map(p->pagetable, np->pagetable, nvma) < 0) {
+        # ifdef DEBUG
         printf("clone: vma deep mapping failed\n");
+        # endif
         return -1;
       }
       nvma = nvma->next;

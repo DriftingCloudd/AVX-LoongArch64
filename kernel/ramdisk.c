@@ -15,7 +15,9 @@ char *ramdisk;
 void ramdisk_init(void) {
   initlock(&ramdisklock, "ramdisk lock");
   ramdisk = (char *)sdcard;
+  # ifdef DEBUG
   printf("ramdiskinit ram start:%p\n", ramdisk);
+  # endif
 }
 
 void ramdisk_read(struct buf *b) {

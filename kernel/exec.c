@@ -42,7 +42,9 @@ static int loadseg(pagetable_t pagetable, uint64 va, struct dirent *ep,
     n = PGSIZE - va_off;
     // llh:in fat32.c
     if (eread(ep, 0, (uint64)(pa + va_off), offset, n) != n) {
+      #ifdef DEBUG
       printf("loadseg: read error\n");
+      #endif
       return -1;
     }
     i += n;
@@ -82,10 +84,13 @@ static int readelfhdr(struct dirent *ep, struct elfhdr *elf) {
 void stackdisplay(pagetable_t pagetable, uint64 sp, uint64 sz) {
   for (uint64 i = sp; i < sz; i += 8) {
     uint64 *pa = (void *)walkaddr(pagetable, i) + i - PGROUNDDOWN(i);
+    # ifdef DEBUG
     if (pa)
       printf("addr %p phaddr:%p value %p\n", i, pa, *pa);
+      
     else
       printf("addr %p value (nil)\n", i);
+    # endif
   }
 }
 
@@ -102,16 +107,22 @@ uint64 loadelf(struct elfhdr *elf, struct dirent *ep, struct proghdr *phdr,
        i++, off += sizeof(struct proghdr)) {
     if (eread(ep, 0, (uint64)&ph, off, sizeof(struct proghdr)) !=
         sizeof(struct proghdr)) {
+      # ifdef DEBUG
       printf("eread failed\n");
+      # endif
       return -1;
     }
     if (ph.type == ELF_PROG_LOAD) {
       if (ph.memsz < ph.filesz) {
+        # ifdef DEBUG
         printf("ph.memsz < ph.filesz\n");
+        # endif
         return -1;
       }
       if (ph.vaddr + ph.memsz < ph.vaddr) {
+        # ifdef DEBUG
         printf("ph.vaddr + ph.memsz < ph.vaddr\n");
+        # endif
         return -1;
       }
       if (!getphdr && phdr && ph.off == 0) {
@@ -126,12 +137,16 @@ uint64 loadelf(struct elfhdr *elf, struct dirent *ep, struct proghdr *phdr,
         perm |= PTE_NR;
       if ((sz1 = uvmalloc(pagetable,  *sz,
                           PGROUNDUP(ph.vaddr + ph.memsz), perm)) == 0) {
+        # ifdef DEBUG
         printf("uvmalloc failed\n");
+        # endif
         return -1;
       }
       *sz = sz1;
       if (loadseg(pagetable, ph.vaddr, ep, ph.off, ph.filesz) < 0) {
+        # ifdef DEBUG
         printf("loadseg failed\n");
+        # endif
         return -1;
       }
     } else if (ph.type == ELF_PROG_PHDR) {
@@ -159,7 +174,9 @@ uint64 get_total_mapping_size(struct elfhdr *interp_elf_ex,
        i++, off += sizeof(struct proghdr)) {
     if (eread(interpreter, 0, (uint64)&ph, off, sizeof(struct proghdr)) !=
         sizeof(struct proghdr)) {
+      #ifdef DEBUG
       printf("[get_total_mapping_size]eread failed\n");
+      #endif
       return -1;
     }
     if (ph.type == ELF_PROG_LOAD) {
@@ -179,14 +196,18 @@ uint64 load_elf_interp(pagetable_t pagetable, struct elfhdr *interp_elf_ex,
   /*----------------------获取总共需要的内存大小--------------------*/
   total_size = get_total_mapping_size(interp_elf_ex, interpreter);
   if (total_size == 0) {
+    #ifdef DEBUG
     printf("[load_elf_interp]get_total_mapping_size failed\n");
+    #endif
     return -1;
   }
   /*----------------------分配总共需要的内存大小--------------------*/
   start_addr = mmap(0, total_size, PROT_READ | PROT_WRITE | PROT_EXEC,
                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (start_addr == -1) {
+    #ifdef DEBUG
     printf("[load_elf_interp]mmap failed\n");
+    #endif
     return -1;
   }
   /*----------------------加载elf文件--------------------*/
@@ -194,21 +215,29 @@ uint64 load_elf_interp(pagetable_t pagetable, struct elfhdr *interp_elf_ex,
        i++, off += sizeof(struct proghdr)) {
     if (eread(interpreter, 0, (uint64)&ph, off, sizeof(struct proghdr)) !=
         sizeof(struct proghdr)) {
+      #ifdef DEBUG
       printf("[load_elf_interp]eread failed\n");
+      #endif
       return -1;
     }
     if (ph.type == ELF_PROG_LOAD) {
       if (ph.memsz < ph.filesz) {
+        #ifdef DEBUG
         printf("[load_elf_interp]ph.memsz < ph.filesz\n");
+        #endif
         return -1;
       }
       if (ph.vaddr + ph.memsz < ph.vaddr) {
+        # ifdef DEBUG
         printf("[load_elf_interp]ph.vaddr + ph.memsz < ph.vaddr\n");
+        # endif
         return -1;
       }
       if (loadseg(pagetable, start_addr + ph.vaddr, interpreter, ph.off,
                   ph.filesz) < 0) {
+        # ifdef DEBUG
         printf("[load_elf_interp]loadseg failed\n");
+        #endif
         return -1;
       }
     }
@@ -228,7 +257,9 @@ int user_stack_push_str(pagetable_t pt, uint64 *ustack, char *str, uint64 sp,
     return -1;
   }
   if (copyout(pt, sp, str, strlen(str) + 1) < 0) {
+    # ifdef DEBUG
     printf("copyout failed\n");
+    # endif
     return -1;
   }
   ustack[argc] = sp;
@@ -299,8 +330,9 @@ int exec(char *path, char **argv, char **env) {
   vma_init(p);
 
   oldpagetable = p->pagetable;
+  # ifdef DEBUG
   printf("oldpagetable:%p\n", oldpagetable);
-
+  # endif 
   int is_shell_script = is_sh_script(path);
   if (is_shell_script) {
     goto bad;
@@ -315,7 +347,9 @@ int exec(char *path, char **argv, char **env) {
   elock(ep);
 
   if (readelfhdr(ep, &elf) < 0) {
+  #ifdef DEBUG
     printf("readelfhdr failed\n");
+  # endif
     goto bad;
   }
 
@@ -327,38 +361,47 @@ int exec(char *path, char **argv, char **env) {
 
   // Load program into memory.
   if (loadelf(&elf, ep, &ph, pagetable,  &sz, &is_dynamic) < 0) {
+    # ifdef DEBUG
     printf("loadelf failed\n");
+    # endif
     goto bad;
   }
   /* -------------------动态链接-------------------------------------------*/
   // 动态链接目前默认处理/libc.so
-
+  # ifdef DEBUG
   printf("is_dynamic is %d\n",is_dynamic);
-
+  # endif
   if (is_dynamic) {
 
     if ((interpreter = ename("/libc.so")) == NULL) {
+      # ifdef DEBUG
       printf("interpreter not found\n");
+      # endif
       goto bad;
     }
 
     elock(interpreter);
     if (readelfhdr(interpreter, &interpreter_elf) < 0) {
+      # ifdef DEBUG
       printf("readelfhdr failed\n");
+      # endif
       goto bad;
     }
 
     interp_start_addr =
         load_elf_interp(pagetable, &interpreter_elf, interpreter);
     program_entry = interp_start_addr + interpreter_elf.entry;
+    # ifdef DEBUG
     printf("interp_start_addr:%p program_entry:%p\n", interp_start_addr,program_entry);
-
+    # endif
     eunlock(interpreter);
     eput(interpreter);
     interpreter = NULL;
   } else {
     program_entry = elf.entry;
+    # ifdef DEBUG
     printf("elf.entry %p\n", elf.entry);
+    # endif
   }
 
   /*--------------------动态链接结束---------------------------------------*/
@@ -378,7 +421,9 @@ int exec(char *path, char **argv, char **env) {
   envp[0] = 0;
   if ((sp = user_stack_push_str(pagetable, envp, "UB_BINDIR=.", sp,
                                 stackbase)) == -1) {
+    # ifdef DEBUG                                  
     printf("user_stack_push_str failed 1\n");
+    # endif
     goto bad;
   }
   // if((sp = user_stack_push_str(pagetable, envp, "PATH=/", sp, stackbase)) ==
@@ -391,7 +436,9 @@ int exec(char *path, char **argv, char **env) {
   uint64 random[2] = {0xcde142a16cb93072, 0x128a39c127d8bbf2};
   sp -= 16;
   if (sp < stackbase || copyout(pagetable, sp, (char *)random, 16) < 0) {
+    # ifdef DEBUG
     printf("[exec] random copy bad\n");
+    # endif
     goto bad;
   }
 
@@ -434,7 +481,9 @@ int exec(char *path, char **argv, char **env) {
       goto bad;
     if ((sp = user_stack_push_str(pagetable, ustack, argv[argc], sp,
                                   stackbase)) == -1) {
+      # ifdef DEBUG                                    
       printf("user_stack_push_str failed 2\n");
+      # endif
       goto bad;
     }
   }
@@ -443,14 +492,18 @@ int exec(char *path, char **argv, char **env) {
     for (envnum = 0; env[envnum]; envnum++) {
       if ((sp = user_stack_push_str(pagetable, envp, env[envnum], sp,
                                     stackbase)) == -1) {
+        # ifdef DEBUG                                      
         printf("user_stack_push_str failed 3\n");
+        # endif
         goto bad;
       }
     }
   }
 
   if ((sp = loadaux(pagetable, sp, stackbase, aux)) == -1) {
+    # ifdef DEBUG
     printf("loadaux failed\n");
+    # endif
     goto bad;
   }
 
@@ -458,13 +511,17 @@ int exec(char *path, char **argv, char **env) {
   if (argc) {
     sp -= (argc + 1) * sizeof(uint64);
     if (sp < stackbase) {
+      # ifdef DEBUG
       printf("sp < stackbase\n");
+      # endif
       goto bad;
     }
     sp -= sp % 16;
     if (copyout(pagetable, sp, (char *)(envp + 1),
                 (argc + 1) * sizeof(uint64)) < 0) {
+      # ifdef DEBUG                  
       printf("copyout failed\n");
+      # endif
       goto bad;
     }
   }
@@ -493,10 +550,13 @@ int exec(char *path, char **argv, char **env) {
   // Commit to the user image.
 
   p->pagetable = pagetable;
+  # ifdef DEBUG
   printf("page table:%p\n", pagetable);
+  # endif 
   p->sz = sz;
+  # ifdef DEBUG
   printf("program_entry:%p\n", program_entry);
-
+  # endif
   p->trapframe->era = program_entry; // initial program counter = main
   p->trapframe->sp = sp;             // initial stack pointer
   // printf("program entry:%p\n", program_entry);
@@ -527,7 +587,9 @@ int exec(char *path, char **argv, char **env) {
       fd = open(redir_file, O_WRONLY | O_CREATE | O_APPEND);
     }
     if (fd != 1) {
+      # ifdef DEBUG
       printf("[exec]:fd != 1\n");
+      # endif
       goto bad;
     }
     p->exec_close[1] = 1;
@@ -541,11 +603,11 @@ int exec(char *path, char **argv, char **env) {
   // w_csr_pgdl(pgdl);
   // sfence_vma();
   // flush_TLB();
-
+  # ifdef DEBUG
   printf("p->trapframe->era:%p\n", p->trapframe->era);
 
   printf("p->ofile[1] is %p\n", p->ofile[1]);
-
+  # endif
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
 bad:

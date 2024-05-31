@@ -18,29 +18,41 @@
 extern int exec(char *path, char **argv, char **env);
 
 uint64 sys_clone(void) {
-  printf("sys_clone: start\n");
+  #ifdef DEBUG
+printf("sys_clone: start\n");
+#endif
   uint64 new_stack, new_fn;
   uint64 ptid, tls, ctid;
   argaddr(1, &new_stack);
   if (argaddr(0, &new_fn) < 0) {
-    printf("sys_clone: argaddr(0, &new_fn) < 0\n");
+    #ifdef DEBUG
+printf("sys_clone: argaddr(0, &new_fn) < 0\n");
+#endif
     return -1;
   }
   if (argaddr(2, &ptid) < 0) {
-    printf("sys_clone: argaddr(2, &ptid) < 0\n");
+    #ifdef DEBUG
+printf("sys_clone: argaddr(2, &ptid) < 0\n");
+#endif
     return -1;
   }
   if (argaddr(3, &tls) < 0) {
-    printf("sys_clone: argaddr(3, &tls) < 0\n");
+    #ifdef DEBUG
+printf("sys_clone: argaddr(3, &tls) < 0\n");
+#endif
     return -1;
   }
   if (argaddr(4, &ctid) < 0) {
-    printf("sys_clone: argaddr(4, &ctid) < 0\n");
+    #ifdef DEBUG
+printf("sys_clone: argaddr(4, &ctid) < 0\n");
+#endif
     return -1;
   }
+  #ifdef DEBUG
   printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
               "ctid = %p\n",
               new_stack, new_fn, ptid, tls, ctid);
+  # endif
   if (new_stack == 0) {
     return fork();
   }
@@ -93,17 +105,23 @@ uint64 sys_exec(void) {
   uint64 uargv, uarg;
 
   if (argstr(0, path, FAT32_MAX_PATH) < 0 || argaddr(1, &uargv) < 0) {
-    printf("[sys_exec] fetch arg error\n");
+    #ifdef DEBUG
+printf("[sys_exec] fetch arg error\n");
+#endif
     return -1;
   }
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
-      printf("[sys_exec] too many arguments\n");
+      #ifdef DEBUG
+printf("[sys_exec] too many arguments\n");
+#endif
       goto bad;
     }
     if (fetchaddr(uargv + sizeof(uint64) * i, (uint64 *)&uarg) < 0) {
-      printf("[sys_exec] fetch %d addr error uargv:%p\n", i, uargv);
+      #ifdef DEBUG
+printf("[sys_exec] fetch %d addr error uargv:%p\n", i, uargv);
+#endif
       goto bad;
     }
     if (uarg == 0) {
@@ -112,12 +130,16 @@ uint64 sys_exec(void) {
     }
     argv[i] = kalloc();
     if (argv[i] == 0) {
-      printf("[sys_exec] kalloc error\n");
+      #ifdef DEBUG
+printf("[sys_exec] kalloc error\n");
+#endif
       goto bad;
     }
     memset(argv[i], 0, PGSIZE);
     if (fetchstr(uarg, argv[i], PGSIZE) < 0) {
-      printf("[sys_exec] fetchstr error\n");
+      #ifdef DEBUG
+printf("[sys_exec] fetchstr error\n");
+#endif
       goto bad;
     }
   }
@@ -130,7 +152,9 @@ uint64 sys_exec(void) {
   return ret;
 
 bad:
-  printf("[sys_exec]: bad\n");
+  #ifdef DEBUG
+printf("[sys_exec]: bad\n");
+#endif
   for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
     kfree(argv[i]);
   return -1;
@@ -148,7 +172,9 @@ uint64 sys_execve(void) {
       argaddr(2, &uenv)) {
     return -1;
   }
-  printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
+  #ifdef DEBUG
+printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
+#endif
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
@@ -183,7 +209,9 @@ bad:
 }
 
 uint64 sys_exit(void) {
-  printf("sys_exit\n");
+  #ifdef DEBUG
+printf("sys_exit\n");
+#endif
   int n;
   if (argint(0, &n) < 0)
     return -1;
@@ -209,7 +237,9 @@ uint64 sys_sched_getaffinity(void) {
       argaddr(2, &addr) < 0) {
     return -1;
   }
-  // printf("%p %p %p\n",pid,cpuset_size,addr);
+//   #ifdef DEBUG
+// printf("%p %p %p\n",pid,cpuset_size,addr);
+// #endif
   uint64 affinity = 1;
   if (either_copyout(1, addr, (void *)&affinity, sizeof(uint64)) < 0)
     return -1;
@@ -240,7 +270,9 @@ uint64 sys_nanosleep(void) {
 
   int mask = p->tmask;
   if (mask) {
-    printf(") ...\n");
+    #ifdef DEBUG
+printf(") ...\n");
+#endif
   }
   acquire(&p->lock);
   uint64 tick0 = ticks;
@@ -278,7 +310,9 @@ uint64 sys_wait(void) {
 uint64 sys_sbrk(void) {
   int addr;
   int n;
-  // printf("sbrk param n: %d\n", n);
+//  #ifdef DEBUG
+// printf("sbrk param n: %d\n", n);
+// #endif
   if (argint(0, &n) < 0)
     return -1;
   addr = myproc()->sz;
@@ -350,15 +384,21 @@ uint64 sys_kill(void) {
   if (argint(1, &sig) < 0)
     return -1;
   if (pid <= 0) {
-    printf("[kill]pid <= 0 do not implement\n");
+    #ifdef DEBUG
+printf("[kill]pid <= 0 do not implement\n");
+#endif
     return -1;
   }
   if (sig < 0 || sig >= SIGRTMAX) {
-    printf("[kill]sig < 0 || sig >= SIGRTMAX\n");
+    #ifdef DEBUG
+printf("[kill]sig < 0 || sig >= SIGRTMAX\n");
+#endif
     return -1;
   }
   pid = myproc()->pid;
-  // printf("kill pid %d, sig: %d\n", pid, sig);
+//   // #ifdef DEBUG
+// printf("kill pid %d, sig: %d\n", pid, sig);
+// #endif
   if (sig == 0) {
     return 0;
   }
@@ -525,7 +565,9 @@ uint64 sys_uname(void) {
 //         panic("copy time error!\n");
 //       }
 //     }
-//     // printf("val: %d\n", userVal);
+// //     // #ifdef DEBUG
+// printf("val: %d\n", userVal);
+// #endif
 //     if (userVal != val) {
 //       return -1;
 //     }

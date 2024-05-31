@@ -44,7 +44,9 @@ void timerinit() {
 // }
 
 void countdown_timer_init(){
+  #ifdef DEBUG
   printf("countdown_timer_init\n");
+  #endif
   uint64 prcfg1_val;
   // 定时器有效位
   // prcfg1_val = r_csr_tcfg();
@@ -130,7 +132,9 @@ uint64 setitimer(int which, const struct itimerval *value,
     if (timer == NULL) {
       for (int i = 0; i < NTIMERS; i++) {
         if (timers[i].pid == 0) {
+          #ifdef DEBUG
           printf("set timer pid %d\n", pid);
+          #endif
           timer = &timers[i];
           timer->pid = pid;
           timer->which = which;

@@ -1,6 +1,7 @@
-platform	:= ramdisk_header
+# platform	:= visionfive
+platform	:= ramdisk
 mode 		:= 
-
+# mode 		:= release
 
 K=kernel
 U=user
@@ -9,24 +10,13 @@ I=include
 IMG=sdcard_loongarch
 linker = ld/kernel.ld
 initcode-ld = ld/initcode.ld
-image = ./kernel.bin
 
+# this is for sdcard.h, not used in target all
 imgname = new_sdcard.img
 headername = sdcard.h
 sdcard_img = $(K)/$(IMG)/$(imgname)
 sdcard_h = $(K)/$(I)/$(headername)
 
-ifeq ($(platform), qemu) 
-OBJS += $K/virtio_disk.o  
-CFLAGS += -DQEMU
-else ifeq ($(platform), ramdisk_header)
-CFLAGS += -DRAMDISK_HEADER
-OBJS += $K/ramdisk.o 
-else ifeq ($(platform), ramdisk_incbin)
-CFLAGS += -DRAMDISK_INCBIN
-OBJS += $K/ramdisk.o 
-OBJS += $K/sddata.o  
-endif
 
 OBJS += \
   $K/entry.o \
@@ -71,7 +61,6 @@ OBJS += \
   # $K/fs.o \
   # $K/futex.o \
   
-  
 # $K/futex.o \
 #   
 #   $K/plic.o 
@@ -86,7 +75,10 @@ OBJS += \
 #   $K/time.o \
 
 
-
+ifeq ($(platform), qemu)
+OBJS += \
+  $K/virtio_disk.o \
+#   #$K/uart.o \
 
 # else
 # OBJS += \
@@ -100,6 +92,7 @@ OBJS += \
 #   $K/sysctl.o 
   
 
+endif
 
 # LWIP_INCLUDES := \
 # 	-Ikernel/lwip/include \
@@ -167,6 +160,7 @@ OBJDUMP = $(TOOLPREFIX)objdump
 
 ASFLAGS = -march=loongarch64 -mabi=lp64s
 CFLAGS = -Wall  -O -fno-omit-frame-pointer -ggdb -g
+# -Werror
 CFLAGS += -MD
 CFLAGS += -march=loongarch64 -mabi=lp64s
 CFLAGS += -ffreestanding -fno-common -nostdlib
@@ -184,6 +178,19 @@ ifeq ($(mode), debug)
 CFLAGS += -DDEBUG 
 endif 
 
+# ifeq ($(exam), yes) 
+# CFLAGS += -DEXAM 
+# endif 
+
+ifeq ($(platform), qemu)
+CFLAGS += -D QEMU
+else ifeq ($(platform), ramdisk)
+# CFLAGS += -D k210
+# else ifeq ($(platform), visionfive)
+# CFLAGS += -D visionfive
+OBJS += $K/ramdisk.o
+OBJS += $K/sddata.o 
+endif
 
 LDFLAGS = -z max-page-size=4096 
 
@@ -198,26 +205,18 @@ LDFLAGS = -z max-page-size=4096
 # $K/liblwip.a:
 # 	@cd kernel && make -f net.mk liblwip.a
 
+# Compile Kernel
+# $T/kernel.bin: $T/kernel
+# 	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
 all:
 	@make build 
 
-ifeq ($(platform),ramdisk_header)
-build: ramdisk-header userprogs $T/kernel.bin 
-	$(OBJCOPY) $T/kernel --strip-all -O binary $(image)
-else 
-build:  userprogs $T/kernel.bin 
-	$(OBJCOPY) $T/kernel --strip-all -O binary $(image)
-endif
-
-# Compile Kernel
-$T/kernel.bin: $T/kernel
-	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
-
-$T/kernel: $(OBJS) $(linker) $U/initcode $U/init-for-test
+$T/kernel: $(OBJS) $(linker) 
 	if [ ! -d "./target" ]; then mkdir target; fi
 	$(LD) $(LDFLAGS) -T $(linker) -o $T/kernel $(OBJS)
 	$(OBJDUMP) -S $T/kernel > $T/kernel.asm
 	$(OBJDUMP) -t $T/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $T/kernel.sym
+	$(OBJCOPY) -O binary $T/kernel ./kernel.bin
 
 # %.o: %.S
 # 	$(CC) $(ASFLAGS) -c $< -o $@
@@ -230,7 +229,14 @@ $T/kernel: $(OBJS) $(linker) $U/initcode $U/init-for-test
 # build-grading: kernel-qemu
 # 	$(OBJCOPY) kernel-qemu --strip-all -O binary kernel-qemu.bin
 
+build: userprogs $T/kernel 
+	$(OBJCOPY) $T/kernel --strip-all -O binary $(image)
+
+image = $T/kernel.bin
+
+
 $K/bin.S:$U/initcode $U/init-for-test
+# $K/bin.S:$U/initcode
 
 $U/initcode: $U/initcode.S
 	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
@@ -243,6 +249,7 @@ $U/init-for-test: $U/init-for-test.S
 	$(LD) $(LDFLAGS) -N -e start -Ttext-segment 0 -T$(initcode-ld) -o $U/init-for-test.out $U/init-for-test.o
 	$(OBJCOPY) -S -O binary $U/init-for-test.out $U/init-for-test
 	$(OBJDUMP) -S $U/init-for-test.o > $U/init-for-test.asm
+
 
 tags: $(OBJS) _init
 	etags *.S *.c
@@ -332,7 +339,7 @@ userprogs: $(UPROGS)
 # 	@sudo cp $U/_sh $(dst)/sh
 # 	@sudo cp README $(dst)/README
 
-ramdisk-header: 
+sdcard-ram: 
 	if [ -f $(sdcard_h) ]; then rm $(sdcard_h); fi
 	xxd -i $(sdcard_img) > $(sdcard_h);
 	sed -i 's/$(K)_$(IMG)_$(imgname)/sdcard/g' $(sdcard_h);

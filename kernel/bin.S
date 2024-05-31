@@ -4,7 +4,7 @@
     .global initcodesize
 initcode:
     # .incbin "./user/initcode"
-    .incbin "./user/initcode"
+    #.incbin "./user/initcode"
     .incbin "./user/init-for-test"
     #.incbin "./xv6-user/busybox_test.bin"
 codeend:

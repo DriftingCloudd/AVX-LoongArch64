@@ -32,6 +32,18 @@ after_getpid:
 	li.d $a7, SYS_wait
 	syscall 0
 
+li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_getpid2
+	la $a0, t_getpid
+	la $a1, argv_gatpid
+	li.d $a7, SYS_exec
+	syscall 0
+after_getpid2:
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
+
 # t_getppid
 	li.d $a7, SYS_fork
 	syscall 0

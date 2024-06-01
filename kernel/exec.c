@@ -542,9 +542,9 @@ int exec(char *path, char **argv, char **env) {
   // sfence_vma();
   // flush_TLB();
 
-  printf("p->trapframe->era:%p\n", p->trapframe->era);
+  // printf("p->trapframe->era:%p\n", p->trapframe->era);
 
-  printf("p->ofile[1] is %p\n", p->ofile[1]);
+  // printf("p->ofile[1] is %p\n", p->ofile[1]);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 

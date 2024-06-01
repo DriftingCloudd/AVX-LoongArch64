@@ -800,7 +800,7 @@ void sched(void) {
 void yield(void) {
   struct proc *p = myproc();
   acquire(&p->lock);
-  printf("pid %d yield, era: %p\n", p->pid, p->trapframe->era);
+  // printf("pid %d yield, era: %p\n", p->pid, p->trapframe->era);
   p->state = RUNNABLE;
   // todo：线程部分
   // p->main_thread->state = t_RUNNABLE;

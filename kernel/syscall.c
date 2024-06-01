@@ -457,8 +457,19 @@ void syscall(void) {
       printf("pid %d: %s -> %d\n", p->pid, sysnames[num], p->trapframe->a0);
     }
   } else {
+    // if(num == 291 && p->name == "mmap"){
+    //   p->trapframe->a0 = syscalls[222]();
+    // }
+    // else if(num == 291 && p->name == "munmap"){
+    //   p->trapframe->a0 = syscalls[215]();
+    // }
+    // else{
+    //   printf("pid %d %s: unknown sys call %d\n", p->pid, p->name, num);
+    //   p->trapframe->a0 = -1;
+    // }
     printf("pid %d %s: unknown sys call %d\n", p->pid, p->name, num);
     p->trapframe->a0 = -1;
+    
   }
 }
 

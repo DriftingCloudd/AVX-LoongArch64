@@ -299,7 +299,7 @@ int exec(char *path, char **argv, char **env) {
   vma_init(p);
 
   oldpagetable = p->pagetable;
-  printf("oldpagetable:%p\n", oldpagetable);
+  // printf("oldpagetable:%p\n", oldpagetable);
 
   int is_shell_script = is_sh_script(path);
   if (is_shell_script) {
@@ -333,7 +333,7 @@ int exec(char *path, char **argv, char **env) {
   /* -------------------动态链接-------------------------------------------*/
   // 动态链接目前默认处理/libc.so
 
-  printf("is_dynamic is %d\n",is_dynamic);
+  // printf("is_dynamic is %d\n",is_dynamic);
 
   if (is_dynamic) {
 

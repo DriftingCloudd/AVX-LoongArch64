@@ -62,8 +62,8 @@
 
 // the kernel expects there to be RAM
 // for use by user pages
-// from physical address 0x8000000 to PHYSTOP.
-#define RAMBASE (0x08000000UL | DMWIN_MASK)
+// from physical address 0x90000000 to PHYSTOP.
+#define RAMBASE (0x90000000UL | DMWIN_MASK)
 #define RAMSTOP (RAMBASE + 128*1024*1024)
 
 // User memory layout.

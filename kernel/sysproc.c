@@ -18,7 +18,7 @@
 extern int exec(char *path, char **argv, char **env);
 
 uint64 sys_clone(void) {
-  printf("sys_clone: start\n");
+  // printf("sys_clone: start\n");
   uint64 new_stack, new_fn;
   uint64 ptid, tls, ctid;
   argaddr(1, &new_stack);
@@ -38,9 +38,9 @@ uint64 sys_clone(void) {
     printf("sys_clone: argaddr(4, &ctid) < 0\n");
     return -1;
   }
-  printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
-              "ctid = %p\n",
-              new_stack, new_fn, ptid, tls, ctid);
+  // printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
+  //             "ctid = %p\n",
+  //             new_stack, new_fn, ptid, tls, ctid);
   if (new_stack == 0) {
     return fork();
   }
@@ -183,7 +183,7 @@ bad:
 }
 
 uint64 sys_exit(void) {
-  printf("sys_exit\n");
+  // printf("sys_exit\n");
   int n;
   if (argint(0, &n) < 0)
     return -1;

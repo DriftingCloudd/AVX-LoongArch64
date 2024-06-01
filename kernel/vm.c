@@ -192,7 +192,7 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
 
     pte = walk(pagetable, va, 0);
     if (pte == 0) {
-      printf("walkaddr: pte == 0\n");
+      // printf("walkaddr: pte == 0\n");
       return NULL;
     }
     if ((*pte & PTE_V) == 0) {

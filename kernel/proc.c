@@ -243,7 +243,7 @@ static struct proc *allocproc(void) {
 found:
   p->pid = allocpid();
   freemem_amount();
-  printf("alloc proc:%d freemem_mount:%p\n", p->pid, freemem_amount());
+  // printf("alloc proc:%d freemem_mount:%p\n", p->pid, freemem_amount());
   p->vma = NULL;
   p->filelimit = NOFILE;
   p->ktime = 1;
@@ -338,7 +338,7 @@ static void freeproc(struct proc *p) {
   }
   // TODO: free threads
   freemem_amount();
-  printf("free proc : %d freemem_mount:%p\n",p->pid, freemem_amount());
+  // printf("free proc : %d freemem_mount:%p\n",p->pid, freemem_amount());
   p->pagetable = 0;
   p->vma = NULL;
   p->sz = 0;

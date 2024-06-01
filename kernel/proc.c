@@ -1013,7 +1013,7 @@ struct proc *findchild(struct proc *p, int pid, struct proc **child) {
     if ((pid == -1 || np->pid == pid) && np->parent == p) {
       acquire(&np->lock);
       *child = np;
-      printf("state : %d\n", np->state);
+      // printf("state : %d\n", np->state);
       if (np->state == ZOMBIE) {
         return np;
       }

@@ -443,9 +443,9 @@ void syscall(void) {
     //   printf("pid %d call %d: %s\n", p->pid, num, sysnames[num]);
     p->trapframe->a0 = syscalls[num]();
     
-    if (num == SYS_openat && p->trapframe->a0 == -1) {
-      printf("pid %d: openat failed\n", p->pid);
-    }
+    // if (num == SYS_openat && p->trapframe->a0 == -1) {
+    //   printf("pid %d: openat failed\n", p->pid);
+    // }
     // trace
     // if (num != SYS_read && num != SYS_write && num != SYS_writev &&
     //     num != SYS_sendto && num != SYS_recvfrom)

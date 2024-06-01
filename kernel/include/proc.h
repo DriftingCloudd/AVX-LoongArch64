@@ -7,7 +7,8 @@
 #include "spinlock.h"
 #include "file.h"
 #include "fat32.h"
-// #include "thread.h"
+// 线程头文件
+#include "thread.h"
 #include "trap.h"
 #include "vma.h"
 #include "signal.h"
@@ -51,7 +52,6 @@ struct cpu {
 
 extern struct cpu cpus[NCPU];
 
-
 // Per-process state
 // DEFINED IN XV6_PROC
 // 进程的状态信息
@@ -74,8 +74,8 @@ struct proc {
   uint64 filelimit;
 
   // these are private to the process, so p->lock need not be held.
-  // thread *main_thread;         // Main thread per process
-  // thread *thread_queue;        // thread_queue
+  thread *main_thread;         // Main thread per process
+  thread *thread_queue;        // thread_queue
   uint64 kstack;               // Virtual address of kernel stack
   uint64 sz;                   // Size of process memory (bytes)
   pagetable_t pagetable;       // User page table
@@ -89,9 +89,10 @@ struct proc {
   struct vma *vma;
   int ktime;
   int utime;
-  // int thread_num;
+  // 线程数
+  int thread_num;
   int char_count;   
-  // uint64 clear_child_tid;
+  uint64 clear_child_tid;
   //signal
   sigaction sigaction[SIGRTMAX + 1]; // signal action
   __sigset_t sig_set; // signal mask
@@ -99,60 +100,25 @@ struct proc {
   struct trapframe *sig_tf; // trapframe for signal
 
   //kernel thread
-  // void (*fn)(void *);
-  // void *arg;
+  void (*fn)(void *);
+  void *arg;
 };
-
-// struct proc
-// {
-//   struct spinlock lock;
-
-//   // p->lock must be held when using these:
-//   enum procstate state;        // Process state
-//   void *chan;                  // If non-zero, sleeping on chan
-//   int killed;                  // If non-zero, have been killed
-//   int xstate;                  // Exit status to be returned to parent's wait
-//   int pid;                     // Process ID
-
-//   // wait_lock must be held when using this:
-//   struct proc *parent;         // Parent process
-
-//   // these are private to the process, so p->lock need not be held.
-//   uint64 kstack;               // Virtual address of kernel stack
-//   uint64 sz;                   // Size of process memory (bytes)
-//   pagetable_t pagetable;    // User lower half address page table
-//   // 内核进程页表 Kernel page table
-//   pagetable_t kpagetable;    // User lower half address page table
-//   // todo： 中断保存寄存器
-//   struct trapframe *trapframe; // data page for uservec.S, use DMW address
-//   struct context context;      // swtch() here to run process
-//   struct file *ofile[NOFILE];  // Open files
-//   // 进程当前目录 
-//   struct inode *cwd;           // Current directory
-//   char name[16];               // Process name (debugging)
-//   //
-//   uint64 filelimit;
-//   // timer
-//   int ktime;
-//   int utime;
-//   // vma
-//   struct vma *vma;
-// };
-
 
 typedef struct rlimit {
   uint64 rlim_cur;
   uint64 rlim_max;
 }rlimit;
 
-// typedef struct thread_stack_param {
-//   uint64 func_point;
-//   uint64 arg_point;
-// }thread_stack_param;
+typedef struct thread_stack_param {
+  // 入口地址
+  uint64 func_point;
+  // 传参地址
+  uint64 arg_point;
+}thread_stack_param;
 
 #define NOFILEMAX(p) (p->filelimit<NOFILE?p->filelimit:NOFILE)
 #define LOG_PROCESS_NUM 7
-// #define THREAD_TOTAL_NUMBER (1 << LOG_PROCESS_NUM)
+#define THREAD_TOTAL_NUMBER 1024
 // #define PROCESS_OFFSET(processId) ((processId) & (THREAD_TOTAL_NUMBER - 1))
 
 void            cpuinit(void);

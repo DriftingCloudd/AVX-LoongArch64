@@ -22,6 +22,17 @@
 
 #define FUTEX_PRIVATE_FLAG 128
 #define FUTEX_COUNT 1024
+//
+#define FUTEX_OP(op, oparg, cmp, cmparg) \
+                            (((op & 0xf) << 28) | \
+                            ((cmp & 0xf) << 24) | \
+                            ((oparg & 0xfff) << 12) | \
+                            (cmparg & 0xfff))
+#define FUTEX_OP_SET        0  /* uaddr2 = oparg; */
+#define FUTEX_OP_ADD        1  /* uaddr2 += oparg; */
+#define FUTEX_OP_OR         2  /* uaddr2 |= oparg; */
+#define FUTEX_OP_ANDN       3  /* uaddr2 &= ~oparg; */
+#define FUTEX_OP_XOR        4  /* uaddr2 ^= oparg; */
 
 void futexWait(uint64 addr, thread* th, TimeSpec2* ts);
 void futexWake(uint64 addr, int n);

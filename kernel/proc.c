@@ -32,10 +32,10 @@ struct spinlock pid_lock;
 
 extern void forkret(void);
 extern int magic_count;
+// swtch.S
 extern void swtch(struct context *, struct context *);
 static void wakeup1(struct proc *chan);
 static void freeproc(struct proc *p);
-
 
 extern char trampoline[];       // trampoline.S
 extern char signalTrampoline[]; // signalTrampoline.S
@@ -807,6 +807,7 @@ void yield(void) {
   struct proc *p = myproc();
   acquire(&p->lock);
   # ifdef DEBUG
+  // 中断返回值
   printf("pid %d yield, era: %p\n", p->pid, p->trapframe->era);
   # endif
   p->state = RUNNABLE;

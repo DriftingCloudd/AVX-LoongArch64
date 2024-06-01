@@ -69,8 +69,10 @@ void sighandle(void) {
         (uint64)p->sigaction[signum].__sigaction_handler.sa_handler;
     p->trapframe->ra = (uint64)SIGTRAMPOLINE;
     p->trapframe->sp = p->trapframe->sp - PGSIZE;
+    # ifdef DEBUG
     printf("sighandle epc:%p ra:%p\n", p->trapframe->era,
                 p->trapframe->ra);
+    # endif
     p->sig_pending.__val[0] &= ~(1ul << signum);
     if (p->sig_pending.__val[0] == 0) {
       p->killed = 0;

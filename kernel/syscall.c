@@ -440,24 +440,34 @@ void syscall(void) {
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     if (num != SYS_read && num != SYS_write && num != SYS_writev &&
         num != SYS_clock_gettime && num != SYS_sendto && num != SYS_recvfrom)
+        #ifdef DEBUG
       printf("pid %d call %d: %s\n", p->pid, num, sysnames[num]);
+      # endif
     p->trapframe->a0 = syscalls[num]();
     
     if (num == SYS_openat && p->trapframe->a0 == -1) {
+      #ifdef DEBUG
       printf("pid %d: openat failed\n", p->pid);
+      # endif
     }
     // trace
     if (num != SYS_read && num != SYS_write && num != SYS_writev &&
         num != SYS_sendto && num != SYS_recvfrom)
+        #ifdef DEBUG
       printf("pid %d: %s -> %d\n", p->pid, sysnames[num],
                   p->trapframe->a0);
+        #endif
     // printf("pid %d call %d: %s a0:%p sp:%p\n", p->pid, num, sysnames[num],
     // p->trapframe->a0, p->trapframe->sp);
     if ((p->tmask & (1 << num)) != 0) {
+      #ifdef DEBUG
       printf("pid %d: %s -> %d\n", p->pid, sysnames[num], p->trapframe->a0);
+      #endif
     }
   } else {
+    # ifdef DEBUG
     printf("pid %d %s: unknown sys call %d\n", p->pid, p->name, num);
+    # endif
     p->trapframe->a0 = -1;
   }
 }
@@ -465,8 +475,10 @@ void syscall(void) {
 uint64 sys_test_proc(void) {
   int n;
   argint(0, &n);
+  #ifdef DEBUG
   printf("hello world from proc %d, hart %d, arg %d\n", myproc()->pid, r_tp(),
          n);
+  #endif
   return 0;
 }
 

@@ -186,21 +186,29 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
   else{
     if (va >= MAXVA) {
       // debug_print --> printf
+      #ifdef DEBUG
       printf("walkaddr: va >= MAXVA\n");
+      #endif
       return NULL;
     }
 
     pte = walk(pagetable, va, 0);
     if (pte == 0) {
+      #ifdef DEBUG
       printf("walkaddr: pte == 0\n");
+      #endif
       return NULL;
     }
     if ((*pte & PTE_V) == 0) {
+      #ifdef DEBUG
       printf("va :%p walkaddr: *pte & PTE_V == 0\n", va);
+      #endif
       return NULL;
     }
     if ((*pte & PTE_PLV3) == 0) {
+      #ifdef DEBUG
       printf("walkaddr: *pte & PTE_U == 0\n");
+      #endif
       return NULL;
     }
     // Used when in user_mode
@@ -263,7 +271,9 @@ int mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa,
     if ((pte = walk(pagetable, a, 1)) == NULL)
       return -1;
     if (*pte & PTE_V) {
+      #ifdef DEBUG
       printf("mappages:%p %p\n", a, PTE2PA(*pte));
+      # endif
       panic("remap");
     }
 
@@ -331,7 +341,9 @@ void uvminit(pagetable_t pagetable, uchar *src,
   memset(mem, 0, PGSIZE);
   mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV3 | PTE_W |PTE_D| PTE_MAT);
   memmove(mem, src + i, sz % PGSIZE);
+  #ifdef DEBUG
   printf("uvminit done sz:%d\n", sz);
+  #endif
   // for (int i = 0; i < sz; i ++) {
   //   printf("[uvminit]mem: %p, %x\n", mem + i, mem[i]);
   // }
@@ -347,14 +359,18 @@ uint64 uvmalloc1(pagetable_t pagetable, uint64 start, uint64 end, int perm) {
     mem = kalloc();
     if (mem == NULL) {
       uvmdealloc1(pagetable, start, a);
+      #ifdef DEBUG
       printf("uvmalloc kalloc failed\n");
+      #endif
       return -1;
     }
     memset(mem, 0, PGSIZE);
     if (mappages(pagetable, a, PGSIZE, (uint64)mem, perm) != 0) {
       kfree(mem);
       uvmdealloc1(pagetable, start, a);
+      # ifdef DEBUG
       printf("[uvmalloc]map user page failed\n");
+      # endif
       return -1;
     }
   }
@@ -572,7 +588,9 @@ int copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len) {
     va0 = PGROUNDDOWN(srcva);
     pa0 = walkaddr(pagetable, va0);
     if (pa0 == NULL) {
+      # ifdef DEBUG
       printf("copyin: pa0 is NULL\n");
+      # endif
       return -1;
     }
     n = PGSIZE - (srcva - va0);

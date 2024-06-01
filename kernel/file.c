@@ -549,7 +549,9 @@ uint64 file_send(struct file *fin, struct file *fout, uint64 addr, uint64 n) {
     rlen = fileinput(fin, 0, (uint64)&buf, rlen, off);
     if (fin->type != FD_PIPE)
       fileiounlock(fin);
+      # ifdef DEBUG
     printf("[filesend] send rlen %p\n", rlen);
+    # endif
     off += rlen;
     n -= rlen;
     if (!rlen) {
@@ -560,7 +562,9 @@ uint64 file_send(struct file *fin, struct file *fout, uint64 addr, uint64 n) {
     wlen = fileoutput(fout, 0, (uint64)&buf, rlen, fout->off);
     if (fout->type != FD_PIPE)
       fileiounlock(fout);
+      # ifdef DEBUG
     printf("[filesend] send wlen:%p\n", rlen, wlen);
+    # endif
     fout->off += wlen;
     ret += wlen;
   }

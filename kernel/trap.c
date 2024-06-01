@@ -116,7 +116,9 @@ usertrap(void)
   }else if((r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x1 || (r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x2  ){
     // load page fault or store page fault
     // check if the page fault is caused by stack growth
+    #ifdef DEBUG
     printf("usertrap():handle stack page fault\n");
+    #endif
     panic("usertrap():handle stack page fault\n");
   } 
   else if((which_dev = devintr()) != 0){
@@ -124,7 +126,9 @@ usertrap(void)
   } else {
     uint64 ir = 0;
     copyin(myproc()->pagetable, (char *)&ir, r_csr_era(), 8);
+    #ifdef DEBUG
     printf("usertrap(): unexpected trapcause %x pid=%d\n", r_csr_estat(), p->pid);
+    #endif
     printf("            era=%p badi=%x\n", r_csr_era(), r_csr_badi());
     trapframedump(p->trapframe);
     p->killed = 1;
@@ -236,8 +240,10 @@ kerneltrap()
     panic("kerneltrap: interrupts enabled");
 
   if((which_dev = devintr()) == 0){
+    #ifdef DEBUG
     printf("estat %x\n", r_csr_estat());
     printf("era=%p eentry=%p\n", r_csr_era(), r_csr_eentry());
+    #endif
     panic("kerneltrap");
   }
   // printf ("which_dev=%d\n", which_dev);
@@ -297,8 +303,9 @@ devintr()
 
       // extioi_complete(1UL << UART0_IRQ);
     } else if(ecfg & estat){
+      #ifdef DEBUG
        printf("unexpected interrupt estate %x, ecfg %x \n", estat, ecfg);   
-    
+      #endif
       // apic_complete(irq); 
       // extioi_complete(irq);  
     }

@@ -14,12 +14,16 @@
 struct vma *vma_init(struct proc *p) {
   // 为进程分配初始化的vma
   if (NULL == p) {
-    printf("p is not existing\n");
+    #ifdef DEBUG
+printf("p is not existing\n");
+#endif
     return NULL;
   }
   struct vma *vma = (struct vma *)kalloc();
   if (NULL == vma) {
-    printf("vma kalloc failed\n");
+    #ifdef DEBUG
+printf("vma kalloc failed\n");
+#endif
     return NULL;
   }
   memset(vma, 0, PGSIZE);
@@ -53,13 +57,17 @@ struct vma *alloc_vma(struct proc *p, enum segtype type, uint64 addr, uint64 sz,
     else if (start >= find_vma->addr && end <= find_vma->end) {
       return find_vma;
     } else {
-      printf("vma address overflow\n");
+      #ifdef DEBUG
+printf("vma address overflow\n");
+#endif
       return NULL;
     }
   }
   struct vma *vma = (struct vma *)kalloc();
   if (NULL == vma) {
-    printf("vma kalloc failed\n");
+    #ifdef DEBUG
+printf("vma kalloc failed\n");
+#endif
     return NULL;
   }
 
@@ -67,13 +75,17 @@ struct vma *alloc_vma(struct proc *p, enum segtype type, uint64 addr, uint64 sz,
   if (0 != sz) {
     if (alloc) {
       if (0 != uvmalloc1(p->pagetable, start, end, perm)) {
-        printf("uvmalloc failed\n");
+        #ifdef DEBUG
+printf("uvmalloc failed\n");
+#endif
         kfree(vma);
         return NULL;
       }
     } else if (pa != 0) {
       if (0 != mappages(p->pagetable, start, sz, pa, perm)) {
-        printf("mappages failed\n");
+        #ifdef DEBUG
+printf("mappages failed\n");
+#endif
         kfree(vma);
         return NULL;
       }
@@ -115,7 +127,9 @@ struct vma *alloc_mmap_vma(struct proc *p, int flags, uint64 addr, uint64 sz,
   }
   vma = alloc_vma(p, MMAP, addr, sz, perm, 1, NULL);
   if (NULL == vma) {
-    printf("alloc_mmap_vma: alloc_vma failed\n");
+    #ifdef DEBUG
+printf("alloc_mmap_vma: alloc_vma failed\n");
+#endif
     return NULL;
   }
   vma->fd = fd;
@@ -128,7 +142,9 @@ struct vma *vma_copy(struct proc *np, struct vma *head) {
   // kalloc -> malloc
   struct vma *new_vma = (struct vma *)kalloc();
   if (NULL == new_vma) {
-    printf("vma copy failed\n");
+    #ifdef DEBUG
+printf("vma copy failed\n");
+#endif
     goto failure;
   }
   new_vma->next = new_vma->prev = new_vma;
@@ -200,11 +216,15 @@ failure2:
 
 int free_vma(struct proc *p, struct vma *del) {
   if (del == NULL) {
-    printf("[free_vma] del is nil\n");
+    #ifdef DEBUG
+printf("[free_vma] del is nil\n");
+#endif
     return 0;
   }
   if (del->prev == NULL || del->next == NULL) {
-    printf("[free_vma] del is illegal\n");
+    #ifdef DEBUG
+printf("[free_vma] del is illegal\n");
+#endif
     return 0;
   }
 
@@ -214,7 +234,9 @@ int free_vma(struct proc *p, struct vma *del) {
   next->prev = prev;
   del->next = del->prev = NULL;
   if (uvmdealloc1(p->pagetable, del->addr, del->end) != 0) {
-    printf("[free_vma] uvmdealloc fail\n");
+    #ifdef DEBUG
+printf("[free_vma] uvmdealloc fail\n");
+#endif
     return 0;
   }
   kfree(del);
@@ -264,13 +286,17 @@ uint64 alloc_vma_stack(struct proc *p) {
 
   struct vma *vma = (struct vma *)kalloc();
   if (NULL == vma) {
-    printf("vma kalloc failed\n");
+    #ifdef DEBUG
+printf("vma kalloc failed\n");
+#endif
     return -1;
   }
 
   if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV3|PTE_D) != 0) {
     // 判断读权限
-    printf("user stack vma alloc failed\n");
+    #ifdef DEBUG
+printf("user stack vma alloc failed\n");
+#endif
     kfree(vma);
     return -1;
   }
@@ -303,11 +329,15 @@ uint64 handle_stack_page_fault(struct proc *p, uint64 va) {
     vma = vma->next;
   }
   if (vma->type != STACK) {
-    printf("handle_stack_page_fault: vma type is not stack\n");
+    #ifdef DEBUG
+printf("handle_stack_page_fault: vma type is not stack\n");
+#endif
     return -1;
   }
+  #ifdef DEBUG
   printf("handle stack page fault now start %p, now end :%p, va:%p\n",
          vma->addr, vma->end, va);
+  #endif
   uint64 start = vma->addr - INCREASE_STACK_SIZE_PER_FAULT;
   if (start > va) {
     start = PGROUNDDOWN(va);
@@ -315,7 +345,9 @@ uint64 handle_stack_page_fault(struct proc *p, uint64 va) {
   uint64 end = vma->addr;
 
   if (uvmalloc1(p->pagetable, start, end, PTE_P | PTE_W | PTE_PLV3|PTE_D) != 0) {
-    printf("user stack vma alloc failed\n");
+    #ifdef DEBUG
+printf("user stack vma alloc failed\n");
+#endif
     return -1;
   }
   vma->addr = start;
@@ -333,7 +365,9 @@ uint64 get_proc_sp(struct proc *p) {
     vma = vma->next;
   }
   if (vma->type != STACK) {
-    printf("get_proc_sp: vma type is not stack\n");
+    #ifdef DEBUG
+printf("get_proc_sp: vma type is not stack\n");
+#endif
     return -1;
   }
   return vma->end;

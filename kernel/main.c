@@ -49,8 +49,9 @@ void main() {
     // #ifdef DEBUG
     // printf("DEBUG:hart %d enter main()...\n", cpuid);
     // #endif
+  # ifdef DEBUG
     printf("DEBUG:hart %d enter main()...\n", cpuid);
-
+  # endif
     // 内存映射 //
     kinit();        // physical page allocator
     kvminit();      // create kernel page table
@@ -74,8 +75,9 @@ void main() {
     fileinit(); // file table
     userinit(); // first user process
     // tcpip_init_with_loopback();
+    # ifdef DEBUG
     printf("cpu %d init done\n", cpuid);
-
+    # endif
 
     __sync_synchronize();
     started = 1;

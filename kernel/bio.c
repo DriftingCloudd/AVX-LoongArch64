@@ -51,9 +51,9 @@ void binit(void) {
     bcache.head.next->prev = b;
     bcache.head.next = b;
   }
-// #ifdef DEBUG
+#ifdef DEBUG
   printf("binit\n");
-// #endif
+#endif
 }
 
 // Look through buffer cache for block on device dev.

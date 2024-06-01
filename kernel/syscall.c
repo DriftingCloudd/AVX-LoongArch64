@@ -440,7 +440,7 @@ void syscall(void) {
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     if (num != SYS_read && num != SYS_write && num != SYS_writev &&
         num != SYS_clock_gettime && num != SYS_sendto && num != SYS_recvfrom)
-      // printf("pid %d call %d: %s\n", p->pid, num, sysnames[num]);
+      printf("pid %d call %d: %s\n", p->pid, num, sysnames[num]);
     p->trapframe->a0 = syscalls[num]();
     
     if (num == SYS_openat && p->trapframe->a0 == -1) {

@@ -113,12 +113,12 @@ usertrap(void)
     printf("usertrap():handling syscall\n");
     #endif
     syscall();
-  }else if(((r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x1 || (r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x2)
-  && handle_stack_page_fault(myproc(), r_csr_badv()) == 0 ){
+  }else if(((r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x1 || (r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x2)){
     // load page fault or store page fault
     // check if the page fault is caused by stack growth
     printf("usertrap():handle stack page fault\n");
     // panic("usertrap():handle stack page fault\n");
+    //  && handle_stack_page_fault(myproc(), r_csr_badv()) == 0 
   } 
   else if((which_dev = devintr()) != 0){
     // ok

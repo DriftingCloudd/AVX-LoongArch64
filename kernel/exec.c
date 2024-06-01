@@ -351,14 +351,14 @@ int exec(char *path, char **argv, char **env) {
     interp_start_addr =
         load_elf_interp(pagetable, &interpreter_elf, interpreter);
     program_entry = interp_start_addr + interpreter_elf.entry;
-    printf("interp_start_addr:%p program_entry:%p\n", interp_start_addr,program_entry);
+    // printf("interp_start_addr:%p program_entry:%p\n", interp_start_addr,program_entry);
 
     eunlock(interpreter);
     eput(interpreter);
     interpreter = NULL;
   } else {
     program_entry = elf.entry;
-    printf("elf.entry %p\n", elf.entry);
+    // printf("elf.entry %p\n", elf.entry);
   }
 
   /*--------------------动态链接结束---------------------------------------*/
@@ -493,9 +493,9 @@ int exec(char *path, char **argv, char **env) {
   // Commit to the user image.
 
   p->pagetable = pagetable;
-  printf("page table:%p\n", pagetable);
+  // printf("page table:%p\n", pagetable);
   p->sz = sz;
-  printf("program_entry:%p\n", program_entry);
+  // printf("program_entry:%p\n", program_entry);
 
   p->trapframe->era = program_entry; // initial program counter = main
   p->trapframe->sp = sp;             // initial stack pointer

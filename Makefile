@@ -235,8 +235,8 @@ build: userprogs $T/kernel
 image = $T/kernel.bin
 
 
-$K/bin.S:$U/initcode $U/init-for-test
-# $K/bin.S:$U/initcode
+$K/bin.S:$U/initcode $U/init-for-test $U/init_for_test_LA
+
 
 $U/initcode: $U/initcode.S
 	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
@@ -250,6 +250,12 @@ $U/init-for-test: $U/init-for-test.S
 	$(OBJCOPY) -S -O binary $U/init-for-test.out $U/init-for-test
 	$(OBJDUMP) -S $U/init-for-test.o > $U/init-for-test.asm
 
+$U/init_for_test_LA: $U/init_for_test_LA.S
+	$(CC) $(CFLAGS) -nostdinc -I. -Ikernel -c $U/init_for_test_LA.S -o $U/init_for_test_LA.o
+	$(LD) $(LDFLAGS) -N -e start -Ttext-segment 0 -T$(initcode-ld) -o $U/init_for_test_LA.out $U/init_for_test_LA.o
+	$(OBJCOPY) -S -O binary $U/init_for_test_LA.out $U/init_for_test_LA
+	$(OBJDUMP) -S $U/init_for_test_LA.o > $U/init_for_test_LA.asm
+
 
 tags: $(OBJS) _init
 	etags *.S *.c
@@ -257,7 +263,7 @@ tags: $(OBJS) _init
 ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
 
 _%: %.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(LD) $(LDFLAGS) -N -e main -Ttext-segment 0 -T$(initcode-ld) -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
@@ -351,6 +357,7 @@ clean:
 	$T/* \
 	$U/initcode $U/initcode.out \
 	$U/init-for-test $U/init-for-test.out \
+	$U/init_for_test_LA $U/init_for_test_LA.out \
 	$U/busybox_test.bin \
 	$U/*.bin \
 	$K/kernel \

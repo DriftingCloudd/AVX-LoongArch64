@@ -96,6 +96,7 @@ uint64 sys_exec(void) {
     printf("[sys_exec] fetch arg error\n");
     return -1;
   }
+  printf("[sys_exec] path:%s, uargv:%p\n", path, uargv);
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
@@ -122,7 +123,7 @@ uint64 sys_exec(void) {
     }
   }
 
-  // printf("[sys_exec] path:%s, argv:%p\n", path, argv);
+  printf("[sys_exec] path:%s, argv:%p\n", path, argv);
 
   int ret = exec(path, argv, 0);
 
@@ -150,36 +151,36 @@ uint64 sys_execve(void) {
       argaddr(2, &uenv)) {
     return -1;
   }
-  // printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
-  // memset(argv, 0, sizeof(argv));
-  // for (i = 0;; i++) {
-  //   if (i >= NELEM(argv)) {
-  //     printf("[sys_execve] too many arguments\n");
-  //     goto bad;
-  //   }
-  //   if (fetchaddr(uargv + sizeof(uint64) * i, (uint64 *)&uarg) < 0) {
-  //     printf("[sys_execve] fetch %d addr error uargv:%p\n", i, uargv);
-  //     goto bad;
-  //   }
-  //   if (uarg == 0) {
-  //     argv[i] = 0;
-  //     break;
-  //   }
-  //   argv[i] = kalloc();
-  //   if (argv[i] == 0) {
-  //     printf("[sys_execve] kalloc error\n");
-  //     goto bad;
-  //   }
-  //   memset(argv[i], 0, PGSIZE);
-  //   if (fetchstr(uarg, argv[i], PGSIZE) < 0) {
-  //     printf("[sys_execve] fetchstr error\n");
-  //     goto bad;
-  //   }
-  // }
+  printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
+  memset(argv, 0, sizeof(argv));
+  for (i = 0;; i++) {
+    if (i >= NELEM(argv)) {
+      printf("[sys_execve] too many arguments\n");
+      goto bad;
+    }
+    if (fetchaddr(uargv + sizeof(uint64) * i, (uint64 *)&uarg) < 0) {
+      printf("[sys_execve] fetch %d addr error uargv:%p\n", i, uargv);
+      goto bad;
+    }
+    if (uarg == 0) {
+      argv[i] = 0;
+      break;
+    }
+    argv[i] = kalloc();
+    if (argv[i] == 0) {
+      printf("[sys_execve] kalloc error\n");
+      goto bad;
+    }
+    memset(argv[i], 0, PGSIZE);
+    if (fetchstr(uarg, argv[i], PGSIZE) < 0) {
+      printf("[sys_execve] fetchstr error\n");
+      goto bad;
+    }
+  }
 
   // printf("[sys_execve] path:%s, argv:%p\n", path, argv);
 
-  int ret = exec(path, 0, 0);
+  int ret = exec(path, argv, 0);
 
   // for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
   //   kfree(argv[i]);

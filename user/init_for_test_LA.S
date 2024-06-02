@@ -20,6 +20,19 @@ start:
         li.d $a7, SYS_dup
         syscall 0	# dup(0);  #  stderr
 
+# execve
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_execve
+	la $a0, t_execve
+	la $a1, argv_execve
+	li.d $a7, SYS_exec
+	syscall 0
+after_execve:
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
+
 # clone
 	li.d $a7, SYS_fork
 	syscall 0
@@ -59,18 +72,7 @@ after_openat:
 	li.d $a7, SYS_wait
 	syscall 0
 
-# execve
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_execve
-	la $a0, t_execve
-	la $a1, argv_execve
-	li.d $a7, SYS_exec
-	syscall 0
-after_execve:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
+
 
 # mmap
 	li.d $a7, SYS_fork

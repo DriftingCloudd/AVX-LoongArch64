@@ -19,6 +19,21 @@ start:
         li.d $a0, 0
         li.d $a7, SYS_dup
         syscall 0	# dup(0);  #  stderr
+
+# exit
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_exit
+	la $a0, t_exit
+	la $a1, argv_exit
+	li.d $a7, SYS_exec
+	syscall 0
+after_exit:
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
+
+
 # # t_getpid
 # 	li.d $a7, SYS_fork
 # 	syscall 0
@@ -318,18 +333,6 @@ after_clone:
 # 	li.d $a7, SYS_wait
 # 	syscall 0
 
-# exit
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_exit
-	la $a0, t_exit
-	la $a1, argv_exit
-	li.d $a7, SYS_exec
-	syscall 0
-after_exit:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
 
 # # times
 # 	li.d $a7, SYS_fork

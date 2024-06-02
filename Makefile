@@ -58,97 +58,11 @@ OBJS += \
   $K/systime.o \
   $K/SignalTrampoline.o \
   $K/gdbdebug.o \
-  # $K/fs.o \
-  # $K/futex.o \
-  
-# $K/futex.o \
-#   
-#   $K/plic.o 
-  
-#   $K/socket_new.o \
-#   $K/sem.o \
-#   $K/syssocket.o \
-#   $K/SignalTrampoline.o \
-#   $K/thread.o \
-#   $K/pselect.o \
-#   $K/uart8250.o \
-#   $K/time.o \
-
 
 ifeq ($(platform), qemu)
 OBJS += \
   $K/virtio_disk.o \
-#   #$K/uart.o \
-
-# else
-# OBJS += \
-# 	$K/sd_final.o
-#   $K/spi.o \
-#   $K/gpiohs.o \
-#   $K/fpioa.o \
-#   $K/utils.o \
-#   $K/sdcard.o \
-#   $K/dmac.o \
-#   $K/sysctl.o 
-  
-
 endif
-
-# LWIP_INCLUDES := \
-# 	-Ikernel/lwip/include \
-# 	-Ikernel/lwip/include/ipv4 \
-# 	-Ikernel/lwip/include/arch \
-# 	-Ikernel/lwip \
-# 	-Ikernel/include \
-# 	-I.
-
-# LWIP_SRCFILES += \
-# 	kernel/lwip/api/api_lib.c \
-# 	kernel/lwip/api/api_msg.c \
-# 	kernel/lwip/api/err.c \
-# 	kernel/lwip/api/if_api.c \
-# 	kernel/lwip/api/netdb.c \
-# 	kernel/lwip/api/netifapi.c \
-# 	kernel/lwip/api/sockets.c \
-# 	kernel/lwip/api/tcpip.c \
-# 	kernel/lwip/api/netbuf.c \
-# 	kernel/lwip/core/init.c \
-# 	kernel/lwip/core/tcp_in.c \
-# 	kernel/lwip/core/dns.c \
-# 	kernel/lwip/core/def.c \
-# 	kernel/lwip/core/mem.c \
-# 	kernel/lwip/core/memp.c \
-# 	kernel/lwip/core/netif.c \
-# 	kernel/lwip/core/pbuf.c \
-# 	kernel/lwip/core/raw.c \
-# 	kernel/lwip/core/stats.c \
-# 	kernel/lwip/core/sys.c \
-# 	kernel/lwip/core/tcp.c \
-# 	kernel/lwip/core/inet_chksum.c \
-# 	kernel/lwip/core/ip.c \
-# 	kernel/lwip/core/timeouts.c \
-# 	kernel/lwip/core/ipv4/autoip.c \
-# 	kernel/lwip/core/ipv4/dhcp.c \
-# 	kernel/lwip/core/ipv4/ip4_addr.c \
-# 	kernel/lwip/core/ipv4/icmp.c \
-# 	kernel/lwip/core/ipv4/ip4.c \
-# 	kernel/lwip/core/ipv4/ip4_frag.c \
-# 	kernel/lwip/core/ipv4/etharp.c \
-# 	kernel/lwip/core/tcp_out.c \
-# 	kernel/lwip/core/udp.c \
-# 	kernel/lwip/netif/ethernet.c \
-# 	kernel/lwip/netif/bridgeif.c \
-# 	kernel/lwip/netif/bridgeif_fdb.c \
-# 	kernel/lwip/arch/sys_arch.c \
-# 	kernel/lwip/arch/atoi.c \
-# 	kernel/lwip/arch/errno.c \
-# 	kernel/lwip/arch/string.c \
-# 	kernel/lwip/arch/rand.c \
-
-# LWIP_OBJFILES := $(patsubst %.c, %.o, $(LWIP_SRCFILES))
-# LWIP_OBJFILES := $(patsubst %.S, %.o, $(LWIP_OBJFILES))
-
-# OBJS += $(LWIP_OBJFILES)
 
 TOOLPREFIX	:= loongarch64-linux-gnu-
 
@@ -160,7 +74,6 @@ OBJDUMP = $(TOOLPREFIX)objdump
 
 ASFLAGS = -march=loongarch64 -mabi=lp64s
 CFLAGS = -Wall  -O -fno-omit-frame-pointer -ggdb -g
-# -Werror
 CFLAGS += -MD
 CFLAGS += -march=loongarch64 -mabi=lp64s
 CFLAGS += -ffreestanding -fno-common -nostdlib
@@ -169,45 +82,20 @@ CFLAGS += -fno-stack-protector
 FLAGS += -I.
 CFLAGS += -Ikernel/include
 CFLAGS += -I.kernel -I.
-# CFLAGS += -Ikernel/lwip/include
-# CFLAGS += -Ikernel/lwip/include/arch
-# CFLAGS += -Ikernel/lwip
-# CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 
 ifeq ($(mode), debug) 
 CFLAGS += -DDEBUG 
 endif 
 
-# ifeq ($(exam), yes) 
-# CFLAGS += -DEXAM 
-# endif 
-
 ifeq ($(platform), qemu)
 CFLAGS += -D QEMU
 else ifeq ($(platform), ramdisk)
-# CFLAGS += -D k210
-# else ifeq ($(platform), visionfive)
-# CFLAGS += -D visionfive
 OBJS += $K/ramdisk.o
 OBJS += $K/sddata.o 
 endif
 
 LDFLAGS = -z max-page-size=4096 
 
-# ifeq ($(platform), visionfive)
-# linker = ./linker/visionfive.ld
-# endif
-
-# ifeq ($(platform), qemu)
-# linker = ./linker/qemu.ld
-# endif
-
-# $K/liblwip.a:
-# 	@cd kernel && make -f net.mk liblwip.a
-
-# Compile Kernel
-# $T/kernel.bin: $T/kernel
-# 	$(OBJCOPY) -O binary $T/kernel $T/kernel.bin
 all:
 	@make build 
 
@@ -218,16 +106,6 @@ $T/kernel: $(OBJS) $(linker)
 	$(OBJDUMP) -t $T/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $T/kernel.sym
 	$(OBJCOPY) -O binary $T/kernel ./kernel.bin
 
-# %.o: %.S
-# 	$(CC) $(ASFLAGS) -c $< -o $@
-
-# kernel-qemu: $(OBJS) $(linker) $U/initcode $U/init_for_test
-# 	$(LD) $(LDFLAGS) -T $(linker) -so kernel-qemu $(OBJS) -L.
-# 	$(OBJDUMP) -S kernel-qemu > kernel-qemu.asm
-# 	$(OBJDUMP) -t kernel-qemu | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > kernel-qemu.sym
-
-# build-grading: kernel-qemu
-# 	$(OBJCOPY) kernel-qemu --strip-all -O binary kernel-qemu.bin
 
 build: userprogs $T/kernel 
 	$(OBJCOPY) $T/kernel --strip-all -O binary $(image)
@@ -317,33 +195,6 @@ UPROGS=\
 userprogs: $(UPROGS)
 	@$(OBJCOPY) -S -O binary $U/_busybox_test $U/busybox_test.bin
 
-# dst=/mnt
-
-# @sudo cp $U/_init $(dst)/init
-# @sudo cp $U/_sh $(dst)/sh
-# Make fs image
-# fs: $(UPROGS)
-# #	@echo a
-# 	@if [ ! -f "fs.img" ]; then \
-# 		echo "making fs image..."; \
-# 		dd if=/dev/zero of=fs.img bs=512k count=512; \
-# 		mkfs.vfat -F 32 fs.img; fi
-# 	@sudo mount fs.img $(dst)
-# 	@if [ ! -d "$(dst)/bin" ]; then sudo mkdir $(dst)/bin; fi
-# 	@sudo cp README $(dst)/README
-# 	@for file in $$( ls $U/_* ); do \
-# 		sudo cp $$file $(dst)/$${file#$U/_};\
-# 		sudo cp $$file $(dst)/bin/$${file#$U/_}; done
-# 	@sudo umount $(dst)
-
-# # Write mounted sdcard
-# sdcard: userprogs
-# 	@if [ ! -d "$(dst)/bin" ]; then sudo mkdir $(dst)/bin; fi
-# 	@for file in $$( ls $U/_* ); do \
-# 		sudo cp $$file $(dst)/bin/$${file#$U/_}; done
-# 	@sudo cp $U/_init $(dst)/init
-# 	@sudo cp $U/_sh $(dst)/sh
-# 	@sudo cp README $(dst)/README
 
 sdcard-ram: 
 	if [ -f $(sdcard_h) ]; then rm $(sdcard_h); fi

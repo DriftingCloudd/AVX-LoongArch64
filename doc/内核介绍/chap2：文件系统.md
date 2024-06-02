@@ -41,4 +41,4 @@ struct file{
 }
 ```
 
-![](doc/内核介绍/picture/pic5.png)
+![](./picture/pic5.png)

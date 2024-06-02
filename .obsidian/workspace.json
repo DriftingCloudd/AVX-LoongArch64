@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "doc/内核介绍/chap2：文件系统.md",
+                "file": "doc/内核介绍/chap4：系统调用.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "doc/内核介绍/chap2：文件系统.md",
+                "file": "doc/内核介绍/chap4：系统调用.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "doc/内核介绍/chap2：文件系统.md",
+                "file": "doc/内核介绍/chap4：系统调用.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "doc/内核介绍/chap2：文件系统.md"
+                "file": "doc/内核介绍/chap4：系统调用.md"
               }
             }
           }
@@ -146,13 +146,13 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "ab7b60b5148e8b35",
+  "active": "a0aca158f748742c",
   "lastOpenFiles": [
+    "doc/内核介绍/chap3：进程管理.md",
+    "doc/内核介绍/chap2：文件系统.md",
+    "doc/内核介绍/chap1：内存管理.md",
     "doc/内核介绍/picture/pic5.png",
     "doc/内核介绍/chap4：系统调用.md",
-    "doc/内核介绍/chap3：进程管理.md",
-    "doc/内核介绍/chap1：内存管理.md",
-    "doc/内核介绍/chap2：文件系统.md",
     "doc/README.md",
     "doc/内核介绍/README.md",
     "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
@@ -169,7 +169,6 @@
     "doc/Loongarch介绍/picture/Pasted image 20240509103054.png",
     "doc/Loongarch介绍/picture/Pasted image 20240508185805.png",
     "doc/Loongarch介绍/picture/Pasted image 20240508185358.png",
-    "doc/Loongarch介绍/picture/Pasted image 20240508182241.png",
     "doc/Loongarch介绍/loongarch架构详细介绍.md",
     "doc/Loongarch介绍/la和rv架构比较.md",
     "doc/Loongarch介绍/Loongarch架构简要介绍.md",

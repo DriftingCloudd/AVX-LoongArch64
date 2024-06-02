@@ -1,5 +1,5 @@
 {
-  "newLinkFormat": "absolute",
+  "newLinkFormat": "relative",
   "promptDelete": false,
   "useMarkdownLinks": true,
   "attachmentFolderPath": "./picture",

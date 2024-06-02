@@ -20,6 +20,19 @@ start:
         li.d $a7, SYS_dup
         syscall 0	# dup(0);  #  stderr
 
+# clone
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_clone
+	la $a0, t_clone
+	la $a1, argv_clone
+	li.d $a7, SYS_exec
+	syscall 0
+after_clone:
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
+
 # exit
 	li.d $a7, SYS_fork
 	syscall 0
@@ -307,18 +320,7 @@ after_exit:
 # 	li.d $a7, SYS_wait
 # 	syscall 0
 
-# clone
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_clone
-	la $a0, t_clone
-	la $a1, argv_clone
-	li.d $a7, SYS_exec
-	syscall 0
-after_clone:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
+
 
 # # unlink
 # 	li.d $a7, SYS_fork
@@ -485,7 +487,7 @@ argv_dup2:
     .dword 0
 
 t_execve:
-    .string "/execve\0"
+    .string "/test_echo\0"
 argv_execve:
     .dword t_execve
     .dword 0

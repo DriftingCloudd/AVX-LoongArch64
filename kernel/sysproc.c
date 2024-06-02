@@ -172,7 +172,7 @@ uint64 sys_execve(void) {
     }
     memset(argv[i], 0, PGSIZE);
     if (fetchstr(uarg, argv[i], PGSIZE) < 0) {
-      printf("[sys_execve fetchstr error\n");
+      printf("[sys_execve] fetchstr error\n");
       goto bad;
     }
   }

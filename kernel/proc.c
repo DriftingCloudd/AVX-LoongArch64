@@ -511,7 +511,7 @@ int fork(void) {
   // np->main_thread->state = t_RUNNABLE;
 
   release(&np->lock);
-  printf("fork: %d -> %d\n", p->pid, np->pid);
+  // printf("fork: %d -> %d\n", p->pid, np->pid);
   return pid;
 }
 

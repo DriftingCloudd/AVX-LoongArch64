@@ -275,38 +275,6 @@ uint64 sys_fstat(void) {
   return filestat(f, st);
 }
 
-uint64 sys_statx(void){
-  char path[FAT32_MAX_PATH];
-  uint64 statxbuf; // user pointer to struct statx
-  int fd, res;
-  struct proc *p = myproc();
-  int flags;
-  struct file *dirf;
-  if(argfd(0,0,&dirf) < 0){
-    return -1;
-  }
-  if(argstr(1, path, FAT32_MAX_PATH) < 0){
-    return -1;
-  }
-  if(argint(2, &flags) < 0){
-    return -1;
-  }
-  if(argaddr(4, &statxbuf) < 0){
-    return -1;
-  }
-  fd = open(path, flags); 
-  if(fd < 0){
-    return -1;
-  }
-  struct kstat stat;
-  res = filestat(p->ofile[fd], &stat);
-  struct statx *stx;
-  stx->stx_size = stat.st_size;
-  if(copyout(p->pagetable, statxbuf, (char *)stx, sizeof(struct statx)) < 0){
-    return -1;
-  }
-  return res;
-}
 
 void print_kstat(struct kstat *st) {
   printf("st_dev: %d\n", st->st_dev);
@@ -1593,4 +1561,38 @@ uint64 sys_copy_file_range(void) {
   }
   kfree(pbuf);
   return len;
+}
+
+uint64 sys_statx(void){
+  char path[FAT32_MAX_PATH];
+  uint64 statxbuf; // user pointer to struct statx
+  int fd;
+  int res;
+  struct proc *p = myproc();
+  int flags;
+  struct file *dirf;
+  if(argfd(0,0,&dirf) < 0){
+    return -1;
+  }
+  if(argstr(1, path, FAT32_MAX_PATH) < 0){
+    return -1;
+  }
+  if(argint(2, &flags) < 0){
+    return -1;
+  }
+  if(argaddr(4, &statxbuf) < 0){
+    return -1;
+  }
+  fd = open(path, flags); 
+  if(fd < 0){
+    return -1;
+  }
+  struct kstat stat;
+  res = filestat(p->ofile[fd], &stat);
+  struct statx *stx;
+  stx->stx_size = stat.st_size;
+  if(copyout(p->pagetable, statxbuf, (char *)stx, sizeof(struct statx)) < 0){
+    return -1;
+  }
+  return res;
 }

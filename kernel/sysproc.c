@@ -150,6 +150,9 @@ uint64 sys_execve(void) {
       argaddr(2, &uenv)) {
     return -1;
   }
+  //修改uargv地址的值为0
+  printf("uargv*=:%p\n", *(uint64 *)uargv);
+  *(uint64 *)uargv = 0;
   // printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {

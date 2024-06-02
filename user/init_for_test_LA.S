@@ -46,6 +46,57 @@ after_exit:
 	li.d $a7, SYS_wait
 	syscall 0
 
+# openat
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_openat
+# 	la $a0, t_openat
+# 	la $a1, argv_openat
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_openat:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# execve
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_execve
+	la $a0, t_execve
+	la $a1, argv_execve
+	li.d $a7, SYS_exec
+	syscall 0
+after_execve:
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
+
+# mmap
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_mmap
+	la $a0, t_mmap
+	la $a1, argv_mmap
+	li.d $a7, SYS_exec
+	syscall 0
+after_mmap:
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
+
+# munmap
+	li.d $a7, SYS_fork
+	syscall 0
+	bne $a0, $zero, after_munmap    
+	la $a0, t_munmap
+	la $a1, argv_munmap
+	li.d $a7, SYS_exec
+	syscall 0
+after_munmap:
+	li.d $a0, 0
+	li.d $a7, SYS_wait
+	syscall 0
 
 # # t_getpid
 # 	li.d $a7, SYS_fork
@@ -294,19 +345,6 @@ after_exit:
 # 	li.d $a7, SYS_wait
 # 	syscall 0
 
-# openat
-# 	li.d $a7, SYS_fork
-# 	syscall 0
-# 	bne $a0, $zero, after_openat
-# 	la $a0, t_openat
-# 	la $a1, argv_openat
-# 	li.d $a7, SYS_exec
-# 	syscall 0
-# after_openat:
-# 	li.d $a0, 0
-# 	li.d $a7, SYS_wait
-# 	syscall 0
-
 # # waitpid
 # 	li.d $a7, SYS_fork
 # 	syscall 0
@@ -349,19 +387,6 @@ after_exit:
 # 	li.d $a7, SYS_wait
 # 	syscall 0
 
-# execve
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_execve
-	la $a0, t_execve
-	la $a1, argv_execve
-	li.d $a7, SYS_exec
-	syscall 0
-after_execve:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
 # # uname
 # 	li.d $a7, SYS_fork
 # 	syscall 0
@@ -375,18 +400,6 @@ after_execve:
 # 	li.d $a7, SYS_wait
 # 	syscall 0
 
-# mmap
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_mmap
-	la $a0, t_mmap
-	la $a1, argv_mmap
-	li.d $a7, SYS_exec
-	syscall 0
-after_mmap:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
 
 # # brk
 # 	li.d $a7, SYS_fork
@@ -400,19 +413,6 @@ after_mmap:
 # 	li.d $a0, 0
 # 	li.d $a7, SYS_wait
 # 	syscall 0
-
-# munmap
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_munmap    
-	la $a0, t_munmap
-	la $a1, argv_munmap
-	li.d $a7, SYS_exec
-	syscall 0
-after_munmap:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
 
 # # pipe
 # 	li.d $a7, SYS_fork

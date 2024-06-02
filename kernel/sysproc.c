@@ -122,7 +122,7 @@ uint64 sys_exec(void) {
     }
   }
 
-  printf("[sys_exec] path:%s, argv:%p\n", path, argv);
+  // printf("[sys_exec] path:%s, argv:%p\n", path, argv);
 
   int ret = exec(path, argv, 0);
 
@@ -177,7 +177,7 @@ uint64 sys_execve(void) {
     }
   }
 
-  printf("[sys_execve] path:%s, argv:%p\n", path, argv);
+  // printf("[sys_execve] path:%s, argv:%p\n", path, argv);
 
   int ret = exec(path, argv, 0);
 

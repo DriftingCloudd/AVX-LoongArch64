@@ -186,6 +186,8 @@ extern uint64 sys_copy_file_range();
 extern uint64 sys_pread();
 extern uint64 sys_mprotect();
 
+extern uint64 sys_statx();
+
 // // socket syscalls
 // extern uint64 sys_socket(void);
 // extern uint64 sys_bind(void);
@@ -210,7 +212,7 @@ static char *sysnames[] = {
     [SYS_read] "read",
     [SYS_kill] "kill",
     [SYS_exec] "exec",
-    [SYS_execve] "execve",
+    [SYS_execve] "exec",
     [SYS_fstat] "fstat",
     [SYS_chdir] "chdir",
     [SYS_dup] "dup",
@@ -295,6 +297,7 @@ static char *sysnames[] = {
     [SYS_readlinkat] "readlinkat",
     [SYS_tkill] "tkill",
     [SYS_copy_file_range] "copy_file_range",
+    [SYS_statx] "statx",
 
     // socket syscalls
     // [SYS_socket] "socket",
@@ -323,7 +326,7 @@ static uint64 (*syscalls[])(void) = {
     [SYS_read] sys_read,
     [SYS_kill] sys_kill,
     [SYS_exec] sys_exec,
-    [SYS_execve] sys_execve,
+    [SYS_execve] sys_exec,
     [SYS_fstat] sys_fstat,
     [SYS_chdir] sys_chdir,
     [SYS_dup] sys_dup,
@@ -404,6 +407,7 @@ static uint64 (*syscalls[])(void) = {
     // [SYS_pselect6] sys_pselect6,
     // [SYS_tkill] sys_tkill,
     [SYS_copy_file_range] sys_copy_file_range,
+    [SYS_statx] sys_statx,
 
     // // socket syscalls
     // [SYS_socket] sys_socket,
@@ -437,9 +441,6 @@ void syscall(void) {
 
   num = p->trapframe->a7;
   // printf("pid %d: %s\n", p->pid, sysnames[num]);
-  if(num == 291){
-    p->trapframe->a0 = syscalls[80]();
-  }
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     // if (num != SYS_read && num != SYS_write && num != SYS_writev &&
     //     num != SYS_clock_gettime && num != SYS_sendto && num != SYS_recvfrom)

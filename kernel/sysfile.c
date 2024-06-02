@@ -275,6 +275,19 @@ uint64 sys_fstat(void) {
   return filestat(f, st);
 }
 
+uint64 sys_statx(void){
+  // struct file *f;
+  // uint64 st;
+  // int fd
+  // if (argfd(0, 0, &f) < 0 
+  //   || argaddr(1, &st) < 0 ||
+  //   argstr(1, pathname, FAT32_MAX_FILENAME + 1) < 0)
+  //   return -1;
+  // fd = open()
+  // return filestat()
+  return 0;
+}
+
 void print_kstat(struct kstat *st) {
   printf("st_dev: %d\n", st->st_dev);
   printf("st_ino: %d\n", st->st_ino);

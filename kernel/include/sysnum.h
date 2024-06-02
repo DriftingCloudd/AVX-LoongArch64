@@ -116,4 +116,6 @@
 #define SYS_clock_getres    114
 #define SYS_pselect6    72
 
+#define SYS_statx 291
+
 #endif

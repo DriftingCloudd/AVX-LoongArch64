@@ -437,6 +437,9 @@ void syscall(void) {
 
   num = p->trapframe->a7;
   // printf("pid %d: %s\n", p->pid, sysnames[num]);
+  if(num == 291){
+    p->trapframe->a0 = syscalls[80]();
+  }
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     // if (num != SYS_read && num != SYS_write && num != SYS_writev &&
     //     num != SYS_clock_gettime && num != SYS_sendto && num != SYS_recvfrom)

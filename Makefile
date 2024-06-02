@@ -60,8 +60,7 @@ OBJS += \
   $K/gdbdebug.o \
 
 ifeq ($(platform), qemu)
-OBJS += \
-  $K/virtio_disk.o \
+OBJS +=  $K/virtio_disk.o 
 endif
 
 TOOLPREFIX	:= loongarch64-linux-gnu-

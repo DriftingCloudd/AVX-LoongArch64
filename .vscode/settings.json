@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "thread.h": "c",
+        "proc.h": "c",
+        "param.h": "c",
+        "loongarch.h": "c",
+        "futex.h": "c",
+        "timer.h": "c",
+        "spinlock.h": "c",
+        "context.h": "c"
+    }
+}

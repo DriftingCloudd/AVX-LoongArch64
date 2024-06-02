@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "doc/内核介绍/README.md",
+                "file": "doc/内核介绍/chap2：文件系统.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "doc/内核介绍/README.md",
+                "file": "doc/内核介绍/chap2：文件系统.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "doc/内核介绍/README.md",
+                "file": "doc/内核介绍/chap2：文件系统.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "doc/内核介绍/README.md"
+                "file": "doc/内核介绍/chap2：文件系统.md"
               }
             }
           }
@@ -146,22 +146,24 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "a0aca158f748742c",
+  "active": "ab7b60b5148e8b35",
   "lastOpenFiles": [
-    "doc/内核介绍/chap3：进程管理.md",
-    "doc/内核介绍/系统设计与实现.md",
+    "doc/内核介绍/picture/pic5.png",
     "doc/内核介绍/chap4：系统调用.md",
+    "doc/内核介绍/chap3：进程管理.md",
     "doc/内核介绍/chap1：内存管理.md",
+    "doc/内核介绍/chap2：文件系统.md",
     "doc/README.md",
+    "doc/内核介绍/README.md",
+    "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
+    "doc/基于LA的OS的特点分析/NPUcore+LA.md",
+    "doc/内核介绍/系统设计与实现.md",
     "doc/内核介绍/picture/pic_3.drawio.png",
     "doc/内核介绍/picture/pic_2.drawio.png",
     "doc/内核介绍/picture/pic_1.jpg",
     "doc/内核介绍/picture/Pasted image 20240521183010.png",
     "doc/内核介绍/picture/Pasted image 20240520184848.png",
     "doc/系统设计与实现.md",
-    "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
-    "doc/内核介绍/chap2：文件系统.md",
-    "doc/内核介绍/README.md",
     "doc/Loongarch介绍/picture/exception.csv",
     "doc/Loongarch介绍/picture/Pasted image 20240509103251.png",
     "doc/Loongarch介绍/picture/Pasted image 20240509103054.png",

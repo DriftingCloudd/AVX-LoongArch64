@@ -440,37 +440,32 @@ void syscall(void) {
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+
   // printf("pid %d: %s\n", p->pid, sysnames[num]);
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+#ifdef DEBUG
     if (num != SYS_read && num != SYS_write && num != SYS_writev &&
         num != SYS_clock_gettime && num != SYS_sendto && num != SYS_recvfrom)
       printf("pid %d call %d: %s\n", p->pid, num, sysnames[num]);
+#endif
     p->trapframe->a0 = syscalls[num]();
     
-    // if (num == SYS_openat && p->trapframe->a0 == -1) {
-    //   printf("pid %d: openat failed\n", p->pid);
-    // }
-    // trace
-    // if (num != SYS_read && num != SYS_write && num != SYS_writev &&
-    //     num != SYS_sendto && num != SYS_recvfrom)
-      // printf("pid %d: %s -> %d\n", p->pid, sysnames[num],
-      //             p->trapframe->a0);
-    // printf("pid %d call %d: %s a0:%p sp:%p\n", p->pid, num, sysnames[num],
-    // p->trapframe->a0, p->trapframe->sp);
+#ifdef DEBUG
+    if (num == SYS_openat && p->trapframe->a0 == -1) {
+      printf("pid %d: openat failed\n", p->pid);
+    }
+    trace
+    if (num != SYS_read && num != SYS_write && num != SYS_writev &&
+        num != SYS_sendto && num != SYS_recvfrom)
+      printf("pid %d: %s -> %d\n", p->pid, sysnames[num],
+                  p->trapframe->a0);
+    printf("pid %d call %d: %s a0:%p sp:%p\n", p->pid, num, sysnames[num],
+    p->trapframe->a0, p->trapframe->sp);
+#endif
     if ((p->tmask & (1 << num)) != 0) {
       printf("pid %d: %s -> %d\n", p->pid, sysnames[num], p->trapframe->a0);
     }
   } else {
-    // if(num == 291 && p->name == "mmap"){
-    //   p->trapframe->a0 = syscalls[222]();
-    // }
-    // else if(num == 291 && p->name == "munmap"){
-    //   p->trapframe->a0 = syscalls[215]();
-    // }
-    // else{
-    //   printf("pid %d %s: unknown sys call %d\n", p->pid, p->name, num);
-    //   p->trapframe->a0 = -1;
-    // }
     printf("pid %d %s: unknown sys call %d\n", p->pid, p->name, num);
     p->trapframe->a0 = -1;
     

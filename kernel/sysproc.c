@@ -18,7 +18,9 @@
 extern int exec(char *path, char **argv, char **env);
 
 uint64 sys_clone(void) {
-  // printf("sys_clone: start\n");
+#ifdef DEBUG
+  printf("sys_clone: start\n");
+#endif
   uint64 new_stack, new_fn;
   uint64 ptid, tls, ctid;
   argaddr(1, &new_stack);
@@ -38,9 +40,11 @@ uint64 sys_clone(void) {
     printf("sys_clone: argaddr(4, &ctid) < 0\n");
     return -1;
   }
-  // printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
-  //             "ctid = %p\n",
-  //             new_stack, new_fn, ptid, tls, ctid);
+#ifdef DEBUG
+  printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
+              "ctid = %p\n",
+              new_stack, new_fn, ptid, tls, ctid);
+#endif
   if (new_stack == 0) {
     return fork();
   }
@@ -122,9 +126,9 @@ uint64 sys_exec(void) {
       goto bad;
     }
   }
-
+#ifdef DEBUG
   printf("[sys_exec] path:%s, argv:%p\n", path, argv);
-
+#endif
   int ret = exec(path, argv, 0);
 
   for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
@@ -151,7 +155,9 @@ uint64 sys_execve(void) {
       argaddr(2, &uenv)) {
     return -1;
   }
+#ifdef DEBUG
   printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
+#endif
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
@@ -177,13 +183,14 @@ uint64 sys_execve(void) {
       goto bad;
     }
   }
-
-  // printf("[sys_execve] path:%s, argv:%p\n", path, argv);
+#ifdef DBEUG
+  printf("[sys_execve] path:%s, argv:%p\n", path, argv);
+#endif
 
   int ret = exec(path, argv, 0);
 
-  // for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
-  //   kfree(argv[i]);
+  for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
+    kfree(argv[i]);
 
   return ret;
 
@@ -194,7 +201,6 @@ bad:
 }
 
 uint64 sys_exit(void) {
-  // printf("sys_exit\n");
   int n;
   if (argint(0, &n) < 0)
     return -1;

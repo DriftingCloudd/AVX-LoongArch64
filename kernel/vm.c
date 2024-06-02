@@ -192,7 +192,9 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
 
     pte = walk(pagetable, va, 0);
     if (pte == 0) {
+#ifdef DEBUG
       // printf("walkaddr: pte == 0\n");
+#endif
       return NULL;
     }
     if ((*pte & PTE_V) == 0) {
@@ -214,9 +216,9 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
 // does not flush TLB or enable paging.
 // 直接映射模式,  va = pa
 void kvmmap(uint64 va, uint64 pa, uint64 sz, int perm) {
-  #if DEBUG
+#ifdef DEBUG
   printf("kvmmap: va:%p, pa:%p, sz:%p, perm:%p\n", va, pa, sz, perm);
-  #endif
+#endif
   if (mappages(kernel_pagetable, va, sz, pa, perm) != 0)
     panic("kvmmap");
 } 
@@ -331,10 +333,12 @@ void uvminit(pagetable_t pagetable, uchar *src,
   memset(mem, 0, PGSIZE);
   mappages(pagetable, i, PGSIZE, (uint64)mem, PTE_P | PTE_PLV3 | PTE_W |PTE_D| PTE_MAT);
   memmove(mem, src + i, sz % PGSIZE);
+#ifdef DEBUG
   printf("uvminit done sz:%d\n", sz);
-  // for (int i = 0; i < sz; i ++) {
-  //   printf("[uvminit]mem: %p, %x\n", mem + i, mem[i]);
-  // }
+  for (int i = 0; i < sz; i ++) {
+    printf("[uvminit]mem: %p, %x\n", mem + i, mem[i]);
+  }
+#endif
 }
 
 // used by vma.c

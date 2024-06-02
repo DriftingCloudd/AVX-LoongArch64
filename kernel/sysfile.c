@@ -1097,11 +1097,10 @@ uint64 sys_mmap() {
     printf("argint off error\n");
     return -1;
   }
-  // printf("mmap start:%p len:%d prot:%d flags:%d fd:%d
-  // off:%d\n",start,len,prot,flags,fd,off); if (len == 0) {
-  //   len = 32 * PGSIZE;
-  //   return mmap(start,len,prot,flags,fd,off) + 16 * PGSIZE;
-  // }
+#ifdef DEBUG
+  printf("mmap start:%p len:%d prot:%d flags:%d fd:%d
+  off:%d\n",start,len,prot,flags,fd,off); 
+#endif
 
   return mmap(start, len, prot, flags, fd, off);
 }

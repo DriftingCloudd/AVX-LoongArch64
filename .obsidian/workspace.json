@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
+                "file": "doc/AVX-LA开发记录/测试集使用记录.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
+                "file": "doc/AVX-LA开发记录/测试集使用记录.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
+                "file": "doc/AVX-LA开发记录/测试集使用记录.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md"
+                "file": "doc/AVX-LA开发记录/测试集使用记录.md"
               }
             }
           }
@@ -133,8 +133,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -146,9 +145,18 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "a0aca158f748742c",
+  "active": "ab7b60b5148e8b35",
   "lastOpenFiles": [
-    "doc/基于LA的OS的特点分析/Starry-OS.md",
+    "doc/AVX-LA开发记录/样例测试信息.md",
+    "doc/AVX-LA开发记录/测试集使用记录.md",
+    "doc/AVX-LA开发记录/picture/Pasted image 20240602190932.png",
+    "doc/AVX-LA开发记录/basic-kernel-v1.1.md",
+    "doc/AVX-LA开发记录/picture/Pasted image 20240602190636.png",
+    "doc/AVX-LA开发记录/picture/Pasted image 20240602190624.png",
+    "Pasted image 20240602190602.png",
+    "Pasted image 20240602190548.png",
+    "doc/基于LA的OS的特点分析/Starry-OS-Loongarch64.md",
+    "未命名.canvas",
     "doc/基于LA的OS的特点分析/xv6-loongarch-exp.md",
     "doc/基于LA的OS的特点分析/NPUcore+LA.md",
     "doc/内核介绍/picture/pic_3.drawio.png",
@@ -156,7 +164,6 @@
     "doc/内核介绍/picture/pic_1.jpg",
     "doc/内核介绍/picture/pic5.png",
     "doc/内核介绍/picture/Pasted image 20240521183010.png",
-    "doc/内核介绍/picture/Pasted image 20240520184848.png",
     "doc/内核介绍/picture",
     "doc/内核介绍/chap4：系统调用.md",
     "doc/内核介绍/chap3：进程管理.md",
@@ -165,10 +172,6 @@
     "doc/内核介绍/README.md",
     "doc/内核介绍",
     "doc/README.md",
-    "doc/Loongarch介绍/picture/image.png",
-    "doc/Loongarch介绍/picture/image-9.png",
-    "doc/Loongarch介绍/picture/image-8.png",
-    "doc/Loongarch介绍/picture/image-7.png",
     "doc/Loongarch介绍/picture/exception.csv",
     "doc/Loongarch介绍/picture",
     "doc/Loongarch介绍/loongarch架构详细介绍.md",
@@ -189,10 +192,6 @@
     "kernel/doc/AVX-LA开发记录/uboot与qemu的启动.md",
     "kernel/doc/AVX-LA开发记录/basic-kernel-v1.2.md",
     "kernel/doc/AVX-LA开发记录/basic-kernel-v1.1.md",
-    "kernel/doc/AVX-LA开发记录/basic-kernel-1.3.md",
-    "doc/异常 & 系统调用开发.md",
-    "doc/基于LA的OS的特点分析/StarryOS-LoongArch.md",
-    "doc/AVX-LA开发记录/basic-kernel-1.3.md",
-    "README.md"
+    "kernel/doc/AVX-LA开发记录/basic-kernel-1.3.md"
   ]
 }

@@ -19,278 +19,6 @@ start:
         li.d $a0, 0
         li.d $a7, SYS_dup
         syscall 0	# dup(0);  #  stderr
-# t_getpid
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_getpid
-	la $a0, t_getpid
-	la $a1, argv_gatpid
-	li.d $a7, SYS_exec
-	syscall 0
-after_getpid:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# t_getppid
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_getppid
-	la $a0, t_getppid
-	la $a1, argv_getppid
-	li.d $a7, SYS_exec
-	syscall 0
-after_getppid:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# t_gettimeofday
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_gettimeofday
-	la $a0, t_gettimeofday
-	la $a1, argv_gettimeofday
-	li.d $a7, SYS_exec
-	syscall 0
-after_gettimeofday:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# t_sleep
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_sleep
-	la $a0, t_sleep
-	la $a1, argv_sleep
-	li.d $a7, SYS_exec
-	syscall 0
-after_sleep:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# wait
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_wait
-	la $a0, t_wait
-	la $a1, argv_wait
-	li.d $a7, SYS_exec
-	syscall 0
-after_wait:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# fork
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_fork
-	la $a0, t_fork
-	la $a1, argv_fork   
-	li.d $a7, SYS_exec
-	syscall 0
-after_fork:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# write
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_write
-	la $a0, t_write
-	la $a1, argv_write
-	li.d $a7, SYS_exec
-	syscall 0
-after_write:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# getcwd
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_getcwd
-	la $a0, t_getcwd
-	la $a1, argv_getcwd 
-	li.d $a7, SYS_exec
-	syscall 0
-after_getcwd:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# chdir
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_chdir
-	la $a0, t_chdir
-	la $a1, argv_chdir
-	li.d $a7, SYS_exec
-	syscall 0
-after_chdir:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# dup2
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_dup2
-	la $a0, t_dup2
-	la $a1, argv_dup2
-	li.d $a7, SYS_exec
-	syscall 0
-after_dup2:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# dup
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_dup
-	la $a0, t_dup
-	la $a1, argv_dup
-	li.d $a7, SYS_exec
-	syscall 0
-after_dup:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# fstat
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_fstat
-	la $a0, t_fstat
-	la $a1, argv_fstat  
-	li.d $a7, SYS_exec
-	syscall 0
-after_fstat:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# close
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_close
-	la $a0, t_close 
-	la $a1, argv_close  
-	li.d $a7, SYS_exec
-	syscall 0
-after_close:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# open
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_open  
-	la $a0, t_open  
-	la $a1, argv_open   
-	li.d $a7, SYS_exec
-	syscall 0
-after_open:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# read
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_read
-	la $a0, t_read
-	la $a1, argv_read   
-	li.d $a7, SYS_exec
-	syscall 0
-after_read:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# mkdir_
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_mkdir_
-	la $a0, t_mkdir_
-	la $a1, argv_mkdir_
-	li.d $a7, SYS_exec
-	syscall 0
-after_mkdir_:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# mount
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_mount
-	la $a0, t_mount
-	la $a1, argv_mount
-	li.d $a7, SYS_exec
-	syscall 0
-after_mount:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-#  umount
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_umount
-	la $a0, t_umount
-	la $a1, argv_umount
-	li.d $a7, SYS_exec
-	syscall 0
-after_umount:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# yield
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_yield
-	la $a0, t_yield
-	la $a1, argv_yield
-	li.d $a7, SYS_exec
-	syscall 0
-after_yield:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# openat
-# 	li.d $a7, SYS_fork
-# 	syscall 0
-# 	bne $a0, $zero, after_openat
-# 	la $a0, t_openat
-# 	la $a1, argv_openat
-# 	li.d $a7, SYS_exec
-# 	syscall 0
-# after_openat:
-# 	li.d $a0, 0
-# 	li.d $a7, SYS_wait
-# 	syscall 0
-
-# waitpid
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_waitpid
-	la $a0, t_waitpid
-	la $a1, argv_waitpid
-	li.d $a7, SYS_exec
-	syscall 0
-after_waitpid:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
 
 # clone
 	li.d $a7, SYS_fork
@@ -301,19 +29,6 @@ after_waitpid:
 	li.d $a7, SYS_exec
 	syscall 0
 after_clone:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# unlink
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_unlink
-	la $a0, t_unlink
-	la $a1, argv_unlink
-	li.d $a7, SYS_exec
-	syscall 0
-after_unlink:
 	li.d $a0, 0
 	li.d $a7, SYS_wait
 	syscall 0
@@ -331,18 +46,18 @@ after_exit:
 	li.d $a7, SYS_wait
 	syscall 0
 
-# times
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_times
-	la $a0, t_times
-	la $a1, argv_times
-	li.d $a7, SYS_exec
-	syscall 0
-after_times:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
+# openat
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_openat
+# 	la $a0, t_openat
+# 	la $a1, argv_openat
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_openat:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
 
 # execve
 	li.d $a7, SYS_fork
@@ -353,19 +68,6 @@ after_times:
 	li.d $a7, SYS_exec
 	syscall 0
 after_execve:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
-# uname
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_uname
-	la $a0, t_uname
-	la $a1, argv_uname
-	li.d $a7, SYS_exec
-	syscall 0
-after_uname:
 	li.d $a0, 0
 	li.d $a7, SYS_wait
 	syscall 0
@@ -383,19 +85,6 @@ after_mmap:
 	li.d $a7, SYS_wait
 	syscall 0
 
-# brk
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_brk
-	la $a0, t_brk
-	la $a1, argv_brk
-	li.d $a7, SYS_exec
-	syscall 0
-after_brk:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
-
 # munmap
 	li.d $a7, SYS_fork
 	syscall 0
@@ -409,31 +98,347 @@ after_munmap:
 	li.d $a7, SYS_wait
 	syscall 0
 
-# pipe
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_pipe  
-	la $a0, t_pipe  
-	la $a1, argv_pipe
-	li.d $a7, SYS_exec
-	syscall 0
-after_pipe:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
+# # t_getpid
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_getpid
+# 	la $a0, t_getpid
+# 	la $a1, argv_gatpid
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_getpid:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
 
-# getdents
-	li.d $a7, SYS_fork
-	syscall 0
-	bne $a0, $zero, after_getdents
-	la $a0, t_getdents  
-	la $a1, argv_getdents
-	li.d $a7, SYS_exec
-	syscall 0
-after_getdents:
-	li.d $a0, 0
-	li.d $a7, SYS_wait
-	syscall 0
+# # t_getppid
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_getppid
+# 	la $a0, t_getppid
+# 	la $a1, argv_getppid
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_getppid:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # t_gettimeofday
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_gettimeofday
+# 	la $a0, t_gettimeofday
+# 	la $a1, argv_gettimeofday
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_gettimeofday:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # t_sleep
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_sleep
+# 	la $a0, t_sleep
+# 	la $a1, argv_sleep
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_sleep:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # wait
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_wait
+# 	la $a0, t_wait
+# 	la $a1, argv_wait
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_wait:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # fork
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_fork
+# 	la $a0, t_fork
+# 	la $a1, argv_fork   
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_fork:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # write
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_write
+# 	la $a0, t_write
+# 	la $a1, argv_write
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_write:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # getcwd
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_getcwd
+# 	la $a0, t_getcwd
+# 	la $a1, argv_getcwd 
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_getcwd:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # chdir
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_chdir
+# 	la $a0, t_chdir
+# 	la $a1, argv_chdir
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_chdir:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # dup2
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_dup2
+# 	la $a0, t_dup2
+# 	la $a1, argv_dup2
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_dup2:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # dup
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_dup
+# 	la $a0, t_dup
+# 	la $a1, argv_dup
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_dup:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # fstat
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_fstat
+# 	la $a0, t_fstat
+# 	la $a1, argv_fstat  
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_fstat:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # close
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_close
+# 	la $a0, t_close 
+# 	la $a1, argv_close  
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_close:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # open
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_open  
+# 	la $a0, t_open  
+# 	la $a1, argv_open   
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_open:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # read
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_read
+# 	la $a0, t_read
+# 	la $a1, argv_read   
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_read:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # mkdir_
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_mkdir_
+# 	la $a0, t_mkdir_
+# 	la $a1, argv_mkdir_
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_mkdir_:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # mount
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_mount
+# 	la $a0, t_mount
+# 	la $a1, argv_mount
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_mount:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# #  umount
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_umount
+# 	la $a0, t_umount
+# 	la $a1, argv_umount
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_umount:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # yield
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_yield
+# 	la $a0, t_yield
+# 	la $a1, argv_yield
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_yield:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # waitpid
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_waitpid
+# 	la $a0, t_waitpid
+# 	la $a1, argv_waitpid
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_waitpid:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+
+
+# # unlink
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_unlink
+# 	la $a0, t_unlink
+# 	la $a1, argv_unlink
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_unlink:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+
+# # times
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_times
+# 	la $a0, t_times
+# 	la $a1, argv_times
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_times:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # uname
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_uname
+# 	la $a0, t_uname
+# 	la $a1, argv_uname
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_uname:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+
+# # brk
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_brk
+# 	la $a0, t_brk
+# 	la $a1, argv_brk
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_brk:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # pipe
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_pipe  
+# 	la $a0, t_pipe  
+# 	la $a1, argv_pipe
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_pipe:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
+
+# # getdents
+# 	li.d $a7, SYS_fork
+# 	syscall 0
+# 	bne $a0, $zero, after_getdents
+# 	la $a0, t_getdents  
+# 	la $a1, argv_getdents
+# 	li.d $a7, SYS_exec
+# 	syscall 0
+# after_getdents:
+# 	li.d $a0, 0
+# 	li.d $a7, SYS_wait
+# 	syscall 0
 
 loop:
         bl loop

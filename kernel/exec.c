@@ -299,7 +299,7 @@ int exec(char *path, char **argv, char **env) {
   vma_init(p);
 
   oldpagetable = p->pagetable;
-  printf("oldpagetable:%p\n", oldpagetable);
+  // printf("oldpagetable:%p\n", oldpagetable);
 
   int is_shell_script = is_sh_script(path);
   if (is_shell_script) {
@@ -333,7 +333,7 @@ int exec(char *path, char **argv, char **env) {
   /* -------------------动态链接-------------------------------------------*/
   // 动态链接目前默认处理/libc.so
 
-  printf("is_dynamic is %d\n",is_dynamic);
+  // printf("is_dynamic is %d\n",is_dynamic);
 
   if (is_dynamic) {
 
@@ -351,14 +351,14 @@ int exec(char *path, char **argv, char **env) {
     interp_start_addr =
         load_elf_interp(pagetable, &interpreter_elf, interpreter);
     program_entry = interp_start_addr + interpreter_elf.entry;
-    printf("interp_start_addr:%p program_entry:%p\n", interp_start_addr,program_entry);
+    // printf("interp_start_addr:%p program_entry:%p\n", interp_start_addr,program_entry);
 
     eunlock(interpreter);
     eput(interpreter);
     interpreter = NULL;
   } else {
     program_entry = elf.entry;
-    printf("elf.entry %p\n", elf.entry);
+    // printf("elf.entry %p\n", elf.entry);
   }
 
   /*--------------------动态链接结束---------------------------------------*/
@@ -493,9 +493,9 @@ int exec(char *path, char **argv, char **env) {
   // Commit to the user image.
 
   p->pagetable = pagetable;
-  printf("page table:%p\n", pagetable);
+  // printf("page table:%p\n", pagetable);
   p->sz = sz;
-  printf("program_entry:%p\n", program_entry);
+  // printf("program_entry:%p\n", program_entry);
 
   p->trapframe->era = program_entry; // initial program counter = main
   p->trapframe->sp = sp;             // initial stack pointer
@@ -542,9 +542,9 @@ int exec(char *path, char **argv, char **env) {
   // sfence_vma();
   // flush_TLB();
 
-  printf("p->trapframe->era:%p\n", p->trapframe->era);
+  // printf("p->trapframe->era:%p\n", p->trapframe->era);
 
-  printf("p->ofile[1] is %p\n", p->ofile[1]);
+  // printf("p->ofile[1] is %p\n", p->ofile[1]);
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 

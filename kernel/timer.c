@@ -44,7 +44,7 @@ void timerinit() {
 // }
 
 void countdown_timer_init(){
-  printf("countdown_timer_init\n");
+  // printf("countdown_timer_init\n");
   uint64 prcfg1_val;
   // 定时器有效位
   // prcfg1_val = r_csr_tcfg();

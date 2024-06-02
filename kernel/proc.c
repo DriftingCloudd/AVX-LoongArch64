@@ -243,7 +243,7 @@ static struct proc *allocproc(void) {
 found:
   p->pid = allocpid();
   freemem_amount();
-  printf("alloc proc:%d freemem_mount:%p\n", p->pid, freemem_amount());
+  // printf("alloc proc:%d freemem_mount:%p\n", p->pid, freemem_amount());
   p->vma = NULL;
   p->filelimit = NOFILE;
   p->ktime = 1;
@@ -338,7 +338,7 @@ static void freeproc(struct proc *p) {
   }
   // TODO: free threads
   freemem_amount();
-  printf("free proc : %d freemem_mount:%p\n",p->pid, freemem_amount());
+  // printf("free proc : %d freemem_mount:%p\n",p->pid, freemem_amount());
   p->pagetable = 0;
   p->vma = NULL;
   p->sz = 0;
@@ -511,6 +511,7 @@ int fork(void) {
   // np->main_thread->state = t_RUNNABLE;
 
   release(&np->lock);
+  // printf("fork: %d -> %d\n", p->pid, np->pid);
   return pid;
 }
 
@@ -800,7 +801,7 @@ void sched(void) {
 void yield(void) {
   struct proc *p = myproc();
   acquire(&p->lock);
-  printf("pid %d yield, era: %p\n", p->pid, p->trapframe->era);
+  // printf("pid %d yield, era: %p\n", p->pid, p->trapframe->era);
   p->state = RUNNABLE;
   // todo：线程部分
   // p->main_thread->state = t_RUNNABLE;
@@ -1013,7 +1014,7 @@ struct proc *findchild(struct proc *p, int pid, struct proc **child) {
     if ((pid == -1 || np->pid == pid) && np->parent == p) {
       acquire(&np->lock);
       *child = np;
-      printf("state : %d\n", np->state);
+      // printf("state : %d\n", np->state);
       if (np->state == ZOMBIE) {
         return np;
       }

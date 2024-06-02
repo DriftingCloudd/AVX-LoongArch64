@@ -153,6 +153,8 @@ int filestat(struct file *f, uint64 addr) {
   }
   if (copyout(myproc()->pagetable, addr, (char *)&kst, sizeof(kst)) < 0)
     return -1;
+
+  // printf("filestat: st_size:%d\n", kst.st_size);
   return 0;
   return -1;
 }
@@ -313,6 +315,7 @@ int filewrite(struct file *f, uint64 addr, int n) {
   #ifdef DEBUG
   printf("filewrite ret:%d\n", ret);
   #endif
+  // printf("filewrite ret:%d\n", ret);
   return ret;
 }
 

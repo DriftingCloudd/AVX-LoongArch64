@@ -510,7 +510,7 @@ uint64 sys_pipe(void) {
     return -1;
   if (pipealloc(&rf, &wf) < 0)
     return -1;
-  printf("pip get arg success\n");
+  // printf("pip get arg success\n");
   fd0 = -1;
   if ((fd0 = fdalloc(rf)) < 0 || (fd1 = fdalloc(wf)) < 0) {
     if (fd0 >= 0)
@@ -642,7 +642,7 @@ uint64 sys_getcwd(void) {
   if (copyout2(addr, s, strlen(s) + 1) < 0)
     return -1;
   */
-  printf("getcwd: %s\n", s);
+  // printf("getcwd: %s\n", s);
   return addr;
 }
 

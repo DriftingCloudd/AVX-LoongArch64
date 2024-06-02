@@ -38,9 +38,9 @@ trapinit(void)
 {
   initlock(&tickslock, "time");
 
-  printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
+  // printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
   // uart_intr_init();
-  printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
+  // printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
 
   uint32 ecfg = ( 0U << CSR_ECFG_VS_SHIFT ) | HWI_VEC | TI_VEC;
   // uint64 tcfg = 0x1000000UL | CSR_TCFG_EN | CSR_TCFG_PER;
@@ -54,7 +54,7 @@ trapinit(void)
   // 倒计时定时器开始倒计时
   countdown_timer_init();
   intr_on();
-  printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
+  // printf("estat & efcg: %p %p\n", r_csr_estat(), r_csr_ecfg());
 }
 
 //
@@ -113,11 +113,12 @@ usertrap(void)
     printf("usertrap():handling syscall\n");
     #endif
     syscall();
-  }else if((r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x1 || (r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x2  ){
+  }else if(((r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x1 || (r_csr_estat() & CSR_ESTAT_ECODE) >> 16 == 0x2)){
     // load page fault or store page fault
     // check if the page fault is caused by stack growth
     printf("usertrap():handle stack page fault\n");
-    panic("usertrap():handle stack page fault\n");
+    // panic("usertrap():handle stack page fault\n");
+    //  && handle_stack_page_fault(myproc(), r_csr_badv()) == 0 
   } 
   else if((which_dev = devintr()) != 0){
     // ok

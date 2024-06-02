@@ -18,7 +18,7 @@
 extern int exec(char *path, char **argv, char **env);
 
 uint64 sys_clone(void) {
-  printf("sys_clone: start\n");
+  // printf("sys_clone: start\n");
   uint64 new_stack, new_fn;
   uint64 ptid, tls, ctid;
   argaddr(1, &new_stack);
@@ -38,9 +38,9 @@ uint64 sys_clone(void) {
     printf("sys_clone: argaddr(4, &ctid) < 0\n");
     return -1;
   }
-  printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
-              "ctid = %p\n",
-              new_stack, new_fn, ptid, tls, ctid);
+  // printf("sys_clone: new_stack = %p, new_fn = %p, ptid = %p, tls = %p, "
+  //             "ctid = %p\n",
+  //             new_stack, new_fn, ptid, tls, ctid);
   if (new_stack == 0) {
     return fork();
   }
@@ -122,6 +122,8 @@ uint64 sys_exec(void) {
     }
   }
 
+  // printf("[sys_exec] path:%s, argv:%p\n", path, argv);
+
   int ret = exec(path, argv, 0);
 
   for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
@@ -148,13 +150,15 @@ uint64 sys_execve(void) {
       argaddr(2, &uenv)) {
     return -1;
   }
-  printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
+  // printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
+      printf("[sys_execve] too many arguments\n");
       goto bad;
     }
     if (fetchaddr(uargv + sizeof(uint64) * i, (uint64 *)&uarg) < 0) {
+      printf("[sys_execve] fetch %d addr error uargv:%p\n", i, uargv);
       goto bad;
     }
     if (uarg == 0) {
@@ -162,12 +166,18 @@ uint64 sys_execve(void) {
       break;
     }
     argv[i] = kalloc();
-    if (argv[i] == 0)
+    if (argv[i] == 0) {
+      printf("[sys_execve] kalloc error\n");
       goto bad;
+    }
     memset(argv[i], 0, PGSIZE);
-    if (fetchstr(uarg, argv[i], PGSIZE) < 0)
+    if (fetchstr(uarg, argv[i], PGSIZE) < 0) {
+      printf("[sys_execve] fetchstr error\n");
       goto bad;
+    }
   }
+
+  // printf("[sys_execve] path:%s, argv:%p\n", path, argv);
 
   int ret = exec(path, argv, 0);
 
@@ -183,7 +193,7 @@ bad:
 }
 
 uint64 sys_exit(void) {
-  printf("sys_exit\n");
+  // printf("sys_exit\n");
   int n;
   if (argint(0, &n) < 0)
     return -1;

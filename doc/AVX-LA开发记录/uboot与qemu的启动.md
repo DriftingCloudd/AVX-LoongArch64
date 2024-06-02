@@ -132,7 +132,8 @@ bootmenu
 ![](picture/image2.png)
 可以看到成功加载了uImage文件。但似乎是因为没有实际的flash导致无法写入。可以之后用实际的板子测试
 ## 在2K1000模拟器中启动kernel
-使用
+启动`./run_qemu`脚本后，长按`c`进入u-boot的终端页面，然后运行下列操作：（参考链接：https://github.com/LoongsonLab/baremetal_kernel_2k1000）
+
 ```bash
 tftpboot <load_address> ${serverip}:<kernel_name>
 # <load_address>是kernel的加载地址。建议是ld脚本中中指定的起始地址（不是这个地址可能会有bug，还没弄清楚原因）

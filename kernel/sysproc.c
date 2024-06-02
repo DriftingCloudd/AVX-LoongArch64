@@ -122,6 +122,8 @@ uint64 sys_exec(void) {
     }
   }
 
+  printf("[sys_exec] path:%s, argv:%p", path, argv);
+
   int ret = exec(path, argv, 0);
 
   for (i = 0; i < NELEM(argv) && argv[i] != 0; i++)
@@ -148,7 +150,7 @@ uint64 sys_execve(void) {
       argaddr(2, &uenv)) {
     return -1;
   }
-  printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
+  // printf("[sys_execve] path:%s, uargv:%p, uenv:%p\n", path, uargv, uenv);
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++) {
     if (i >= NELEM(argv)) {
@@ -168,6 +170,8 @@ uint64 sys_execve(void) {
     if (fetchstr(uarg, argv[i], PGSIZE) < 0)
       goto bad;
   }
+
+  printf("[sys_execve] path:%s, argv:%p", path, argv);
 
   int ret = exec(path, argv, 0);
 

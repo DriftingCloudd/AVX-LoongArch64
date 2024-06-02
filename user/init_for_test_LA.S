@@ -487,7 +487,7 @@ argv_dup2:
     .dword 0
 
 t_execve:
-    .string "/test_echo\0"
+    .string "/execve\0"
 argv_execve:
     .dword t_execve
     .dword 0

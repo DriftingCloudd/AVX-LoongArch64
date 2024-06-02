@@ -276,16 +276,36 @@ uint64 sys_fstat(void) {
 }
 
 uint64 sys_statx(void){
-  // struct file *f;
-  // uint64 st;
-  // int fd
-  // if (argfd(0, 0, &f) < 0 
-  //   || argaddr(1, &st) < 0 ||
-  //   argstr(1, pathname, FAT32_MAX_FILENAME + 1) < 0)
-  //   return -1;
-  // fd = open()
-  // return filestat()
-  return 0;
+  char path[FAT32_MAX_PATH];
+  uint64 statxbuf; // user pointer to struct statx
+  int fd, res;
+  struct proc *p = myproc();
+  int flags;
+  struct file *dirf;
+  if(argfd(0,0,&dirf) < 0){
+    return -1;
+  }
+  if(argstr(1, path, FAT32_MAX_PATH) < 0){
+    return -1;
+  }
+  if(argint(2, &flags) < 0){
+    return -1;
+  }
+  if(argaddr(4, &statxbuf) < 0){
+    return -1;
+  }
+  fd = open(path, flags); 
+  if(fd < 0){
+    return -1;
+  }
+  struct kstat stat;
+  res = filestat(p->ofile[fd], &stat);
+  struct statx *stx;
+  stx->stx_size = stat.st_size;
+  if(copyout(p->pagetable, statxbuf, (char *)stx, sizeof(struct statx)) < 0){
+    return -1;
+  }
+  return res;
 }
 
 void print_kstat(struct kstat *st) {

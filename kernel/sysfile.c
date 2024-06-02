@@ -955,7 +955,7 @@ uint64 sys_openat() {
       dp = NULL;
     }
   }
-  printf("%s\n", path);
+  // printf("%s\n", path);
   if (NULL == (ep = new_ename(dp, path))) {
     // 如果文件不存在
     if ((flags & O_CREATE) || strncmp(path, "/proc/loadavg", 13) == 0 ||
@@ -1017,7 +1017,9 @@ uint64 sys_openat() {
   if (strncmp(path, "/dev/zero", 9) == 0) {
     strncpy(f->ep->filename, "zero", 4);
   }
-
+  if (dp) {
+    eunlock(dp);
+  }
   return fd;
 }
 
@@ -1415,7 +1417,7 @@ static uint64 creat_file() {
       dp = NULL;
     }
   }
-  printf("%s\n", path);
+  // printf("%s\n", path);
   if (NULL == (ep = new_ename(dp, path))) {
     // 如果文件不存在
     if ((flags & O_CREATE) || strncmp(path, "/proc/loadavg", 13) == 0 ||
